@@ -1,0 +1,3 @@
+[server]
+host = "{{ parameters.SERVER_HOST }}"
+port = {{ parameters.SERVER_PORT }}

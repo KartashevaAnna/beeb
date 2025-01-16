@@ -1,0 +1,35 @@
+[tool.poetry]
+name = "beeb"
+version = "0.1.0"
+description = ""
+authors = ["Anna Veselova <annakartashevamail@gmail.com>"]
+readme = "README.md"
+
+[tool.poetry.dependencies]
+python = "^3.13"
+fastapi = "^0.115.6"
+uvicorn = "^0.34.0"
+ruff = "^0.9.1"
+pydantic-settings = "^2.7.1"
+jinja2 = "^3.1.5"
+pre-commit = "^4.0.1"
+
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
+
+[tool.ruff]
+line-length = 120
+
+
+[tool.ruff.lint]
+select = [
+    # Pyflakes
+    "F",
+    # Pycodestyle
+    "E",
+    "W",
+    # isort
+    "I001"
+]
