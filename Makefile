@@ -17,3 +17,20 @@ compose-up:
 .PHONY: compose-down
 compose-down:
 	docker-compose -f docker-compose.yml rm -f
+
+.PHONY: tests
+tests:
+	${MAKE} teardown-tests && ${MAKE} build-tests && ${MAKE} run-tests && ${MAKE} teardown-tests
+
+.PHONY: run-tests
+run-tests:
+	docker-compose -f tests/functional/docker-compose.local.yml up --abort-on-container-exit --remove-orphans
+
+.PHONY: build-tests
+build-tests:
+	docker-compose -f tests/functional/docker-compose.local.yml build
+
+.PHONY: teardown-tests
+teardown-tests:
+	docker-compose -f tests/functional/docker-compose.local.yml rm -f
+
