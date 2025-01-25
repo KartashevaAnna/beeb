@@ -35,8 +35,13 @@ class ServerSettings(BaseModel):
     port: int
 
 
+class Urls(BaseModel):
+    ping: str
+
+
 class Settings(CustomSettings):
     server: ServerSettings
+    urls: Urls
 
 
 SETTINGS = Settings()

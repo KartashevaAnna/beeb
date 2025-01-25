@@ -1,3 +1,7 @@
+
 [server]
 host = "{{ parameters.SERVER_HOST }}"
 port = {{ parameters.SERVER_PORT }}
+
+[urls]
+ping = "{{ parameters.URL_PING }}"
