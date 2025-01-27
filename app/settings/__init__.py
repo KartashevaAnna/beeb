@@ -1,47 +1,19 @@
-from typing import Tuple, Type
+from functools import lru_cache
+from pathlib import Path
 
-from pydantic import BaseModel
-from pydantic_settings import (
-    BaseSettings,
-    PydanticBaseSettingsSource,
-    SettingsConfigDict,
-)
+from jinja2_fragments.fastapi import Jinja2Blocks
 
-from app.utils.tools.config_loader import load_custom_config_source
+from app.settings.schema import Settings
 
 
-class CustomSettings(BaseSettings):
-    model_config = SettingsConfigDict(env_file_encoding="utf-8")
-
-    @classmethod
-    def settings_customise_sources(
-        cls,
-        settings_cls: Type[BaseSettings],
-        init_settings: PydanticBaseSettingsSource,
-        env_settings: PydanticBaseSettingsSource,
-        dotenv_settings: PydanticBaseSettingsSource,
-        file_secret_settings: PydanticBaseSettingsSource,
-    ) -> Tuple[PydanticBaseSettingsSource, ...]:
-        return (
-            init_settings,
-            load_custom_config_source,
-            env_settings,
-            file_secret_settings,
-        )
+@lru_cache
+def get_settings():
+    return Settings()
 
 
-class ServerSettings(BaseModel):
-    host: str
-    port: int
+SETTINGS = get_settings()
 
 
-class Urls(BaseModel):
-    ping: str
-
-
-class Settings(CustomSettings):
-    server: ServerSettings
-    urls: Urls
-
-
-SETTINGS = Settings()
+TEMPLATES_DIR = Path(__file__).parent.parent / "templates"
+TEMPLATES = Jinja2Blocks(directory=TEMPLATES_DIR)
+TEMPLATES.env.globals["URLS"] = SETTINGS.urls
