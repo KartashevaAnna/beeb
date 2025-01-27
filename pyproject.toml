@@ -21,6 +21,8 @@ ruff = "^0.9.3"
 loguru = "^0.7.3"
 coloredlogs = "^15.0.1"
 jinja2-fragments = "^1.7.0"
+sqlalchemy = "^2.0.37"
+psycopg2-binary = "^2.9.10"
 
 
 [build-system]

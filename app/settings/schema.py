@@ -1,11 +1,12 @@
 from typing import Tuple, Type
 
-from pydantic import BaseModel
+from pydantic import BaseModel, ConfigDict, computed_field
 from pydantic_settings import (
     BaseSettings,
     PydanticBaseSettingsSource,
     SettingsConfigDict,
 )
+from sqlalchemy import URL
 
 from app.utils.tools.config_loader import load_custom_config_source
 
@@ -37,6 +38,29 @@ class ServerSettings(BaseModel):
     log_level: str = "critical"
 
 
+class DatabaseSettings(BaseModel):
+    model_config = ConfigDict(arbitrary_types_allowed=True)
+
+    dialect: str = "postgresql"
+    host: str
+    port: int
+    database: str
+    user: str
+    password: str
+
+    @computed_field
+    @property
+    def db_url(self) -> URL:
+        return URL.create(
+            self.dialect,
+            username=self.user,
+            password=self.password,
+            host=self.host,
+            port=self.port,
+            database=self.database,
+        )
+
+
 class Urls(BaseModel):
     ping: str
 
@@ -44,3 +68,4 @@ class Urls(BaseModel):
 class Settings(CustomSettings):
     server: ServerSettings
     urls: Urls
+    database: DatabaseSettings

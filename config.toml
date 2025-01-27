@@ -3,5 +3,12 @@
 host = "{{ parameters.SERVER_HOST }}"
 port = {{ parameters.SERVER_PORT }}
 
+[database]
+host = "{{ parameters.DATABASE_HOST }}"
+port = {{ parameters.DATABASE_PORT }}
+database = "{{ parameters.DATABASE_NAME }}"
+user = "{{ parameters.DATABASE_USER }}"
+password = "{{ secrets.DATABASE_PASSWORD }}"
+
 [urls]
 ping = "{{ parameters.URL_PING }}"

@@ -6,4 +6,12 @@ services:
       target: production
     entrypoint: >
       sh -c 'CONFIG_SECRETS_PATH=./tests/functional/test.secrets.toml CONFIG_PATH=config.toml CONFIG_RENDERER=jinja2 python3 -m pytest tests -p no:cacheprovider --cov=. --cov-report xml:/out/coverage.xml --junitxml /out/report.xml && coverage report -m -i'
+    depends_on:
+      - database
 
+  database:
+    image: postgres
+    environment:
+      POSTGRES_DB: beeb-test
+      POSTGRES_PASSWORD: 1234
+      POSTGRES_USER: postgres
