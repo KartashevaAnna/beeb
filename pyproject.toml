@@ -18,6 +18,9 @@ pytest-asyncio = "^0.25.2"
 uvicorn = "^0.34.0"
 fastapi = "^0.115.7"
 ruff = "^0.9.3"
+loguru = "^0.7.3"
+coloredlogs = "^15.0.1"
+jinja2-fragments = "^1.7.0"
 
 
 [build-system]

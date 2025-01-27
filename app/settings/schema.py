@@ -1,4 +1,4 @@
-from typing import Tuple
+from typing import Tuple, Type
 
 from pydantic import BaseModel
 from pydantic_settings import (
@@ -16,8 +16,10 @@ class CustomSettings(BaseSettings):
     @classmethod
     def settings_customise_sources(
         cls,
+        settings_cls: Type[BaseSettings],
         init_settings: PydanticBaseSettingsSource,
         env_settings: PydanticBaseSettingsSource,
+        dotenv_settings: PydanticBaseSettingsSource,
         file_secret_settings: PydanticBaseSettingsSource,
     ) -> Tuple[PydanticBaseSettingsSource, ...]:
         return (
@@ -31,7 +33,14 @@ class CustomSettings(BaseSettings):
 class ServerSettings(BaseModel):
     host: str
     port: int
+    debug: bool = False
+    log_level: str = "critical"
+
+
+class Urls(BaseModel):
+    ping: str
 
 
 class Settings(CustomSettings):
     server: ServerSettings
+    urls: Urls
