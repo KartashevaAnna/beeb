@@ -63,6 +63,7 @@ class DatabaseSettings(BaseModel):
 
 class Urls(BaseModel):
     ping: str
+    expenses: str
 
 
 class Settings(CustomSettings):
