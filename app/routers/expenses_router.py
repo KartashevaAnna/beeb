@@ -1,7 +1,7 @@
 from typing import Annotated
 
 import fastapi
-from fastapi import Depends, Request
+from fastapi import Depends, HTTPException, Request
 
 from app.repositories.expenses import ExpenseRepo
 from app.settings import SETTINGS, TEMPLATES
@@ -19,3 +19,13 @@ def read_all(repo: Annotated[ExpenseRepo, Depends(expenses_repo)], request: Requ
         )
     except Exception as exc:
         return f"Exception: There was an error: {str(exc)}"
+
+
+@expenses_router.get(SETTINGS.urls.expense)
+def read_expense(expense_id: int, repo: Annotated[ExpenseRepo, Depends(expenses_repo)], request: Request):
+    if not (expense := repo.read(expense_id)):
+        raise HTTPException(404, "Service not found")
+    return TEMPLATES.TemplateResponse(
+        SETTINGS.templates.read_expense,
+        context={"request": request, "expense": expense},
+    )

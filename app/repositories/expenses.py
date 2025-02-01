@@ -12,3 +12,8 @@ class ExpenseRepo:
         statement = select(Expense)
         results = self.session.execute(statement)
         return results.scalars().all()
+
+    def read(self, expense_id: int) -> Expense | None:
+        statement = select(Expense).where(Expense.id == expense_id)
+        results = self.session.execute(statement)
+        return results.scalars().one_or_none()

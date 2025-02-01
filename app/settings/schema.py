@@ -64,10 +64,12 @@ class DatabaseSettings(BaseModel):
 class Urls(BaseModel):
     ping: str
     expenses: str
+    expense: str
 
 
 class Templates(BaseModel):
     read_expenses: str
+    read_expense: str
 
 
 class Settings(CustomSettings):
