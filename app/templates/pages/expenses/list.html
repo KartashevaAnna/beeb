@@ -1,0 +1,22 @@
+{% extends "base.html" %}
+
+{% block body %}
+{% if exception %}
+Got exception: {{ exception }}
+{% endif %}
+<table>
+<tr>
+    <th>id</th>
+    <th>название</th>
+    <th>стоимость</th>
+</tr>
+{% for expense in expenses %}
+</tr>
+    <td>{{ expense.id }}</td>
+    <td>{{ expense.name }}</td>
+    <td>{{ expense.price }}</td>
+</tr>
+{% endfor %}
+</table>
+
+{% endblock %}

@@ -66,7 +66,12 @@ class Urls(BaseModel):
     expenses: str
 
 
+class Templates(BaseModel):
+    read_expenses: str
+
+
 class Settings(CustomSettings):
     server: ServerSettings
     urls: Urls
+    templates: Templates
     database: DatabaseSettings

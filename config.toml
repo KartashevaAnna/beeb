@@ -14,3 +14,5 @@ password = "{{ secrets.DATABASE_PASSWORD }}"
 ping = "{{ parameters.URL_PING }}"
 expenses = "{{ parameters.URL_EXPENSES }}"
 
+[templates]
+read_expenses = "{{ parameters.TEMPLATE_READ_EXPENSES }}"

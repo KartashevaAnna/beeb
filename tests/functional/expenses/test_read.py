@@ -10,8 +10,8 @@ def test_expenses_normal_function(client, add_expenses):
     """Case: normal mode, endpoint returns page with expenses in context."""
     response = client.get(SETTINGS.urls.expenses)
     assert response.status_code == 200
-    assert "name" in response.text
-    assert "price" in response.text
+    assert "название" in response.text
+    assert "стоимость" in response.text
     assert "None" not in response.text
     assert EXPENSES[0]["name"] in response.text
     assert str(EXPENSES[-1]["price"]) in response.text

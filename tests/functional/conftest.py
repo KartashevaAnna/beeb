@@ -35,7 +35,7 @@ def execute_migrations(session):
         session.commit()
 
 
-def raise_always(*args, **kwargs):
+def raise_always(scope="function", *args, **kwargs):
     raise Exception
 
 
