@@ -8,6 +8,7 @@ from sqlalchemy.orm import sessionmaker
 from app.application import build_app
 from app.models import AlchemyBaseModel, Expense
 from app.settings import ENGINE
+from app.utils.tools.helpers import get_expense
 
 
 @pytest.fixture(scope="function")
@@ -42,3 +43,8 @@ def raise_always(scope="function", *args, **kwargs):
 @pytest.fixture(scope="function")
 def add_expenses(client) -> Expense:
     client.post("/create-expenses-in-db")
+
+
+@pytest.fixture(scope="function")
+def expense(session):
+    return get_expense(session)

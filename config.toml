@@ -13,6 +13,8 @@ password = "{{ secrets.DATABASE_PASSWORD }}"
 [urls]
 ping = "{{ parameters.URL_PING }}"
 expenses = "{{ parameters.URL_EXPENSES }}"
+expense = "{{ parameters.URL_EXPENSE }}"
 
 [templates]
 read_expenses = "{{ parameters.TEMPLATE_READ_EXPENSES }}"
+read_expense = "{{ parameters.TEMPLATE_READ_EXPENSE }}"
