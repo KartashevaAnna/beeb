@@ -78,8 +78,9 @@ RUN --mount=type=cache,target=/root/.cache \
     poetry install --with=dev
 
 # will become mountpoint of our code
-WORKDIR /app
 
+COPY . /app
+WORKDIR /app
 EXPOSE 1919
 
 
