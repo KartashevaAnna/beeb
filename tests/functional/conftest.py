@@ -1,3 +1,4 @@
+import random
 from pathlib import Path
 
 import pytest
@@ -8,43 +9,56 @@ from sqlalchemy.orm import sessionmaker
 from app.application import build_app
 from app.models import AlchemyBaseModel, Expense
 from app.settings import ENGINE
-from app.utils.tools.helpers import get_expense
+from tests.constants import PRODUCTS
 
 
-@pytest.fixture(scope="function")
+@pytest.fixture(scope="session")
 def client():
-    return TestClient(app=build_app(), follow_redirects=False)
+    return TestClient(app=build_app())
 
 
-@pytest.fixture(scope="function")
+@pytest.fixture(scope="session")
 def session():
     engine = ENGINE
-    sa_session = sessionmaker(autocommit=False, bind=engine, expire_on_commit=True)
+    sa_session = sessionmaker(bind=engine)
     with sa_session() as session:
         yield session
     AlchemyBaseModel.metadata.drop_all(engine)
     engine.dispose()
 
 
-@pytest.fixture(scope="function", autouse=True)
-def execute_migrations(session):
+@pytest.fixture(scope="session", autouse=True)
+def migrate(session):
     migrations_dir = Path("./migrations")
     migrations_list = list(migrations_dir.iterdir())
     for migration in sorted(migrations_list):
-        with open(file=migration, mode="r", encoding="utf-8") as migration_file:
-            session.execute(text(migration_file.read()))
-        session.commit()
+        with open(file=migration, mode="r") as migration_file:
+            with session.begin():
+                session.execute(text(migration_file.read()))
 
 
 def raise_always(scope="function", *args, **kwargs):
     raise Exception
 
 
-@pytest.fixture(scope="function")
-def add_expenses(client) -> Expense:
-    client.post("/create-expenses-in-db")
+def clean_db(session):
+    session.query(Expense).delete()
+    session.commit()
+
+
+def add_expenses(session):
+    for _ in range(10):
+        expense = Expense(
+            name=random.choice(PRODUCTS),
+            price=random.randrange(100, 5000, 100),
+        )
+        session.add(expense)
+        session.flush()
+    session.commit()
 
 
 @pytest.fixture(scope="function")
-def expense(session):
-    return get_expense(session)
+def fill_db(session):
+    add_expenses(session)
+    yield
+    clean_db(session)

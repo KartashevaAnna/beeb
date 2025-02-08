@@ -63,13 +63,13 @@ class DatabaseSettings(BaseModel):
 
 class Urls(BaseModel):
     ping: str
-    expenses: str
     expense: str
+    expenses: str
 
 
 class Templates(BaseModel):
-    read_expenses: str
     read_expense: str
+    read_expenses: str
 
 
 class Settings(CustomSettings):

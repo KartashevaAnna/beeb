@@ -2,7 +2,7 @@
 name = "beeb"
 version = "0.1.0"
 description = ""
-authors = ["Anna Veselova <annakartashevamail@gmail.com>"]
+authors = ["Anna Kartasheva <annakartashevamail@gmail.com>"]
 readme = "README.md"
 
 [tool.poetry.dependencies]
