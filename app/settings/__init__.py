@@ -14,7 +14,7 @@ def get_settings():
 
 SETTINGS = get_settings()
 
-ENGINE = create_engine(url=SETTINGS.database.db_url, echo=False)
+ENGINE = create_engine(url=SETTINGS.database.db_url)
 
 TEMPLATES_DIR = Path(__file__).parent.parent / "templates"
 TEMPLATES = Jinja2Blocks(directory=TEMPLATES_DIR)
