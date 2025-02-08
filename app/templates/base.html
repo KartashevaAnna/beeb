@@ -12,6 +12,12 @@
 
 <body>
 {% block body %}
+    {% if exception %}
+        {% include 'exception.html' %}
+    {% else %}
+        {% block bodycontent %}
+        {% endblock %}
+    {% endif %}
 {% endblock %}
 </body>
 
