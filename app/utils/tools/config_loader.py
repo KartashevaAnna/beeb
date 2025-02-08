@@ -15,6 +15,8 @@ def render_secrets(context, secrets) -> dict:
     rendered = Template(context).render(
         parameters=secrets["parameters"],
         secrets=secrets["secrets"],
+        urls=secrets["urls"],
+        templates=secrets["templates"],
     )
     return tomllib.loads(rendered)
 
