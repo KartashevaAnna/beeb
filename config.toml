@@ -11,10 +11,10 @@ user = "{{ parameters.DATABASE_USER }}"
 password = "{{ secrets.DATABASE_PASSWORD }}"
 
 [urls]
-ping = "{{ parameters.URL_PING }}"
-expenses = "{{ parameters.URL_EXPENSES }}"
-expense = "{{ parameters.URL_EXPENSE }}"
+ping = "{{ urls.URL_PING }}"
+expenses = "{{ urls.URL_EXPENSES }}"
+expense = "{{ urls.URL_EXPENSE }}"
 
 [templates]
-read_expenses = "{{ parameters.TEMPLATE_READ_EXPENSES }}"
-read_expense = "{{ parameters.TEMPLATE_READ_EXPENSE }}"
+read_expenses = "{{ templates.TEMPLATE_READ_EXPENSES }}"
+read_expense = "{{ templates.TEMPLATE_READ_EXPENSE }}"
