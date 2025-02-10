@@ -11,7 +11,7 @@
 {% for expense in expenses %}
 </tr>
     <td>{{ expense.id }}</td>
-    <td>{{ expense.name }}</td>
+    <td>{{ expense.name.title() }}</td>
     <td>{{ expense.price }}</td>
 </tr>
 {% endfor %}

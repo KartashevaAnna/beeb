@@ -7,7 +7,7 @@
         <legend>Расходы</legend>
                 <label for="name">название</label><br>
                 <input name="name" id="name" type="text" placeholder="name"
-                    value="{{ expense.name or '' }}" disabled>
+                    value="{{ expense.name.title() or '' }}" disabled>
                     <br>
                 <label for="price">стоимость, ₽</label><br>
                 <input name="price" id="price" type="text" placeholder="стоимость"
