@@ -2,6 +2,10 @@
 
 {% block bodycontent %}
 
+{% if total %}
+ВСЕГО: {{ total if total is not none}}
+{% endif %}
+
 <table>
 <tr>
     <th>id</th>
@@ -12,7 +16,7 @@
 </tr>
     <td>{{ expense.id }}</td>
     <td>{{ expense.name.title() }}</td>
-    <td>{{ expense.price }}</td>
+    <td>{{ expense.price_in_rub }}</td>
 </tr>
 {% endfor %}
 </table>

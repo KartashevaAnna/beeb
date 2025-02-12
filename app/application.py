@@ -1,3 +1,4 @@
+import locale
 from contextlib import asynccontextmanager
 
 from fastapi import FastAPI
@@ -20,11 +21,9 @@ def build_app():
     app.include_router(ping_router)
     app.include_router(expenses_router)
     app.include_router(dev_router)
-
     app.mount("/static", StaticFiles(directory="./app/static/"), name="static")
-
     app.mount("/css", StaticFiles(directory="./app/static/css"), name="css")
     app.mount("/js", StaticFiles(directory="./app/static/js"), name="js")
     app.mount("/img", StaticFiles(directory="./app/static/images"), name="img")
-
+    locale.setlocale(locale.LC_NUMERIC, "ru_RU.utf8")
     return app

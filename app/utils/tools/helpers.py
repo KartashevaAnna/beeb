@@ -1,3 +1,4 @@
+import locale
 import random
 
 from app.models import Expense
@@ -11,3 +12,8 @@ def add_expenses_to_db(session) -> Expense:
     )
     session.add(expense)
     session.commit()
+
+
+def get_readable_price(price: int) -> str:
+    """Formats price as per Russian locale and appends currency symbol."""
+    return locale.format_string("%.2f", (price / 100), grouping=True) + "₽"

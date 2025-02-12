@@ -5,6 +5,7 @@ from sqlalchemy import func, select
 from app.models import Expense
 from app.repositories.expenses import ExpensesRepo
 from app.settings import SETTINGS
+from app.utils.tools.helpers import get_readable_price
 from tests.functional.conftest import fill_db, raise_always
 
 
@@ -14,8 +15,8 @@ def test_expense_normal_function(client, fill_db, session):
     response = client.get(SETTINGS.urls.expense.format(expense_id=expense.id))
     assert response.status_code == 200
     assert str(expense.id) in response.text
-    assert expense.name in response.text
-    assert str(expense.price) in response.text
+    assert expense.name.title() in response.text
+    assert get_readable_price(expense.price) in response.text
 
 
 def test_expense_404(client, fill_db, session):
