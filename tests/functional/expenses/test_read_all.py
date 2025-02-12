@@ -6,6 +6,7 @@ from sqlalchemy import select
 from app.models import Expense
 from app.repositories.expenses import ExpensesRepo
 from app.settings import SETTINGS
+from app.utils.tools.helpers import get_readable_price
 from tests.functional.conftest import raise_always
 
 
@@ -17,9 +18,9 @@ def test_expenses_normal_function(client, fill_db, session, total_expenses):
     for expense in all_expenses:
         assert str(expense.id) in response.text
         assert expense.name.title() in response.text
-        assert str(expense.price) in response.text
+        assert get_readable_price(expense.price) in response.text
     assert isinstance(total_expenses, int)
-    assert str(total_expenses) in response.text
+    assert get_readable_price(total_expenses) in response.text
 
 
 def test_expenses_empty_db(client, total_expenses):

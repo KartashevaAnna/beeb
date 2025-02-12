@@ -9,9 +9,9 @@
                 <input name="name" id="name" type="text" placeholder="name"
                     value="{{ expense.name.title() or '' }}" disabled>
                     <br>
-                <label for="price">стоимость, ₽</label><br>
+                <label for="price">стоимость</label><br>
                 <input name="price" id="price" type="text" placeholder="стоимость"
-                    value="{{ expense.price or '' }}" disabled><br>
+                    value="{{ expense.price_in_rub or '' }}" disabled><br>
                 <label for="id">id</label><br>
                 <input name="id" id="id" type="email"
                     placeholder="ID" value="{{ expense.id }}" disabled>

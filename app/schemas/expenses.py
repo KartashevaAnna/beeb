@@ -1,6 +1,8 @@
 from typing import Annotated
 
-from pydantic import BaseModel, Field, StringConstraints, field_validator
+from pydantic import BaseModel, Field, StringConstraints, computed_field, field_validator
+
+from app.utils.tools.helpers import get_readable_price
 
 
 class ExpenseCreate(BaseModel):
@@ -13,3 +15,14 @@ class ExpenseCreate(BaseModel):
             value = value.replace("  ", " ")
         assert not value.isspace(), "Empty strings are not allowed."
         return value
+
+
+class ExpenseShow(BaseModel):
+    id: Annotated[int, Field]
+    name: Annotated[str, Field()]
+    price: Annotated[int, Field()]
+
+    @computed_field
+    @property
+    def price_in_rub(cls) -> str:
+        return get_readable_price(cls.price)
