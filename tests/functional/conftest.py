@@ -3,8 +3,9 @@ from pathlib import Path
 
 import pytest
 from fastapi.testclient import TestClient
-from sqlalchemy import text
+from sqlalchemy import select, text
 from sqlalchemy.orm import sessionmaker
+from sqlalchemy.sql import functions
 
 from app.application import build_app
 from app.models import AlchemyBaseModel, Expense
@@ -62,3 +63,10 @@ def fill_db(session):
     add_expenses(session)
     yield
     clean_db(session)
+
+
+@pytest.fixture(scope="function")
+def total_expenses(session):
+    statement = select(functions.sum(Expense.price))
+    results = session.execute(statement)
+    return results.scalars().first()

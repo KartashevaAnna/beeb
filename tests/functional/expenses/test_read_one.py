@@ -14,7 +14,7 @@ def test_expense_normal_function(client, fill_db, session):
     response = client.get(SETTINGS.urls.expense.format(expense_id=expense.id))
     assert response.status_code == 200
     assert str(expense.id) in response.text
-    assert expense.name in response.text
+    assert expense.name.title() in response.text
     assert str(expense.price) in response.text
 
 
