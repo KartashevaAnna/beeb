@@ -33,4 +33,3 @@ build-tests:
 .PHONY: teardown-tests
 teardown-tests:
 	docker-compose -f tests/functional/docker-compose.local.yml rm -f
-

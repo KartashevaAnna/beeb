@@ -8,15 +8,14 @@
 
 <table>
 <tr>
-    <th>id</th>
     <th>название</th>
     <th>стоимость</th>
 </tr>
 {% for expense in expenses %}
 </tr>
-    <td>{{ expense.id }}</td>
     <td>{{ expense.name.title() }}</td>
     <td>{{ expense.price_in_rub }}</td>
+    <td><a href="/expenses/{{expense.id}}">подробнее</a></td>
 </tr>
 {% endfor %}
 </table>
