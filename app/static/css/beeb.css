@@ -7,11 +7,11 @@
 :root,
 [data-bs-theme=beeb] {
   color-scheme: beeb;
-  --bs-body-color: #deb15e;
+  --bs-body-color: #ffc000;
   --bs-body-color-rgb: 222, 117, 94;
   --bs-body-bg: #191919;
   --bs-body-bg-rgb: 25, 25, 25;
-  --bs-emphasis-color: #fff;
+  --bs-emphasis-color: #deb15e; /* Цвет теста в таблицах */ 
   --bs-emphasis-color-rgb: 255, 255, 255;
   --bs-secondary-color: rgba(222, 226, 230, 0.75);
   --bs-secondary-color-rgb: 222, 226, 230;
