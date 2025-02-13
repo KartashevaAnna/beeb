@@ -6,16 +6,12 @@
 ВСЕГО: {{ total if total is not none}}
 {% endif %}
 
-<table>
-<tr>
-    <th>название</th>
-    <th>стоимость</th>
-</tr>
+<table class="table table-hover">
+
 {% for expense in expenses %}
-</tr>
-    <td>{{ expense.name.title() }}</td>
+    <td scope="row">{{ expense.name.title() }}</td>
     <td>{{ expense.price_in_rub }}</td>
-    <td><a href="/expenses/{{expense.id}}"><i class="material-icons">visibility</i></a></td>
+    <td><a href="/expenses/{{expense.id}}"><i class="material-icons">👁️</i></a></td>
 </tr>
 {% endfor %}
 </table>
