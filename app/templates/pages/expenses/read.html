@@ -4,17 +4,35 @@
 
 <form action="/expenses" method="get">
     <fieldset>
-        <legend>
-            Расход №{{expense.id}}
-            <a href="/expenses/create" class="btn beeb-secondary-button" >➕</a>
-        </legend> 
 
-        <br>
-                <input name="name" id="name" type="text" placeholder="name"
-                    value="{{ expense.name.title() or '' }}" disabled class="beeb-input"> <br>
-                <input name="price" id="price" type="text" placeholder="стоимость"
-                    value="{{ expense.price_in_rub or '' }}" disabled class="beeb-input"> <br>
+
+        <div class="container-fluid">
+            <div class="row justify-content-lg-center my-1 p-2">
+                <div class="col-lg-10"></div>
+                <div class="col-lg-2">
+                    <a href="/expenses/create" class="btn beeb-secondary-button float-right" >➕</a>
+                </div>
+            <div class="row justify-content-lg-center">
+                <div class="col-lg-3 justify-content-center">
+                    <legend style="text-align: center;">
+                        Расход №{{expense.id}}
+                    </legend> 
+                </div>
+            <div class="row justify-content-lg-center my-1 p-2">
+                <div class="col-lg-3 justify-content-center">
+                    <input name="name" id="name" type="text" placeholder="name"
+                    value="{{ expense.name.title() or '' }}" disabled class="beeb-input">
+                </div>
+            </div>
+            <div class="row justify-content-center my-1 p-2">
+                <div class="col-lg-3 justify-content-center">
+                    <input name="price" id="price" type="text" placeholder="стоимость"
+                    value="{{ expense.price_in_rub or '' }}" disabled class="beeb-input">
+                </div> 
+            </div> 
         </div>
+
+
     </fieldset>
 </form>
 
