@@ -11,7 +11,11 @@ from tests.functional.conftest import raise_always
 
 
 def test_expenses_normal_function(client, fill_db, session, total_expenses):
-    """Case: normal mode, endpoint returns page with expenses in context."""
+    """Case: normal mode.
+
+    Checks that the endpoint returns page
+    with expenses in context.
+    """
     response = client.get(SETTINGS.urls.expenses)
     assert response.status_code == 200
     all_expenses = session.scalars(select(Expense))
@@ -24,7 +28,11 @@ def test_expenses_normal_function(client, fill_db, session, total_expenses):
 
 
 def test_expenses_empty_db(client, total_expenses):
-    """Case: the database is empty, endpoint returns page with no expenses in context."""
+    """Case: the database is empty.
+
+    Checks that the endpoint returns page
+    with no expenses in context.
+    """
     response = client.get(SETTINGS.urls.expenses)
     assert response.status_code == 200
     assert response.context["expenses"] == []
@@ -33,7 +41,10 @@ def test_expenses_empty_db(client, total_expenses):
 
 @patch.object(ExpensesRepo, "read_all", raise_always)
 def test_expenses_exception(client):
-    """Case: any exception is thrown."""
+    """Case: any exception is thrown.
+
+    Checks that the endpoint returns an error page.
+    """
     response = client.get(SETTINGS.urls.expenses)
     assert response.status_code != 200
     assert "exception" in response.text

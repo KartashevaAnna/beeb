@@ -10,7 +10,11 @@ from tests.functional.conftest import fill_db, raise_always
 
 
 def test_expense_normal_function(client, fill_db, session):
-    """Case: normal mode, endpoint returns page with one expense in context."""
+    """Case: normal mode.
+
+    Checks that the endpoint returns page
+    with one expense in context.
+    """
     expense = session.scalars(select(Expense)).first()
     response = client.get(SETTINGS.urls.expense.format(expense_id=expense.id))
     assert response.status_code == 200
@@ -20,15 +24,23 @@ def test_expense_normal_function(client, fill_db, session):
 
 
 def test_expense_404(client, fill_db, session):
-    """Case: user request a nonexistant id, endpoint returns page with no expense in context."""
+    """Case: user request a nonexistant id.
+
+    Checks that the endpoint returns a 404 status code.
+    """
     max_expense_id = session.scalar(select(func.max(Expense.id)))
     non_existing_expense_id = max_expense_id + 1
-    response = client.get(SETTINGS.urls.expense.format(expense_id=non_existing_expense_id))
+    response = client.get(
+        SETTINGS.urls.expense.format(expense_id=non_existing_expense_id)
+    )
     assert response.status_code == 404
 
 
 def test_expense_empty_db_404(client):
-    """Case: the database is empty, endpoint returns page with no expense in context."""
+    """Case: the database is empty.
+
+    Checks that the endpoint returns a 404 status code.
+    """
     response = client.get(SETTINGS.urls.expense.format(expense_id=1))
     assert response.status_code == 404
 
