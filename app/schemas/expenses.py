@@ -1,12 +1,23 @@
 from typing import Annotated
 
-from pydantic import BaseModel, Field, StringConstraints, computed_field, field_validator
+from pydantic import (
+    BaseModel,
+    Field,
+    StringConstraints,
+    computed_field,
+    field_validator,
+)
 
 from app.utils.tools.helpers import get_readable_price
 
 
 class ExpenseCreate(BaseModel):
-    name: Annotated[str, StringConstraints(min_length=1, max_length=255, strip_whitespace=True, to_lower=True)]
+    name: Annotated[
+        str,
+        StringConstraints(
+            min_length=1, max_length=255, strip_whitespace=True, to_lower=True
+        ),
+    ]
     price: Annotated[int, Field(gt=0)]
 
     @field_validator("name")

@@ -5,7 +5,7 @@ from sqlalchemy.orm import Session
 from sqlalchemy.sql import functions
 
 from app.models import Expense
-from app.schemas.expenses import ExpenseShow
+from app.schemas.expenses import ExpenseCreate, ExpenseShow
 from app.utils.tools.helpers import get_readable_price
 
 
@@ -30,3 +30,12 @@ class ExpensesRepo:
         results = self.session.execute(statement)
         expense = results.scalars().one_or_none()
         return ExpenseShow(**expense.__dict__) if expense else None
+
+    def create(self, expense: ExpenseCreate):
+        new_expense = Expense(**expense.model_dump())
+        self.session.add(new_expense)
+        self.session.commit()
+        statement = select(Expense).where(Expense.id == new_expense.id)
+        results = self.session.execute(statement)
+        expense = results.scalars().one_or_none()
+        return expense

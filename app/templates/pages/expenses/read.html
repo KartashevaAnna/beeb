@@ -4,11 +4,16 @@
 
 <form action="/expenses" method="get">
     <fieldset>
-        <legend>Расход №{{expense.id}}</legend>
+        <legend>
+            Расход №{{expense.id}}
+            <a href="/expenses/create" class="btn beeb-secondary-button" >➕</a>
+        </legend> 
+
+        <br>
                 <input name="name" id="name" type="text" placeholder="name"
-                    value="{{ expense.name.title() or '' }}" disabled style="color: rgb(34, 33, 33)"><br>
+                    value="{{ expense.name.title() or '' }}" disabled class="beeb-input"> <br>
                 <input name="price" id="price" type="text" placeholder="стоимость"
-                    value="{{ expense.price_in_rub or '' }}" disabled style="color: rgb(34, 33, 33)"><br>
+                    value="{{ expense.price_in_rub or '' }}" disabled class="beeb-input"> <br>
         </div>
     </fieldset>
 </form>

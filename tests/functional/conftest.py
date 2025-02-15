@@ -15,7 +15,7 @@ from tests.constants import PRODUCTS
 
 @pytest.fixture(scope="session")
 def client():
-    return TestClient(app=build_app())
+    return TestClient(app=build_app(), follow_redirects=False)
 
 
 @pytest.fixture(scope="session")
