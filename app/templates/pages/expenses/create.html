@@ -1,17 +1,25 @@
 {% extends "base.html" %}
 
 {% block bodycontent %}
-<div class="form-group">
-<form method="post" enctype="multipart/form-data" action="create">
-  <div class="form-group row my-1 p-2">
-    <input type="name" class="beeb-input-create" id="name" name="name" placeholder="название">
+<div class="container-fluid">
+  <div class="form-group">
+    <form method="post" enctype="multipart/form-data" action="create">
+      <div class="row justify-content-lg-center my-1 p-2">
+        <div class="col-lg-3 justify-content-center">
+          <input type="name" class="beeb-input-create" id="name" name="name" placeholder="название">
+        </div>
+      </div>
+      <div class="row justify-content-lg-center my-1 p-2">
+        <div class="col-lg-3 justify-content-center">
+          <input type="text" class="beeb-input-create" id="price" name="price" placeholder="стоимость">
+        </div>
+      </div>
+      <div class="row justify-content-lg-center my-1 p-2">
+        <div class="col-lg-3 justify-content-center">
+          <button type="submit" class="btn btn-block beeb-submit-button">🫡 Отправить</button>
+        </div>
+      </div>
+    </form> 
   </div>
-  <div class="form-group row my-1 p-2 justify-content-center">
-    <input type="text" class="beeb-input-create" id="price" name="price" placeholder="стоимость">
-  </div>
-  <div class="form-group row my-1 p-2 justify-content-center">
-    <button type="submit" class="btn btn-block beeb-submit-button">🫡 Отправить</button>
-  </div>
-</form> 
 </div>
 {% endblock %}
