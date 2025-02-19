@@ -1,11 +1,11 @@
 from typing import List
 
-from sqlalchemy import select
+from sqlalchemy import select, update
 from sqlalchemy.orm import Session
 from sqlalchemy.sql import functions
 
 from app.models import Expense
-from app.schemas.expenses import ExpenseCreate, ExpenseShow
+from app.schemas.expenses import ExpenseCreate, ExpenseShow, ExpenseUpdate
 from app.utils.tools.helpers import get_readable_price
 
 
@@ -31,7 +31,7 @@ class ExpensesRepo:
         expense = results.scalars().one_or_none()
         return ExpenseShow(**expense.__dict__) if expense else None
 
-    def create(self, expense: ExpenseCreate):
+    def create(self, expense: ExpenseCreate) -> Expense:
         new_expense = Expense(**expense.model_dump())
         self.session.add(new_expense)
         self.session.commit()
@@ -39,3 +39,12 @@ class ExpensesRepo:
         results = self.session.execute(statement)
         expense = results.scalars().one_or_none()
         return expense
+
+    def update(self, expense_id: int, to_upate: ExpenseUpdate):
+        stmt = (
+            update(Expense)
+            .where(Expense.id == expense_id)
+            .values(name=to_upate.name, price=to_upate.price_in_kopecks)
+        )
+        self.session.execute(stmt)
+        self.session.commit()

@@ -8,7 +8,7 @@ from app.utils.dependencies import get_session
 from app.utils.tools.helpers import add_expenses_to_db
 from tests.constants import PRODUCTS
 
-dev_router = fastapi.APIRouter(tags=["Dev"])
+dev_router = fastapi.APIRouter(tags=["Dev"], include_in_schema=False)
 
 
 @dev_router.post("/create-expenses-in-db")
