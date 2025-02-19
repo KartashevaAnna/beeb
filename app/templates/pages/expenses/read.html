@@ -2,15 +2,14 @@
 
 {% block bodycontent %}
 
-<form action="/expenses" method="get">
+
+<form action="/expenses/update/{{expense.id}}" method="post">
     <fieldset>
-
-
         <div class="container-fluid">
                 <div class="row align-items-center justify-content-lg-center my-4 p-2">
                     <div class="col-lg-4 justify-content-center">
                             <div class="card" style="border-radius: .80rem; background-color:#3c4055; border: 2px solid; border-color: #a7acb1">
-                            <div class="card-body" style="background-color:#3c4055; border-radius: 20px; overflow: hidden;">
+                            <div class="card-body" id="my_card_body"style="background-color:#3c4055; border-radius: 20px; overflow: hidden;">
                                 <div class="row align-items-center justify-content-sm-center my-1 p-2">
                                     <div class="col-xs-2 justify-content-center align-items-*-center">
                                         <legend style="text-align: center;">
@@ -19,28 +18,56 @@
                                     </div>
                                 <div class="row align-items-center justify-content-lg-center my-1 p-2">
                                     <div class="col justify-content-center">
+                                        {% if form_disabled %}
                                         <input name="name" id="name" type="text" placeholder="name"
                                         value="{{ expense.name.title() or '' }}" disabled class="beeb-input ">
+                                        {% else %}
+                                        <input name="name" id="name" type="text" placeholder="name"
+                                        value="{{ expense.name.title() or '' }}" class="beeb-input ">
+                                        {% endif %}
                                     </div>
                                 </div>
                                 <div class="row justify-content-center my-1 p-2">
                                     <div class="col justify-content-center">
+                                        {% if form_disabled %}
                                         <input name="price" id="price" type="text" placeholder="стоимость"
                                         value="{{ expense.price_in_rub or '' }}" disabled class="beeb-input">
+                                        {% else %}
+                                        <input name="price" id="price" type="text" placeholder="стоимость"
+                                        value="{{ expense.price_in_rub or '' }}" class="beeb-input">
+                                        {% endif %}
                                     </div> 
                                 </div>
                                 <div class="row align-items-center justify-content-center my-1 p-2">
                                     <div class="col-12 justify-content-center align-items-xs-center">
+                                        {% if form_disabled %}
+                                        <a href="/expenses/update/{{expense.id}}" class="btn beeb-submit-button" style="display: block;
+            width: 100%;">✏️ отредактировать</a>
+                                        {% else %}
+        
+                                        <button 
+                                        type="submit" 
+                               
+                                        class="btn beeb-submit-button"
+                                        >OK
+                                    </button>
+                                        {% endif %}
+                          
+                                    </div>
+                                </div>
+                                {% if form_disabled %}
+                                <div class="row align-items-center justify-content-center my-1 p-2">
+                                    <div class="col-12 justify-content-center align-items-xs-center">
                                         <a href="/expenses/create" class="btn beeb-submit-button" style="display: block;
-            width: 100%;">добавить</a>
+            width: 100%;">➕ добавить</a>
                                     </div> 
                                 </div>
+                                {% endif %}
                             </div>
                                 </div>
                             </div>
                             </div>
                         </div>
-                    
         </div>
     </fieldset>
 </form>

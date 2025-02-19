@@ -6,7 +6,7 @@ from fastapi.responses import RedirectResponse
 from pydantic import ValidationError
 
 from app.repositories.expenses import ExpensesRepo
-from app.schemas.expenses import ExpenseCreate
+from app.schemas.expenses import ExpenseCreate, ExpenseUpdate
 from app.settings import SETTINGS, TEMPLATES
 from app.utils.dependencies import expenses_repo
 
@@ -16,8 +16,71 @@ expenses_router = fastapi.APIRouter(tags=["Expenses"])
 @expenses_router.get(SETTINGS.urls.create_expense)
 def serve_create_expense_template(request: Request):
     return TEMPLATES.TemplateResponse(
-        SETTINGS.templates.create_expense, context={"request": request}
+        SETTINGS.templates.create_expense,
+        context={"request": request},
     )
+
+
+@expenses_router.post(SETTINGS.urls.update_expense)
+def update_expense(
+    name: Annotated[str, Form()],
+    price: Annotated[str, Form()],
+    expense_id: int,
+    repo: Annotated[ExpensesRepo, Depends(expenses_repo)],
+    request: Request,
+):
+    to_update = ExpenseUpdate(name=name, price=price)
+    try:
+        repo.update(expense_id=expense_id, to_upate=to_update)
+        return RedirectResponse(
+            url="/expenses", status_code=status.HTTP_303_SEE_OTHER
+        )
+    except Exception as exc:
+        return TEMPLATES.TemplateResponse(
+            SETTINGS.templates.read_expense,
+            context={
+                "request": request,
+                "exception": f"There was an error: {str(exc)}",
+            },
+            status_code=status.HTTP_501_NOT_IMPLEMENTED,
+        )
+
+
+@expenses_router.get(SETTINGS.urls.update_expense)
+def serve_update_expense_template(
+    expense_id: int,
+    repo: Annotated[ExpensesRepo, Depends(expenses_repo)],
+    request: Request,
+):
+    try:
+        if not (expense := repo.read(expense_id)):
+            raise HTTPException(404, "Expense not found")
+        return TEMPLATES.TemplateResponse(
+            SETTINGS.templates.read_expense,
+            context={
+                "request": request,
+                "expense": expense,
+                "form_disabled": False,
+            },
+        )
+    except HTTPException as exc:
+        return TEMPLATES.TemplateResponse(
+            SETTINGS.templates.read_expense,
+            context={
+                "request": request,
+                "exception": f"There was an error: {str(exc)}",
+            },
+            status_code=status.HTTP_404_NOT_FOUND,
+        )
+    except Exception as exc:
+        return TEMPLATES.TemplateResponse(
+            SETTINGS.templates.read_expense,
+            context={
+                "request": request,
+                "exception": f"There was an error: {str(exc)}",
+            },
+            status_code=status.HTTP_501_NOT_IMPLEMENTED,
+        )
 
 
 @expenses_router.get(SETTINGS.urls.expense)
@@ -31,7 +94,11 @@ def read_expense(
             raise HTTPException(404, "Expense not found")
         return TEMPLATES.TemplateResponse(
             SETTINGS.templates.read_expense,
-            context={"request": request, "expense": expense},
+            context={
+                "request": request,
+                "expense": expense,
+                "form_disabled": True,
+            },
         )
     except HTTPException as exc:
         return TEMPLATES.TemplateResponse(
