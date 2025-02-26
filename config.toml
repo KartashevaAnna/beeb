@@ -15,6 +15,7 @@ ping = "{{ urls.URL_PING }}"
 expenses = "{{ urls.URL_EXPENSES }}"
 create_expense = "{{ urls.URL_CREATE_EXPENSE }}"
 update_expense = "{{ urls.URL_UPDATE_EXPENSE }}"
+delete_expense = "{{ urls.URL_DELETE_EXPENSE }}"
 expense = "{{ urls.URL_EXPENSE }}"
 
 [templates]

@@ -61,6 +61,7 @@
   --bs-form-invalid-border-color: #e685b5;
 }
 
+
 .beeb-submit-button {
   background-color: #20c997;
   border-color: #0cca91a5;
@@ -73,6 +74,7 @@
   border-color: #0cca91a5;
   color: black;
 }
+
 .beeb-secondary-button
 {background-color: rgba(222, 226, 230, 0.75);}
 

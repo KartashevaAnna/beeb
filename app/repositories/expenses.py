@@ -1,6 +1,6 @@
 from typing import List
 
-from sqlalchemy import select, update
+from sqlalchemy import delete, select, update
 from sqlalchemy.orm import Session
 from sqlalchemy.sql import functions
 
@@ -46,5 +46,10 @@ class ExpensesRepo:
             .where(Expense.id == expense_id)
             .values(name=to_upate.name, price=to_upate.price_in_kopecks)
         )
+        self.session.execute(stmt)
+        self.session.commit()
+
+    def delete(self, expense_id: int):
+        stmt = delete(Expense).where(Expense.id == expense_id)
         self.session.execute(stmt)
         self.session.commit()

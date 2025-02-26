@@ -41,6 +41,7 @@ def test_update_expense_standard_mode_name_lowercase_price_int(
         },
     )
     assert response.status_code == 303
+    assert response.headers.get("location") == SETTINGS.urls.expenses
     session.expire_all()
     updated_expense = session.get(Expense, expense.id)
     assert expense.id == updated_expense.id
@@ -65,6 +66,7 @@ def test_update_expense_standard_mode_name_title_price_int(
         },
     )
     assert response.status_code == 303
+    assert response.headers.get("location") == SETTINGS.urls.expenses
     session.expire_all()
     updated_expense = session.get(Expense, expense.id)
     assert expense.id == updated_expense.id
@@ -88,6 +90,7 @@ def test_update_expense_standard_mode_name_upper_price_int(
         },
     )
     assert response.status_code == 303
+    assert response.headers.get("location") == SETTINGS.urls.expenses
     session.expire_all()
     updated_expense = session.get(Expense, expense.id)
     assert expense.id == updated_expense.id
@@ -111,6 +114,7 @@ def test_update_expense_standard_mode_name_lowercase_price_frontend(
         },
     )
     assert response.status_code == 303
+    assert response.headers.get("location") == SETTINGS.urls.expenses
     session.expire_all()
     updated_expense = session.get(Expense, expense.id)
     assert expense.id == updated_expense.id
