@@ -64,12 +64,20 @@
                                 </div>
 </form>
 <form action="/expenses/delete/{{expense.id}}" method="post">
-                                <div class="row align-items-center justify-content-center my-1 p-2">
-                                    <div class="col-12 justify-content-center align-items-xs-center">
-                                        <button type="submit" a href="/expenses/delete/{expense_id}" class="btn beeb-delete-button" style="display: block;
-            width: 100%;">➖ удалить</a>
-                                    </div> 
-                                </div>
+    <div class="row align-items-center justify-content-center my-1 p-2">
+        <div class="col-12 justify-content-center align-items-xs-center">
+            <button id="delete-expenses-btn" 
+            hx-post="/expenses/delete/{{expense.id}}"
+            hx-push-url="true"
+            hx-confirm="точно ли нужно удалить этот расход?"
+            hx-target="body"
+            class="btn beeb-delete-button" 
+            style="display: block; width: 100%;";>
+            ➖ удалить
+          </button>
+        </div> 
+    </div>
+
                                 {% endif %}
                             </div>
                                 </div>
