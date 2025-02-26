@@ -1,0 +1,13 @@
+.beeb-add-button {
+    background-color: #7ebcfa;
+    border-color: #7ebcfa;
+    color: black;
+    display: block;
+    width: 100%;
+  }
+  .beeb-add-button:hover {
+    background-color: #17a2b8;
+    border-color: #17a2b8;
+    color: black;
+  }
+  

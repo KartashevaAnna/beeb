@@ -83,6 +83,28 @@ def serve_update_expense_template(
         )
 
 
+@expenses_router.post(SETTINGS.urls.delete_expense)
+def delete_expense(
+    expense_id: int,
+    repo: Annotated[ExpensesRepo, Depends(expenses_repo)],
+    request: Request,
+):
+    try:
+        repo.delete(expense_id)
+        return RedirectResponse(
+            url="/expenses", status_code=status.HTTP_303_SEE_OTHER
+        )
+    except Exception as exc:
+        return TEMPLATES.TemplateResponse(
+            SETTINGS.templates.read_expense,
+            context={
+                "request": request,
+                "exception": f"There was an error: {str(exc)}",
+            },
+            status_code=status.HTTP_501_NOT_IMPLEMENTED,
+        )
+
+
 @expenses_router.get(SETTINGS.urls.expense)
 def read_expense(
     expense_id: int,
@@ -142,7 +164,6 @@ def create_expense(
             context={
                 "request": request,
                 "exception": f"Error: {str(exc)}",
-                "status_code": 422,
             },
             status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
         )
@@ -152,7 +173,6 @@ def create_expense(
             context={
                 "request": request,
                 "exception": f"Error: {str(exc)}",
-                "status_code": 500,
             },
             status_code=status.HTTP_501_NOT_IMPLEMENTED,
         )

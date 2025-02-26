@@ -67,6 +67,7 @@ class Urls(BaseModel):
     expense: str
     expenses: str
     update_expense: str
+    delete_expense: str
 
 
 class Templates(BaseModel):
