@@ -63,20 +63,21 @@
                                     </div> 
                                 </div>
 </form>
-<form action="/expenses/delete/{{expense.id}}" method="post">
+<form id="delete_expense" action="/expenses/delete/{{expense.id}}" method="post">
     <div class="row align-items-center justify-content-center my-1 p-2">
         <div class="col-12 justify-content-center align-items-xs-center">
-            <button id="delete-expenses-btn" 
-            hx-post="/expenses/delete/{{expense.id}}"
-            hx-push-url="true"
-            hx-confirm="точно ли нужно удалить этот расход?"
-            hx-target="body"
-            class="btn beeb-delete-button" 
-            style="display: block; width: 100%;";>
-            ➖ удалить
-          </button>
+          <button 
+          hx-get={{ URLS.delete_expense  }} 
+          hx-target="#modals-here" 
+          hx-trigger="click" 
+          hx-push-url="false"
+          data-bs-toggle="modal"
+          data-bs-target="#modals-here" 
+          class="btn beeb-delete-button w-100">➖ удалить</button>
+      </div>
         </div> 
     </div>
+    
 
                                 {% endif %}
                             </div>
@@ -87,6 +88,10 @@
         </div>
     </fieldset>
 </form>
-
+<div id="modals-here" class="modal modal-blur fade" style="display: none" tabindex="-1">
+    <div class="modal-dialog modal-lg modal-dialog-centered" role="document">
+        <div class="modal-content"></div>
+    </div>
+</div>
 {% endblock %}
 
