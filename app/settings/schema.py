@@ -74,6 +74,7 @@ class Templates(BaseModel):
     read_expense: str
     read_expenses: str
     create_expense: str
+    delete_expense: str
 
 
 class Settings(CustomSettings):

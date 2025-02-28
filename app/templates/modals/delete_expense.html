@@ -1,0 +1,17 @@
+{% block body %}
+<div class="modal-dialog modal-dialog-centered" id="modal">
+    <div class="modal-content">
+        <div class="modal-header text-center">
+            <h5 class="modal-title w-100">Подтвердите удаление</h5>
+        </div>
+        <div class="modal-body">
+            <form id="delete_expense" hx-post={{ URLS.delete_expense }} hx-target="body" hx-push-url="false">
+                <div class="row justify-content-center" hx-target="this" hx-swap="outerHTML">
+            </form>
+        </div>
+            <button form="delete_expense" type="submit" class="btn beeb-delete-button float-end w-30" class="btn" id="delete-expense-button">Удалить</button>
+            <button type="button" class="btn beeb-close-modal-button float-start w-30" data-bs-dismiss="modal"">
+                Закрыть
+            </button>
+</div>
+{% endblock %}

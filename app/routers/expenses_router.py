@@ -105,6 +105,16 @@ def delete_expense(
         )
 
 
+@expenses_router.get(SETTINGS.urls.delete_expense)
+def signup_template(
+    request: Request,
+):
+    return TEMPLATES.TemplateResponse(
+        SETTINGS.templates.delete_expense,
+        context={"request": request},
+    )
+
+
 @expenses_router.get(SETTINGS.urls.expense)
 def read_expense(
     expense_id: int,
