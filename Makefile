@@ -33,3 +33,12 @@ build-tests:
 .PHONY: teardown-tests
 teardown-tests:
 	docker-compose -f tests/functional/docker-compose.local.yml rm -f
+
+
+.PHONY: small-test
+small-test:
+		docker-compose -f tests/functional/docker-compose.local.small.yml up --abort-on-container-exit --remove-orphans
+
+.PHONY: small-tests
+small-tests:
+	${MAKE} teardown-tests && ${MAKE} build-tests && ${MAKE} small-test && ${MAKE} teardown-tests
