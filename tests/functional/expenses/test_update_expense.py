@@ -7,7 +7,7 @@ from app.repositories.expenses import ExpensesRepo
 from app.settings import SETTINGS
 from app.utils.enums import ExpenseCategory
 from app.utils.tools.helpers import get_readable_price
-from tests.functional.conftest import fill_db, raise_always
+from tests.conftest import fill_db, raise_always
 
 NAME = "potatoe"
 PRICE = 6500

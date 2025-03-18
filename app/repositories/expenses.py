@@ -14,7 +14,7 @@ class ExpensesRepo:
         self.session = session
 
     def read_all(self) -> List[Expense]:
-        statement = select(Expense)
+        statement = select(Expense).order_by(Expense.created_at.desc())
         res = self.session.execute(statement)
         results = res.scalars().all()
         return [ExpenseShow(**expense.__dict__) for expense in results]
