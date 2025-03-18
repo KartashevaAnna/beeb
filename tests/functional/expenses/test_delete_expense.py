@@ -5,7 +5,7 @@ from sqlalchemy import select
 from app.models import Expense
 from app.repositories.expenses import ExpensesRepo
 from app.settings import SETTINGS
-from tests.functional.conftest import fill_db, raise_always
+from tests.conftest import fill_db, raise_always
 
 
 def test_delete_expense(client, fill_db, session):

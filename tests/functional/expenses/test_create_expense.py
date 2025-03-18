@@ -6,7 +6,7 @@ from app.models import Expense
 from app.repositories.expenses import ExpensesRepo
 from app.settings import SETTINGS
 from app.utils.enums import ExpenseCategory
-from tests.functional.conftest import raise_always
+from tests.conftest import raise_always
 
 NAME = "milk"
 PRICE = 350

@@ -24,20 +24,20 @@ tests:
 
 .PHONY: run-tests
 run-tests:
-	docker-compose -f tests/functional/docker-compose.local.yml up --abort-on-container-exit --remove-orphans
+	docker-compose -f tests/docker-compose.local.yml up --abort-on-container-exit --remove-orphans
 
 .PHONY: build-tests
 build-tests:
-	docker-compose -f tests/functional/docker-compose.local.yml build
+	docker-compose -f tests/docker-compose.local.yml build
 
 .PHONY: teardown-tests
 teardown-tests:
-	docker-compose -f tests/functional/docker-compose.local.yml rm -f
+	docker-compose -f tests/docker-compose.local.yml rm -f
 
 
 .PHONY: small-test
 small-test:
-		docker-compose -f tests/functional/docker-compose.local.small.yml up --abort-on-container-exit --remove-orphans
+		docker-compose -f tests/docker-compose.local.small.yml up --abort-on-container-exit --remove-orphans
 
 .PHONY: small-tests
 small-tests:

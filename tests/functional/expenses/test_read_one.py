@@ -6,7 +6,7 @@ from app.models import Expense
 from app.repositories.expenses import ExpensesRepo
 from app.settings import SETTINGS
 from app.utils.tools.helpers import get_readable_price
-from tests.functional.conftest import fill_db, raise_always
+from tests.conftest import fill_db, raise_always
 
 
 def test_expense_normal_function(client, fill_db, session):
