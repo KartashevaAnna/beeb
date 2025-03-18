@@ -44,7 +44,11 @@ class ExpensesRepo:
         stmt = (
             update(Expense)
             .where(Expense.id == expense_id)
-            .values(name=to_upate.name, price=to_upate.price_in_kopecks)
+            .values(
+                name=to_upate.name,
+                price=to_upate.price_in_kopecks,
+                category=to_upate.category,
+            )
         )
         self.session.execute(stmt)
         self.session.commit()

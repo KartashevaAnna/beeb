@@ -10,6 +10,7 @@ from sqlalchemy.sql import functions
 from app.application import build_app
 from app.models import AlchemyBaseModel, Expense
 from app.settings import ENGINE
+from app.utils.enums import ExpenseCategory
 from tests.constants import PRODUCTS
 
 
@@ -52,6 +53,7 @@ def add_expenses(session):
         expense = Expense(
             name=random.choice(PRODUCTS),
             price=random.randrange(100, 5000, 100),
+            category=random.choice(ExpenseCategory.list_names()),
         )
         session.add(expense)
         session.flush()

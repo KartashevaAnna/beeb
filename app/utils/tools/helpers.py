@@ -2,6 +2,7 @@ import locale
 import random
 
 from app.models import Expense
+from app.utils.enums import ExpenseCategory
 from tests.constants import PRODUCTS
 
 
@@ -9,6 +10,7 @@ def add_expenses_to_db(session) -> Expense:
     expense = Expense(
         name=random.choice(PRODUCTS),
         price=random.randrange(100, 5000, 100),
+        category=random.choice(ExpenseCategory.list_names()),
     )
     session.add(expense)
     session.commit()
@@ -28,3 +30,16 @@ def get_number_for_db(frontend_input: str) -> int:
     removed_currency_symbol = frontend_input.replace(currency_symbol, "")
     removed_decimal = removed_currency_symbol.replace(",", "")
     return locale.atoi(removed_decimal)
+
+
+def get_expenses_options(current_option: str) -> list:
+    """Gets all expenses options.
+
+    Sorts options so that the one currently selected is on top.
+    """
+    all_options = ExpenseCategory.list_names()
+    sorted_options = [current_option]
+    all_options.remove(current_option)
+    all_options = sorted(all_options)
+    sorted_options.extend(iter(all_options))
+    return sorted_options

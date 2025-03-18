@@ -5,11 +5,17 @@ from sqlalchemy import select
 from app.models import Expense
 from app.repositories.expenses import ExpensesRepo
 from app.settings import SETTINGS
+from app.utils.enums import ExpenseCategory
 from tests.functional.conftest import raise_always
 
 NAME = "milk"
 PRICE = 350
-EXPENSE_CREATE_VALID_JSON = {"name": NAME, "price": PRICE}
+CATEGORY = ExpenseCategory.list_names()[0]
+EXPENSE_CREATE_VALID_JSON = {
+    "name": NAME,
+    "price": PRICE,
+    "category": CATEGORY,
+}
 
 
 def test_create_expense_template(session, client):
@@ -18,6 +24,7 @@ def test_create_expense_template(session, client):
     assert response.status_code == 200
     assert "название" in response.text
     assert "стоимость" in response.text
+    assert "категория" in response.text
 
 
 def test_create_expense_valid_data(session, client):
@@ -30,6 +37,7 @@ def test_create_expense_valid_data(session, client):
     statement = select(Expense).where(
         Expense.name == NAME,
         Expense.price == PRICE,
+        Expense.category == CATEGORY,
     )
     results = session.execute(statement)
     expense = results.scalars().one_or_none()
@@ -42,7 +50,8 @@ def test_create_expense_valid_data(session, client):
 def test_create_expense_invalid_data_negative_price(session, client):
     """Case: endpoint raises ValidationError if price is negative."""
     response = client.post(
-        url=SETTINGS.urls.create_expense, data={"name": NAME, "price": -100}
+        url=SETTINGS.urls.create_expense,
+        data={"name": NAME, "price": -100, "category": CATEGORY},
     )
     assert response.status_code == 422
 
@@ -50,7 +59,8 @@ def test_create_expense_invalid_data_negative_price(session, client):
 def test_create_expense_invalid_data_zero_price(session, client):
     """Case: endpoint raises ValidationError if price is zero."""
     response = client.post(
-        url=SETTINGS.urls.create_expense, data={"name": NAME, "price": 0}
+        url=SETTINGS.urls.create_expense,
+        data={"name": NAME, "price": 0, "category": CATEGORY},
     )
     assert response.status_code == 422
 
