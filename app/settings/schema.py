@@ -68,6 +68,7 @@ class Urls(BaseModel):
     expenses: str
     update_expense: str
     delete_expense: str
+    total_expenses: str
 
 
 class Templates(BaseModel):
@@ -75,6 +76,7 @@ class Templates(BaseModel):
     read_expenses: str
     create_expense: str
     delete_expense: str
+    total_expenses: str
 
 
 class Settings(CustomSettings):
