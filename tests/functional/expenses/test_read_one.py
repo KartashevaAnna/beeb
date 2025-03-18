@@ -21,6 +21,7 @@ def test_expense_normal_function(client, fill_db, session):
     assert str(expense.id) in response.text
     assert expense.name.title() in response.text
     assert get_readable_price(expense.price) in response.text
+    assert expense.category in response.text
 
 
 def test_expense_404(client, fill_db, session):

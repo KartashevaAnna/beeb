@@ -5,11 +5,13 @@ from sqlalchemy import select
 from app.models import Expense
 from app.repositories.expenses import ExpensesRepo
 from app.settings import SETTINGS
+from app.utils.enums import ExpenseCategory
 from app.utils.tools.helpers import get_readable_price
 from tests.functional.conftest import fill_db, raise_always
 
 NAME = "potatoe"
 PRICE = 6500
+CATEGORY = ExpenseCategory.list_names()[0]
 
 
 def test_serve_template_update_expense(client, fill_db, session):
@@ -22,6 +24,7 @@ def test_serve_template_update_expense(client, fill_db, session):
     assert expense.name.title() in response.text
     assert str(expense.id) in response.text
     assert get_readable_price(expense.price) in response.text
+    assert expense.category in response.text
 
 
 def test_update_expense_standard_mode_name_lowercase_price_int(
@@ -37,6 +40,7 @@ def test_update_expense_standard_mode_name_lowercase_price_int(
         data={
             "name": NAME,
             "price": PRICE,
+            "category": CATEGORY,
             "form_disabled": True,
         },
     )
@@ -62,6 +66,7 @@ def test_update_expense_standard_mode_name_title_price_int(
         data={
             "name": NAME.title(),
             "price": PRICE,
+            "category": CATEGORY,
             "form_disabled": True,
         },
     )
@@ -86,6 +91,7 @@ def test_update_expense_standard_mode_name_upper_price_int(
         data={
             "name": NAME.upper(),
             "price": PRICE,
+            "category": CATEGORY,
             "form_disabled": True,
         },
     )
@@ -95,6 +101,7 @@ def test_update_expense_standard_mode_name_upper_price_int(
     updated_expense = session.get(Expense, expense.id)
     assert expense.id == updated_expense.id
     assert updated_expense.name == NAME
+    assert updated_expense.category == CATEGORY
 
 
 def test_update_expense_standard_mode_name_lowercase_price_frontend(
@@ -110,6 +117,7 @@ def test_update_expense_standard_mode_name_lowercase_price_frontend(
         data={
             "name": NAME,
             "price": "65,00₽",
+            "category": CATEGORY,
             "form_disabled": True,
         },
     )
@@ -120,6 +128,7 @@ def test_update_expense_standard_mode_name_lowercase_price_frontend(
     assert expense.id == updated_expense.id
     assert updated_expense.name == NAME
     assert updated_expense.price == PRICE
+    assert updated_expense.category == CATEGORY
 
 
 def test_update_expense_name_lowercase_price_int_zero(client, fill_db, session):
@@ -133,6 +142,7 @@ def test_update_expense_name_lowercase_price_int_zero(client, fill_db, session):
         data={
             "name": NAME,
             "price": 0,
+            "category": CATEGORY,
             "form_disabled": True,
         },
     )
@@ -152,6 +162,7 @@ def test_update_expense_name_lowercase_price_frontend_zero(
         data={
             "name": NAME,
             "price": "00,00₽",
+            "category": CATEGORY,
             "form_disabled": True,
         },
     )
@@ -172,6 +183,7 @@ def test_update_expense_name_lowercase_price_frontend_negative(
         data={
             "name": NAME,
             "price": "-56,00₽",
+            "category": CATEGORY,
             "form_disabled": True,
         },
     )
@@ -191,6 +203,7 @@ def test_update_expense_name_lowercase_price_int_negative(
         data={
             "name": NAME,
             "price": -56,
+            "category": CATEGORY,
             "form_disabled": True,
         },
     )
@@ -214,8 +227,36 @@ def test_update_expense_exception(client):
         data={
             "name": NAME,
             "price": -56,
+            "category": CATEGORY,
             "form_disabled": True,
         },
     )
     assert response.status_code == 501
     assert "exception" in response.text
+
+
+def test_update_expense_update_category(client, session, fill_db):
+    """Case: endpoint updates an expense.
+
+    Name is uppercase, price is integer.
+    """
+    stmt = select(Expense).where(Expense.category == CATEGORY)
+    result = session.execute(stmt)
+    expense = result.scalars().first()
+    response = client.post(
+        SETTINGS.urls.update_expense.format(expense_id=expense.id),
+        data={
+            "name": NAME,
+            "price": PRICE,
+            "category": ExpenseCategory.list_names()[1],
+            "form_disabled": True,
+        },
+    )
+    assert response.status_code == 303
+    assert response.headers.get("location") == SETTINGS.urls.expenses
+    session.expire_all()
+    updated_expense = session.get(Expense, expense.id)
+    assert expense.id == updated_expense.id
+    assert updated_expense.name == NAME
+    assert updated_expense.price == PRICE
+    assert updated_expense.category == ExpenseCategory.list_names()[1]

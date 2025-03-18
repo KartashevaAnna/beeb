@@ -9,6 +9,7 @@ from app.repositories.expenses import ExpensesRepo
 from app.schemas.expenses import ExpenseCreate, ExpenseUpdate
 from app.settings import SETTINGS, TEMPLATES
 from app.utils.dependencies import expenses_repo
+from app.utils.tools.helpers import get_expenses_options
 
 expenses_router = fastapi.APIRouter(tags=["Expenses"])
 
@@ -25,11 +26,12 @@ def serve_create_expense_template(request: Request):
 def update_expense(
     name: Annotated[str, Form()],
     price: Annotated[str, Form()],
+    category: Annotated[str, Form()],
     expense_id: int,
     repo: Annotated[ExpensesRepo, Depends(expenses_repo)],
     request: Request,
 ):
-    to_update = ExpenseUpdate(name=name, price=price)
+    to_update = ExpenseUpdate(name=name, price=price, category=category)
     try:
         repo.update(expense_id=expense_id, to_upate=to_update)
         return RedirectResponse(
@@ -61,6 +63,7 @@ def serve_update_expense_template(
                 "request": request,
                 "expense": expense,
                 "form_disabled": False,
+                "options": get_expenses_options(expense.category),
             },
         )
     except HTTPException as exc:
@@ -156,11 +159,12 @@ def read_expense(
 def create_expense(
     name: Annotated[str, Form()],
     price: Annotated[str, Form()],
+    category: Annotated[str, Form()],
     repo: Annotated[ExpensesRepo, Depends(expenses_repo)],
     request: Request,
 ):
     try:
-        new_expense = ExpenseCreate(name=name, price=price)
+        new_expense = ExpenseCreate(name=name, price=price, category=category)
         created_expense = repo.create(new_expense)
 
         return RedirectResponse(

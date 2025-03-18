@@ -8,6 +8,7 @@ from pydantic import (
     field_validator,
 )
 
+from app.utils.enums import ExpenseCategory
 from app.utils.tools.helpers import get_number_for_db, get_readable_price
 
 
@@ -19,6 +20,7 @@ class ExpenseCreate(BaseModel):
         ),
     ]
     price: Annotated[int, Field(gt=0)]
+    category: ExpenseCategory = Field(default=ExpenseCategory.list_names()[0])
 
     @field_validator("name")
     def prevent_blank_strings(cls, value):
@@ -32,6 +34,7 @@ class ExpenseShow(BaseModel):
     id: Annotated[int, Field]
     name: Annotated[str, Field()]
     price: Annotated[int, Field()]
+    category: ExpenseCategory = Field(default=ExpenseCategory.list_names()[0])
 
     @computed_field
     @property
@@ -47,6 +50,7 @@ class ExpenseUpdate(BaseModel):
         ),
     ]
     price: Annotated[str, Field()]
+    category: ExpenseCategory = Field(default=ExpenseCategory.list_names()[0])
 
     def get_positive_number(self, number) -> int:
         if not number or number <= 0:
