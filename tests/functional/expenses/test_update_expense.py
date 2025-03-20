@@ -236,7 +236,7 @@ def test_update_expense_exception(client):
 
 
 def test_update_expense_update_category(client, session, fill_db):
-    """Case: endpoint updates an expense.
+    """Case: endpoint updates an expense with a new category.
 
     Name is uppercase, price is integer.
     """

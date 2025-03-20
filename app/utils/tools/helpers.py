@@ -2,8 +2,8 @@ import locale
 import random
 
 from app.models import Expense
+from app.utils.constants import PRODUCTS
 from app.utils.enums import ExpenseCategory
-from tests.constants import PRODUCTS
 
 
 def add_expenses_to_db(session) -> Expense:
@@ -43,3 +43,16 @@ def get_expenses_options(current_option: str) -> list:
     all_options = sorted(all_options)
     sorted_options.extend(iter(all_options))
     return sorted_options
+
+
+def get_monthly_expenses(all_expenses: list[Expense]) -> dict[int, str]:
+    monthly_expenses = {}
+    for expense in all_expenses:
+        if expense.created_at.strftime("%m") not in monthly_expenses.keys():
+            monthly_expenses[expense.created_at.strftime("%m")] = expense.price
+        else:
+            monthly_expenses[expense.created_at.strftime("%m")] = (
+                expense.price
+                + monthly_expenses[expense.created_at.strftime("%m")]
+            )
+    return monthly_expenses

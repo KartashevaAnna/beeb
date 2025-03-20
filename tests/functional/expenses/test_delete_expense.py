@@ -29,3 +29,8 @@ def test_delete_expense_that_does_not_exist(client):
     response = client.post(SETTINGS.urls.delete_expense.format(expense_id=1))
     assert response.status_code == 501
     assert "exception" in response.text
+
+
+def test_delete_expense_template(client):
+    response = client.get(SETTINGS.urls.delete_expense)
+    assert response.status_code == 200

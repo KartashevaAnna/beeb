@@ -10,8 +10,8 @@ from sqlalchemy.sql import functions
 from app.application import build_app
 from app.models import AlchemyBaseModel, Expense
 from app.settings import ENGINE
+from app.utils.constants import PRODUCTS
 from app.utils.enums import ExpenseCategory
-from tests.constants import PRODUCTS
 
 
 @pytest.fixture(scope="session")

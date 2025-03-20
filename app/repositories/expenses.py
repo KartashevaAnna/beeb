@@ -1,12 +1,18 @@
+import calendar
 from typing import List
 
-from sqlalchemy import delete, select, update
+from sqlalchemy import delete, func, select, update
 from sqlalchemy.orm import Session
 from sqlalchemy.sql import functions
 
 from app.models import Expense
 from app.schemas.expenses import ExpenseCreate, ExpenseShow, ExpenseUpdate
-from app.utils.tools.helpers import get_readable_price
+from app.utils.constants import MONTHES
+from app.utils.tools.helpers import (
+    get_monthly_expenses,
+    get_number_for_db,
+    get_readable_price,
+)
 
 
 class ExpensesRepo:
@@ -24,6 +30,34 @@ class ExpensesRepo:
         results = self.session.execute(statement)
         total_numeric = results.scalars().first()
         return get_readable_price(total_numeric) if total_numeric else None
+
+    def get_total_days(self) -> int:
+        max_date = self.session.scalar(select(func.max(Expense.created_at)))
+        min_date = self.session.scalar(select(func.min(Expense.created_at)))
+        if not any([max_date, min_date]):
+            return 0
+        else:
+            delta = max_date - min_date
+            return delta.days
+
+    def get_total_per_day_overall(self) -> str:
+        try:
+            return get_readable_price(
+                get_number_for_db(self.get_total()) / self.get_total_days()
+            )
+        except ZeroDivisionError:
+            return None
+
+    def get_total_per_month(self) -> dict[str, str]:
+        stmt = select(Expense)
+        results = self.session.execute(stmt)
+        all_expenses = results.scalars().all()
+        monthly_expenses = get_monthly_expenses(all_expenses)
+        sorted_monthly_expenses = dict(sorted(monthly_expenses.items()))
+        return {
+            MONTHES[calendar.month_name[int(key)]]: get_readable_price(value)
+            for key, value in sorted_monthly_expenses.items()
+        }
 
     def read(self, expense_id: int) -> Expense | None:
         statement = select(Expense).where(Expense.id == expense_id)
