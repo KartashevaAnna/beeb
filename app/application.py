@@ -5,7 +5,7 @@ from fastapi import FastAPI
 from fastapi.staticfiles import StaticFiles
 
 from app.routers.dev_router import dev_router
-from app.routers.expenses.router import expenses_router
+from app.routers.expenses_router import expenses_router
 from app.routers.ping_router import ping_router
 from app.settings import ENGINE
 

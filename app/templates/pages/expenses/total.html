@@ -1,0 +1,29 @@
+{% extends "base.html" %}
+{% block bodycontent %}
+
+
+{% if total %}
+    ВСЕГО ЗА ВСЁ ВРЕМЯ: {{ total if total is not none}}
+{% endif %}
+<br>
+{% if total_per_day %}
+    В ДЕНЬ ЗА ВСЁ ВРЕМЯ: {{ total_per_day if total_per_day is not none}}
+{% endif %}
+<br>
+
+
+{% if total_per_month %}
+<table class="table table-hover">
+
+    {% for expense in total_per_month.items() %}
+        <td scope="row">{{ expense[0] }}</td>
+        <td>{{ expense[1] }}</td>
+        <td><a href="/"><i class="material-icons">👁️</i></a></td>
+    </tr>
+    {% endfor %}
+    </table>
+    {% endif %}
+
+
+
+{% endblock %}
