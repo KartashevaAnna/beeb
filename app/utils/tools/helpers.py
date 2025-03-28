@@ -56,3 +56,24 @@ def get_monthly_expenses(all_expenses: list[Expense]) -> dict[int, str]:
                 + monthly_expenses[expense.created_at.strftime("%m")]
             )
     return monthly_expenses
+
+
+def get_expenses_sums_per_category(
+    all_expenses: list[Expense],
+) -> dict[int, str]:
+    expenses_sums_per_category = {}
+    for expense in all_expenses:
+        if expense.category not in expenses_sums_per_category.keys():
+            expenses_sums_per_category[expense.category] = expense.price
+        else:
+            expenses_sums_per_category[expense.category] = (
+                expense.price + expenses_sums_per_category[expense.category]
+            )
+    return expenses_sums_per_category
+
+
+def get_expenses_shares(expenses_per_categories: dict, total: int) -> dict:
+    return {
+        key: int(round(expenses_per_categories[key] * 100 / total, 0))
+        for key in expenses_per_categories
+    }

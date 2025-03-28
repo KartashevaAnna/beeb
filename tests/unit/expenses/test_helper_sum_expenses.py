@@ -28,7 +28,7 @@ def test_get_monthly_expenses(session):
         name=random.choice(PRODUCTS),
         price=400,
         category=random.choice(ExpenseCategory.list_names()),
-        created_at=datetime.datetime.now() + datetime.timedelta(weeks=-4),
+        created_at=datetime.datetime.now() - datetime.timedelta(weeks=-4),
     )
     session.add(second_expense)
     session.flush()
@@ -36,7 +36,7 @@ def test_get_monthly_expenses(session):
         name=random.choice(PRODUCTS),
         price=200,
         category=random.choice(ExpenseCategory.list_names()),
-        created_at=datetime.datetime.now() + datetime.timedelta(weeks=-4),
+        created_at=datetime.datetime.now() - datetime.timedelta(weeks=-4),
     )
     session.add(third_expense)
     session.flush()

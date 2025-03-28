@@ -22,5 +22,8 @@ def read_all(
             "total": repo.get_total(),
             "total_per_month": repo.get_total_per_month(),
             "total_per_day": repo.get_total_per_day_overall(),
+            "total_shares": list(
+                repo.get_total_monthly_expenses_shares().items()
+            ),
         },
     )

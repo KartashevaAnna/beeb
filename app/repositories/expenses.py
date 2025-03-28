@@ -9,6 +9,8 @@ from app.models import Expense
 from app.schemas.expenses import ExpenseCreate, ExpenseShow, ExpenseUpdate
 from app.utils.constants import MONTHES
 from app.utils.tools.helpers import (
+    get_expenses_shares,
+    get_expenses_sums_per_category,
     get_monthly_expenses,
     get_number_for_db,
     get_readable_price,
@@ -58,6 +60,16 @@ class ExpensesRepo:
             MONTHES[calendar.month_name[int(key)]]: get_readable_price(value)
             for key, value in sorted_monthly_expenses.items()
         }
+
+    def get_total_monthly_expenses_shares(self) -> dict:
+        stmt = select(Expense)
+        results = self.session.execute(stmt)
+        all_expenses = results.scalars().all()
+        total = get_number_for_db(self.get_total())
+        expenses_per_categories = get_expenses_sums_per_category(all_expenses)
+        return get_expenses_shares(
+            expenses_per_categories=expenses_per_categories, total=total
+        )
 
     def read(self, expense_id: int) -> Expense | None:
         statement = select(Expense).where(Expense.id == expense_id)
