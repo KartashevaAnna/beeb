@@ -2,14 +2,86 @@
 {% block bodycontent %}
 
 
-{% if total %}
-    ВСЕГО ЗА ВСЁ ВРЕМЯ: {{ total if total is not none}}
-{% endif %}
-<br>
-{% if total_per_day %}
-    В ДЕНЬ ЗА ВСЁ ВРЕМЯ: {{ total_per_day if total_per_day is not none}}
-{% endif %}
-<br>
+<script src=
+"https://d3js.org/d3.v4.min.js"></script>
+<script src=
+"https://cdn.jsdelivr.net/npm/billboard.js/dist/billboard.min.js"></script>
+<link rel="stylesheet"
+      href=
+"https://cdn.jsdelivr.net/npm/billboard.js/dist/billboard.min.css" />
+<link rel=
+"https://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/css/bootstrap.min.css"
+      type="text/css" />
+ 
+<script src=
+"https://cdnjs.cloudflare.com/ajax/libs/jquery/2.1.3/jquery.min.js">
+</script>
+<script src=
+"https://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/js/bootstrap.min.js">
+</script>
+ 
+<script src=
+"https://cdnjs.cloudflare.com/ajax/libs/Chart.js/1.0.1/Chart.min.js">
+</script>
+
+
+
+
+<div class="row">
+  <div class="col-sm-6">
+    <div class="card">
+      <h5 class="card-title" align="center">по категориям</h5>
+      <div class="card-body">
+        <div class="card-text" id="donut-chart"></div>
+      </div>
+    </div>
+  </div>
+  <div class="col-sm-6">
+    <div class="card">
+      <div class="card-body">
+       {% if total %}
+          <div class="col-xs-12 text-center">
+            <h6 align="left">всего: {{ total if total is not none }} </h6>
+          </div>
+          {% endif %}
+          
+          {% if total_per_day %}
+          <div class="col-xs-12 text-center">
+            <h6 align="left">в день: {{ total_per_day if total_per_day is not none }} </h6>
+          </div>
+          {% endif %}
+      </div>
+    </div>
+  </div>
+</div>
+
+
+
+
+    <script src="https://cdn.jsdelivr.net/npm/apexcharts"></script>
+    <script>
+      let chart = bb.generate({
+          data: {
+              columns: [
+                  ['{{total_shares[0][0]}}', '{{total_shares[0][1]}}'],
+                  ['{{total_shares[1][0]}}', '{{total_shares[1][1]}}'],
+
+              ],
+              type: "donut",
+              onclick: function (d, i) {
+                  console.log("onclick", d, i);
+              },
+              onover: function (d, i) {
+                  console.log("onover", d, i);
+              },
+              onout: function (d, i) {
+                  console.log("onout", d, i);
+              },
+          },
+          bindto: "#donut-chart",
+      });
+  </script>
+
 
 
 {% if total_per_month %}
@@ -23,7 +95,6 @@
     {% endfor %}
     </table>
     {% endif %}
-
 
 
 {% endblock %}
