@@ -11,7 +11,7 @@ total_expenses_router = fastapi.APIRouter()
 
 
 @total_expenses_router.get(SETTINGS.urls.total_expenses)
-def read_all(
+def read_all_expenses(
     repo: Annotated[ExpensesRepo, Depends(expenses_repo)],
     request: Request,
 ):
@@ -25,5 +25,19 @@ def read_all(
             "total_shares": list(
                 repo.get_total_monthly_expenses_shares().items()
             ),
+        },
+    )
+
+
+@total_expenses_router.get(SETTINGS.urls.total_expenses_monthly)
+def read_monthly_expenses_breakdown(
+    repo: Annotated[ExpensesRepo, Depends(expenses_repo)],
+    request: Request,
+):
+    return TEMPLATES.TemplateResponse(
+        SETTINGS.templates.total_expenses_monthly,
+        context={
+            "request": request,
+            "total_per_month": repo.get_total_per_month(),
         },
     )

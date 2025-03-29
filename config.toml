@@ -18,6 +18,7 @@ update_expense = "{{ urls.URL_UPDATE_EXPENSE }}"
 delete_expense = "{{ urls.URL_DELETE_EXPENSE }}"
 expense = "{{ urls.URL_EXPENSE }}"
 total_expenses = "{{ urls.URL_EXPENSES_TOTAL }}"
+total_expenses_monthly = "{{ urls.URL_EXPENSES_TOTAL_MONTHLY }}"
 
 [templates]
 read_expenses = "{{ templates.TEMPLATE_READ_EXPENSES }}"
@@ -25,3 +26,5 @@ create_expense = "{{ templates.TEMPLATE_CREATE_EXPENSE }}"
 read_expense = "{{ templates.TEMPLATE_READ_EXPENSE }}"
 delete_expense = "{{ templates.TEMPLATE_DELETE_EXPENSE }}"
 total_expenses = "{{ templates.TEMPLATE_EXPENSES_TOTAL }}"
+total_expenses_monthly = "{{ templates.TEMPLATE_EXPENSES_TOTAL_MONTLY }}"
+
