@@ -42,9 +42,7 @@ def test_create_expense_valid_data(session, client):
     results = session.execute(statement)
     expense = results.scalars().one_or_none()
     assert expense
-    assert response.headers.get("location") == SETTINGS.urls.expense.format(
-        expense_id=expense.id
-    )
+    assert response.headers.get("location") == SETTINGS.urls.create_expense
 
 
 def test_create_expense_invalid_data_negative_price(session, client):

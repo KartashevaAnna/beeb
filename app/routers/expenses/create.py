@@ -31,10 +31,10 @@ def create_expense(
 ):
     try:
         new_expense = ExpenseCreate(name=name, price=price, category=category)
-        created_expense = repo.create(new_expense)
+        repo.create(new_expense)
 
         return RedirectResponse(
-            SETTINGS.urls.expense.format(expense_id=created_expense.id),
+            SETTINGS.urls.create_expense,
             status_code=status.HTTP_303_SEE_OTHER,
         )
 
