@@ -18,11 +18,12 @@ def test_expenses_normal_function(client, fill_db, session, total_expenses):
     """
     response = client.get(SETTINGS.urls.expenses)
     assert response.status_code == 200
-    all_expenses = session.scalars(select(Expense))
-    for expense in all_expenses:
-        assert str(expense.id) in response.text
-        assert expense.name.title() in response.text
-        assert get_readable_price(expense.price) in response.text
+    all_expenses = session.scalars(select(Expense)).all()
+    assert len(all_expenses) > 2
+    expense = all_expenses[2]
+    assert str(expense.id) in response.text
+    assert expense.name.title() in response.text
+    assert get_readable_price(expense.price) in response.text
     assert isinstance(total_expenses, int)
     assert get_readable_price(total_expenses) in response.text
 

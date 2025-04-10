@@ -1,6 +1,7 @@
 from fastapi import Depends
 from sqlalchemy.orm import Session, sessionmaker
 
+from app.repositories.categories import CategoryRepo
 from app.repositories.expenses import ExpensesRepo
 from app.settings import ENGINE
 
@@ -15,3 +16,7 @@ def get_session() -> Session:
 
 def expenses_repo(session: Session = Depends(get_session)) -> ExpensesRepo:
     return ExpensesRepo(session)
+
+
+def categories_repo(session: Session = Depends(get_session)) -> CategoryRepo:
+    return CategoryRepo(session)

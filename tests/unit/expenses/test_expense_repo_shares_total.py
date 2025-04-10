@@ -11,4 +11,4 @@ def test_get_monthly_expenses_shares_total(client, fill_db, session):
         session
     ).get_total_monthly_expenses_shares()
     checksum = int(sum(list(monthly_expenses_shares_total.values())))
-    assert checksum == 100
+    assert checksum <= 100

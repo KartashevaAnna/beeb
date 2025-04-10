@@ -1,17 +1,17 @@
+import datetime
 import random
 from pathlib import Path
 
 import pytest
 from fastapi.testclient import TestClient
 from sqlalchemy import select, text
-from sqlalchemy.orm import sessionmaker
+from sqlalchemy.orm import Session, sessionmaker
 from sqlalchemy.sql import functions
 
 from app.application import build_app
-from app.models import AlchemyBaseModel, Expense
+from app.models import AlchemyBaseModel, Category, Expense
 from app.settings import ENGINE
-from app.utils.constants import PRODUCTS
-from app.utils.enums import ExpenseCategory
+from app.utils.constants import CATEGORIES, PRODUCTS
 
 
 @pytest.fixture(scope="session")
@@ -45,26 +45,88 @@ def raise_always(scope="function", *args, **kwargs):
 
 def clean_db(session):
     session.query(Expense).delete()
+    session.query(Category).delete()
     session.commit()
 
 
+def get_categories(session):
+    statement = select(Category)
+    res = session.execute(statement)
+    return res.scalars().all()
+
+
+def get_expenses(session):
+    statement = select(Expense)
+    res = session.execute(statement)
+    return res.scalars().all()
+
+
+def add_categories(session):
+    categories = get_categories(session)
+    if not categories:
+        for i in range(len(CATEGORIES)):
+            category = Category(name=CATEGORIES[i])
+            session.add(category)
+            session.flush()
+        session.commit()
+
+
 def add_expenses(session):
+    categories = get_categories(session)
+    category_ids = [x.id for x in categories]
     for _ in range(10):
         expense = Expense(
             name=random.choice(PRODUCTS),
             price=random.randrange(100, 5000, 100),
-            category=random.choice(ExpenseCategory.list_names()),
+            category_id=random.choice(category_ids),
         )
         session.add(expense)
         session.flush()
     session.commit()
 
 
+def add_expense(
+    session: Session,
+    category_id: int,
+    created_at: datetime.datetime,
+    price: int,
+) -> Expense:
+    expense = Expense(
+        name=random.choice(PRODUCTS),
+        price=price,
+        category_id=category_id,
+        created_at=created_at,
+    )
+    session.add(expense)
+    session.flush()
+    return expense
+
+
 @pytest.fixture(scope="function")
 def fill_db(session):
+    add_categories(session)
     add_expenses(session)
     yield
     clean_db(session)
+
+
+@pytest.fixture(scope="function")
+def categories(session):
+    add_categories(session)
+    yield
+    clean_db(session)
+
+
+@pytest.fixture(scope="function")
+def category(categories, session):
+    statement = select(Category)
+    res = session.execute(statement)
+    return res.scalars().all()[0]
+
+
+@pytest.fixture(scope="function")
+def expense(fill_db, session):
+    return session.scalars(select(Expense).join(Category)).all()[0]
 
 
 @pytest.fixture(scope="function")

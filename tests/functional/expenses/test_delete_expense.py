@@ -8,9 +8,9 @@ from app.settings import SETTINGS
 from tests.conftest import fill_db, raise_always
 
 
-def test_delete_expense(client, fill_db, session):
+def test_delete_expense(client, expense, session):
     """Case: endpoint deletes an expense."""
-    expense_id = session.scalars(select(Expense)).first().id
+    expense_id = expense.id
     response = client.post(
         SETTINGS.urls.delete_expense.format(expense_id=expense_id),
     )
