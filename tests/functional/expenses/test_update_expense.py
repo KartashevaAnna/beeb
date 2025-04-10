@@ -1,18 +1,16 @@
 from unittest.mock import patch
 
 from app.models import Expense
-from app.repositories.expenses import ExpensesRepo
+from app.repositories.expenses import ExpenseRepo
 from app.settings import SETTINGS
-from app.utils.constants import CATEGORIES
 from app.utils.tools.helpers import get_readable_price
 from tests.conftest import get_categories, raise_always
 
 NAME = "potatoe"
 PRICE = 6500
-CATEGORY = CATEGORIES[0]
 
 
-def test_serve_template_update_expense(client, expense, session):
+def test_serve_template_update_expense(client, expense):
     """Case: endpoint returns form to update an expense."""
     response = client.get(
         SETTINGS.urls.update_expense.format(expense_id=expense.id)
@@ -131,7 +129,7 @@ def test_update_expense_standard_mode_name_lowercase_price_frontend(
     )
 
 
-def test_update_expense_name_lowercase_price_int_zero(client, expense, session):
+def test_update_expense_name_lowercase_price_int_zero(client, expense):
     """Case: endpoint fails updating an expense.
 
     Name is lowercase, price is zero (int).
@@ -149,7 +147,8 @@ def test_update_expense_name_lowercase_price_int_zero(client, expense, session):
 
 
 def test_update_expense_name_lowercase_price_frontend_zero(
-    client, expense, session
+    client,
+    expense,
 ):
     """Case: endpoint fails updating an expense.
 
@@ -168,7 +167,8 @@ def test_update_expense_name_lowercase_price_frontend_zero(
 
 
 def test_update_expense_name_lowercase_price_frontend_negative(
-    client, expense, session
+    client,
+    expense,
 ):
     """Case: endpoint fails updating an expense.
 
@@ -213,7 +213,7 @@ def test_update_expense_serve_template_404(client):
     assert response.status_code == 404
 
 
-@patch.object(ExpensesRepo, "update", raise_always)
+@patch.object(ExpenseRepo, "update", raise_always)
 def test_update_expense_exception(client, expense):
     """Case: any exception is thrown."""
     response = client.post(

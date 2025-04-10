@@ -22,7 +22,7 @@ from app.utils.tools.helpers import (
 )
 
 
-class ExpensesRepo:
+class ExpenseRepo:
     def __init__(self, session: Session) -> None:
         self.session = session
 
@@ -98,8 +98,7 @@ class ExpensesRepo:
         self.session.commit()
         statement = select(Expense).where(Expense.id == new_expense.id)
         results = self.session.execute(statement)
-        expense = results.scalars().one_or_none()
-        return expense
+        return results.scalars().one_or_none()
 
     def update(self, expense_id: int, to_upate: ExpenseUpdate):
         stmt = (

@@ -12,7 +12,7 @@ from app.utils.tools.helpers import get_number_for_db, get_readable_price
 
 
 class ExpenseShow(BaseModel):
-    id: Annotated[int, Field]
+    id: Annotated[int, Field()]
     name: Annotated[str, Field()]
     price: Annotated[int, Field()]
 

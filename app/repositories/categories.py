@@ -1,7 +1,8 @@
-from sqlalchemy import select
+from sqlalchemy import select, update
 from sqlalchemy.orm import Session
 
 from app.models import Category
+from app.schemas.categories import CategoryCreate, CategoryShowOne
 
 
 class CategoryRepo:
@@ -45,3 +46,46 @@ class CategoryRepo:
         sorted_options.append((first_option))
         sorted_options.extend(iter(all_options))
         return sorted_options
+
+    def read_name(self, category_name: str) -> Category | None:
+        statement = select(Category).where(Category.name == category_name)
+        results = self.session.execute(statement)
+        category = results.scalars().all()
+        return (
+            CategoryShowOne(
+                **category[0].__dict__,
+            )
+            if category
+            else None
+        )
+
+    def read(self, category_id: int) -> Category | None:
+        statement = select(Category).where(Category.id == category_id)
+        results = self.session.execute(statement)
+        category = results.scalars().all()
+        return (
+            CategoryShowOne(
+                **category[0].__dict__,
+            )
+            if category
+            else None
+        )
+
+    def create(self, category: CategoryCreate) -> Category:
+        new_category = Category(**category.model_dump())
+        self.session.add(new_category)
+        self.session.commit()
+        statement = select(Category).where(Category.id == new_category.id)
+        results = self.session.execute(statement)
+        return results.scalars().one_or_none()
+
+    def update(self, category_id: int, to_upate: CategoryCreate):
+        stmt = (
+            update(Category)
+            .where(Category.id == category_id)
+            .values(
+                name=to_upate.name,
+            )
+        )
+        self.session.execute(stmt)
+        self.session.commit()

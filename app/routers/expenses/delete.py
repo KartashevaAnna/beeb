@@ -4,7 +4,7 @@ import fastapi
 from fastapi import Depends, Request, status
 from fastapi.responses import RedirectResponse
 
-from app.repositories.expenses import ExpensesRepo
+from app.repositories.expenses import ExpenseRepo
 from app.settings import SETTINGS, TEMPLATES
 from app.utils.dependencies import expenses_repo
 
@@ -24,7 +24,7 @@ def delete_template(
 @delete_expenses_router.post(SETTINGS.urls.delete_expense)
 def delete_expense(
     expense_id: int,
-    repo: Annotated[ExpensesRepo, Depends(expenses_repo)],
+    repo: Annotated[ExpenseRepo, Depends(expenses_repo)],
     request: Request,
 ):
     try:

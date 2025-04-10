@@ -3,13 +3,13 @@ from unittest.mock import patch
 from sqlalchemy import func, select
 
 from app.models import Expense
-from app.repositories.expenses import ExpensesRepo
+from app.repositories.expenses import ExpenseRepo
 from app.settings import SETTINGS
 from app.utils.tools.helpers import get_readable_price
 from tests.conftest import expense, raise_always
 
 
-def test_expense_normal_function(client, expense, session):
+def test_expense_normal_function(client, expense):
     """Case: normal mode.
 
     Checks that the endpoint returns page
@@ -45,7 +45,7 @@ def test_expense_empty_db_404(client):
     assert response.status_code == 404
 
 
-@patch.object(ExpensesRepo, "read", raise_always, expense)
+@patch.object(ExpenseRepo, "read", raise_always, expense)
 def test_expense_exception(client):
     """Case: any exception is thrown."""
     response = client.get(SETTINGS.urls.expense.format(expense_id=1))

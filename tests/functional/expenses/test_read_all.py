@@ -4,7 +4,7 @@ from unittest.mock import patch
 from sqlalchemy import select
 
 from app.models import Expense
-from app.repositories.expenses import ExpensesRepo
+from app.repositories.expenses import ExpenseRepo
 from app.settings import SETTINGS
 from app.utils.tools.helpers import get_readable_price
 from tests.conftest import raise_always
@@ -40,7 +40,7 @@ def test_expenses_empty_db(client, total_expenses):
     assert isinstance(total_expenses, NoneType)
 
 
-@patch.object(ExpensesRepo, "read_all", raise_always)
+@patch.object(ExpenseRepo, "read_all", raise_always)
 def test_expenses_exception(client):
     """Case: any exception is thrown.
 

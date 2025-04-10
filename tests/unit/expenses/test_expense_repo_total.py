@@ -1,4 +1,4 @@
-from app.repositories.expenses import ExpensesRepo
+from app.repositories.expenses import ExpenseRepo
 from app.utils.tools.helpers import get_readable_price
 from tests.conftest import get_expenses
 
@@ -10,7 +10,7 @@ def test_expenses_total(fill_db, session):
     """
     all_expenses = get_expenses(session)
     total = sum(expense.price for expense in all_expenses)
-    assert ExpensesRepo(session).get_total() == get_readable_price(total)
+    assert ExpenseRepo(session).get_total() == get_readable_price(total)
 
 
 def test_expenses_total_days_no_expenses(session):
@@ -18,7 +18,7 @@ def test_expenses_total_days_no_expenses(session):
 
     Check that the repo returns 0.
     """
-    assert ExpensesRepo(session).get_total_days() == 0
+    assert ExpenseRepo(session).get_total_days() == 0
 
 
 def test_expenses_total_days_just_one_expense(session, category):
@@ -26,4 +26,4 @@ def test_expenses_total_days_just_one_expense(session, category):
 
     Check that the repo returns 0.
     """
-    assert ExpensesRepo(session).get_total_days() == 0
+    assert ExpenseRepo(session).get_total_days() == 0

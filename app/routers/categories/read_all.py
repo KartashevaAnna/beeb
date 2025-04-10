@@ -3,28 +3,27 @@ from typing import Annotated
 import fastapi
 from fastapi import Depends, Request, status
 
-from app.repositories.expenses import ExpenseRepo
+from app.repositories.categories import CategoryRepo
 from app.settings import SETTINGS, TEMPLATES
-from app.utils.dependencies import expenses_repo
+from app.utils.dependencies import categories_repo
 
-read_expenses_router = fastapi.APIRouter()
+read_categories_router = fastapi.APIRouter()
 
 
-@read_expenses_router.get(SETTINGS.urls.expenses)
+@read_categories_router.get(SETTINGS.urls.categories)
 def read_all(
-    repo: Annotated[ExpenseRepo, Depends(expenses_repo)],
+    repo: Annotated[CategoryRepo, Depends(categories_repo)],
     request: Request,
 ):
     try:
-        expenses = repo.read_all()
-        total = repo.get_total()
+        categories = repo.read_all()
         return TEMPLATES.TemplateResponse(
-            SETTINGS.templates.read_expenses,
-            context={"request": request, "expenses": expenses, "total": total},
+            SETTINGS.templates.read_categories,
+            context={"request": request, "categories": categories},
         )
     except Exception as exc:
         return TEMPLATES.TemplateResponse(
-            SETTINGS.templates.read_expenses,
+            SETTINGS.templates.read_categories,
             context={
                 "request": request,
                 "expenses": [],

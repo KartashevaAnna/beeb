@@ -5,21 +5,21 @@ from fastapi import Depends, Form, HTTPException, Request, status
 from fastapi.responses import RedirectResponse
 
 from app.repositories.categories import CategoryRepo
-from app.repositories.expenses import ExpensesRepo
+from app.repositories.expenses import ExpenseRepo
 from app.schemas.expenses import ExpenseUpdate
 from app.settings import SETTINGS, TEMPLATES
 from app.utils.dependencies import categories_repo, expenses_repo
 
-update_expenses_router = fastapi.APIRouter()
+update_expense_router = fastapi.APIRouter()
 
 
-@update_expenses_router.post(SETTINGS.urls.update_expense)
+@update_expense_router.post(SETTINGS.urls.update_expense)
 def update_expense(
     name: Annotated[str, Form()],
     price: Annotated[str, Form()],
     category: Annotated[str, Form()],
     expense_id: int,
-    repo: Annotated[ExpensesRepo, Depends(expenses_repo)],
+    repo: Annotated[ExpenseRepo, Depends(expenses_repo)],
     category_repo: Annotated[CategoryRepo, Depends(categories_repo)],
     request: Request,
 ):
@@ -43,10 +43,10 @@ def update_expense(
         )
 
 
-@update_expenses_router.get(SETTINGS.urls.update_expense)
+@update_expense_router.get(SETTINGS.urls.update_expense)
 def serve_update_expense_template(
     expense_id: int,
-    repo: Annotated[ExpensesRepo, Depends(expenses_repo)],
+    repo: Annotated[ExpenseRepo, Depends(expenses_repo)],
     category_repo: Annotated[CategoryRepo, Depends(categories_repo)],
     request: Request,
 ):
