@@ -28,6 +28,9 @@ def serve_update_category_template(
                 "request": request,
                 "category": category,
                 "form_disabled": False,
+                "options": repo.get_status_options(
+                    current_option=category.status
+                ),
             },
         )
     except HTTPException as exc:
@@ -53,14 +56,13 @@ def serve_update_category_template(
 @update_category_router.post(SETTINGS.urls.update_category)
 def update_category(
     name: Annotated[str, Form()],
+    category_status: Annotated[str, Form()],
     category_id: int,
     repo: Annotated[CategoryRepo, Depends(categories_repo)],
     request: Request,
 ):
     try:
-        to_update = CategoryCreate(
-            name=name,
-        )
+        to_update = CategoryCreate(name=name, status=category_status)
         if repo.read_name(name):
             raise HTTPException(
                 status.HTTP_304_NOT_MODIFIED,

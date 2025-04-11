@@ -3,6 +3,7 @@ import math
 import random
 
 from app.models import Category, Expense
+from app.schemas.categories import CategoryCreate
 from app.utils.constants import PRODUCTS
 
 
@@ -14,12 +15,14 @@ def add_expenses_to_db(session, category_id: int) -> Expense:
     )
     session.add(expense)
     session.commit()
+    return expense
 
 
 def add_category_to_db(session, name: str) -> Category:
-    category = Category(name=name)
+    category = Category(**CategoryCreate(name=name).__dict__)
     session.add(category)
     session.commit()
+    return category
 
 
 def get_readable_price(price: int) -> str:
@@ -76,3 +79,25 @@ def get_expenses_shares(expenses_per_categories: dict, total: int) -> dict:
         key: math.floor(expenses_per_categories[key] * 100 / total)
         for key in expenses_per_categories
     }
+
+
+def sort_options(
+    all_options: list[str], current_option: str | None = None
+) -> list:
+    """Gets all options.
+
+    Sorts options so that:
+    - the one currently selected is on top
+    - if nothing is selected, first created item shall always be on top
+    """
+    first_option = all_options[0]
+    all_options.remove(first_option)
+    if current_option not in all_options:
+        sorted_options = []
+    else:
+        sorted_options = [current_option]
+        all_options.remove(current_option)
+    all_options = sorted(all_options)
+    sorted_options.append((first_option))
+    sorted_options.extend(iter(all_options))
+    return sorted_options

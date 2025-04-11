@@ -3,6 +3,7 @@ from sqlalchemy.orm import Session
 
 from app.models import Category
 from app.schemas.categories import CategoryCreate, CategoryShowOne
+from app.utils.tools.helpers import sort_options
 
 
 class CategoryRepo:
@@ -17,6 +18,10 @@ class CategoryRepo:
     def list_names(self) -> list[str]:
         results = self.read_all()
         return [x.name for x in results]
+
+    def list_statuses(self) -> list[str]:
+        results = self.read_all()
+        return list({x.status for x in results})
 
     def get_dict_names(self) -> dict:
         statement = select(Category)
@@ -35,17 +40,17 @@ class CategoryRepo:
         - if nothing is selected, first created category shall always be on top"
         """
         all_options = self.list_names()
-        first_option = all_options[0]
-        all_options.remove(first_option)
-        if current_option not in all_options:
-            sorted_options = []
-        else:
-            sorted_options = [current_option]
-            all_options.remove(current_option)
-        all_options = sorted(all_options)
-        sorted_options.append((first_option))
-        sorted_options.extend(iter(all_options))
-        return sorted_options
+        return sort_options(all_options, current_option)
+
+    def get_status_options(self, current_option: str | None = None) -> list:
+        """Gets all status options.
+
+        Sorts options so that:
+        - the one currently selected is on top
+        - if nothing is selected, first created status shall always be on top"
+        """
+        all_options = self.list_statuses()
+        return sort_options(all_options, current_option)
 
     def read_name(self, category_name: str) -> Category | None:
         statement = select(Category).where(Category.name == category_name)

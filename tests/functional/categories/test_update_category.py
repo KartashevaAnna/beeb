@@ -18,17 +18,16 @@ def test_serve_template_update_expense(client, category):
     )
     assert response.status_code == 200
     assert category.name.title() in response.text
+    assert category.status in response.text
 
 
-def test_update__category_standard_mode(client, category, session):
+def test_update__category_name(client, category, session):
     """Case: endpoint updates a category."""
     category_id = category.id
 
     response = client.post(
         SETTINGS.urls.update_category.format(category_id=category_id),
-        data={
-            "name": NAME,
-        },
+        data={"name": NAME, "category_status": category.status},
     )
     assert response.status_code == 303
     assert response.headers.get("location") == SETTINGS.urls.categories
@@ -36,6 +35,7 @@ def test_update__category_standard_mode(client, category, session):
     updated_category = session.get(Category, category_id)
     assert category_id == updated_category.id
     assert updated_category.name == NAME
+    assert updated_category.status == category.status
 
 
 def test_update__category_duplicate_name(client, category):
@@ -44,9 +44,7 @@ def test_update__category_duplicate_name(client, category):
 
     response = client.post(
         SETTINGS.urls.update_category.format(category_id=category_id),
-        data={
-            "name": category.name,
-        },
+        data={"name": category.name, "category_status": category.status},
     )
     assert response.status_code == status.HTTP_304_NOT_MODIFIED
 
@@ -57,9 +55,7 @@ def test_update__category_name_is_None(client, category):
 
     response = client.post(
         SETTINGS.urls.update_category.format(category_id=category_id),
-        data={
-            "name": None,
-        },
+        data={"name": None, "category_status": category.status},
     )
     assert response.status_code == 422
 
@@ -79,9 +75,7 @@ def test_update_expense_exception(client, category):
     category_id = category.id
     response = client.post(
         SETTINGS.urls.update_category.format(category_id=category_id),
-        data={
-            "name": NAME,
-        },
+        data={"name": NAME, "category_status": category.status},
     )
     assert response.status_code == 501
     assert "exception" in response.text
