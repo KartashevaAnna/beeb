@@ -18,7 +18,7 @@ def read_category(
 ):
     try:
         if not (category := repo.read(category_id)):
-            raise HTTPException(404, "Category not found")
+            raise HTTPException(status.HTTP_404_NOT_FOUND, "Category not found")
         return TEMPLATES.TemplateResponse(
             SETTINGS.templates.read_category,
             context={

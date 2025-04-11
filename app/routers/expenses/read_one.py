@@ -18,7 +18,7 @@ def read_expense(
 ):
     try:
         if not (expense := repo.read(expense_id)):
-            raise HTTPException(404, "Expense not found")
+            raise HTTPException(status.HTTP_404_NOT_FOUND, "Expense not found")
         return TEMPLATES.TemplateResponse(
             SETTINGS.templates.read_expense,
             context={

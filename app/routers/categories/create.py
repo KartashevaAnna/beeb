@@ -33,7 +33,10 @@ def create_category(
 ):
     try:
         if new_category := repo.read_name(category_name=name):
-            raise HTTPException(406, "Category with this name already exists")
+            raise HTTPException(
+                status.HTTP_406_NOT_ACCEPTABLE,
+                "Category with this name already exists",
+            )
         new_category = CategoryCreate(name=name)
         repo.create(new_category)
         return RedirectResponse(

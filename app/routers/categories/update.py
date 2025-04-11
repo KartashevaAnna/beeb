@@ -3,6 +3,7 @@ from typing import Annotated
 import fastapi
 from fastapi import Depends, Form, HTTPException, Request, status
 from fastapi.responses import RedirectResponse
+from pydantic import ValidationError
 
 from app.repositories.categories import CategoryRepo
 from app.schemas.categories import CategoryCreate
@@ -20,7 +21,7 @@ def serve_update_category_template(
 ):
     try:
         if not (category := repo.read(category_id)):
-            raise HTTPException(404, "Category not found")
+            raise HTTPException(status.HTTP_404_NOT_FOUND, "Category not found")
         return TEMPLATES.TemplateResponse(
             SETTINGS.templates.read_category,
             context={
@@ -61,7 +62,10 @@ def update_category(
             name=name,
         )
         if repo.read_name(name):
-            raise HTTPException(406, "Category with this name already exists")
+            raise HTTPException(
+                status.HTTP_304_NOT_MODIFIED,
+                "Category with this name already exists",
+            )
         repo.update(category_id=category_id, to_upate=to_update)
         return RedirectResponse(
             url="/categories", status_code=status.HTTP_303_SEE_OTHER
@@ -73,7 +77,16 @@ def update_category(
                 "request": request,
                 "exception": "Категория с таким названием уже существует",
             },
-            status_code=status.HTTP_406_NOT_ACCEPTABLE,
+            status_code=status.HTTP_304_NOT_MODIFIED,
+        )
+    except ValidationError as exc:
+        return TEMPLATES.TemplateResponse(
+            SETTINGS.templates.read_category,
+            context={
+                "request": request,
+                "exception": f"There was an error: {str(exc)}",
+            },
+            status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
         )
 
     except Exception as exc:

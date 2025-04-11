@@ -1,5 +1,7 @@
 from unittest.mock import patch
 
+from fastapi import status
+
 from app.models import Category
 from app.repositories.categories import CategoryRepo
 from app.settings import SETTINGS
@@ -37,7 +39,7 @@ def test_update__category_standard_mode(client, category, session):
 
 
 def test_update__category_duplicate_name(client, category):
-    """Case: endpoint updates a category."""
+    """Case: endpoint refuses updating a category."""
     category_id = category.id
 
     response = client.post(
@@ -46,7 +48,20 @@ def test_update__category_duplicate_name(client, category):
             "name": category.name,
         },
     )
-    assert response.status_code == 406
+    assert response.status_code == status.HTTP_304_NOT_MODIFIED
+
+
+def test_update__category_name_is_None(client, category):
+    """Case: endpoint refuses updating a category."""
+    category_id = category.id
+
+    response = client.post(
+        SETTINGS.urls.update_category.format(category_id=category_id),
+        data={
+            "name": None,
+        },
+    )
+    assert response.status_code == 422
 
 
 def test_update_category_serve_template_404(client):
