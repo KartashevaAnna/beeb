@@ -7,4 +7,4 @@ class CategoryStatus(StrEnum):
 
     @classmethod
     def list_names(cls):
-        return list(map(lambda c: c.name, cls))
+        return list(map(lambda c: c.value, cls))

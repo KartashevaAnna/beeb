@@ -12,7 +12,7 @@ class CategoryCreate(BaseModel):
             min_length=1, max_length=255, strip_whitespace=True, to_lower=True
         ),
     ]
-    status: CategoryStatus = Field(default=CategoryStatus.active)
+    status: str = Field(default=CategoryStatus.active.value)
 
     @field_validator("name")
     def prevent_blank_strings(cls, value):

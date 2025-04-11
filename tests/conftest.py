@@ -67,7 +67,7 @@ def add_categories(session):
     if not categories:
         for i in range(len(CATEGORIES)):
             category = Category(
-                name=CATEGORIES[i], status=CategoryStatus.active
+                name=CATEGORIES[i], status=CategoryStatus.active.value
             )
             session.add(category)
             session.flush()

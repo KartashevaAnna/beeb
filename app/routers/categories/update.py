@@ -63,12 +63,14 @@ def update_category(
 ):
     try:
         to_update = CategoryCreate(name=name, status=category_status)
-        if repo.read_name(name):
-            raise HTTPException(
-                status.HTTP_304_NOT_MODIFIED,
-                "Category with this name already exists",
-            )
-        repo.update(category_id=category_id, to_upate=to_update)
+        category_with_the_same_name = repo.read_name(name)
+        if category_with_the_same_name:
+            if category_with_the_same_name.id != category_id:
+                raise HTTPException(
+                    status.HTTP_304_NOT_MODIFIED,
+                    "Category with this name already exists",
+                )
+        repo.update(category_id=category_id, to_update=to_update)
         return RedirectResponse(
             url="/categories", status_code=status.HTTP_303_SEE_OTHER
         )

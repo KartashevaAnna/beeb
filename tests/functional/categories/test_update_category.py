@@ -5,7 +5,8 @@ from fastapi import status
 from app.models import Category
 from app.repositories.categories import CategoryRepo
 from app.settings import SETTINGS
-from tests.conftest import raise_always
+from app.utils.enums import CategoryStatus
+from tests.conftest import get_categories, raise_always
 
 NAME = "exotic_category"
 
@@ -38,13 +39,31 @@ def test_update__category_name(client, category, session):
     assert updated_category.status == category.status
 
 
-def test_update__category_duplicate_name(client, category):
-    """Case: endpoint refuses updating a category."""
+def test_update__category_change_status(client, category):
+    """Case: endpoint updates a category."""
     category_id = category.id
 
     response = client.post(
         SETTINGS.urls.update_category.format(category_id=category_id),
-        data={"name": category.name, "category_status": category.status},
+        data={
+            "name": category.name,
+            "category_status": CategoryStatus.deprecated.value,
+        },
+    )
+    assert response.status_code == status.HTTP_303_SEE_OTHER
+
+
+def test_update__category_duplicate_name(client, categories, session):
+    """Case: endpoint refuses updating a category."""
+    categories = get_categories(session)
+    category_id = categories[0].id
+
+    response = client.post(
+        SETTINGS.urls.update_category.format(category_id=category_id),
+        data={
+            "name": categories[1].name,
+            "category_status": categories[0].status,
+        },
     )
     assert response.status_code == status.HTTP_304_NOT_MODIFIED
 
