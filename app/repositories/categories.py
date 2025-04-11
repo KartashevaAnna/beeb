@@ -3,7 +3,6 @@ from sqlalchemy.orm import Session
 
 from app.models import Category
 from app.schemas.categories import CategoryCreate, CategoryShowOne
-from app.utils.enums import CategoryStatus
 from app.utils.tools.helpers import sort_options
 
 
@@ -21,7 +20,7 @@ class CategoryRepo:
         return [x.name for x in results]
 
     def list_statuses(self) -> list[str]:
-        return CategoryStatus.list_names()
+        return [True, False]
 
     def get_dict_names(self) -> dict:
         statement = select(Category)
@@ -88,7 +87,7 @@ class CategoryRepo:
         stmt = (
             update(Category)
             .where(Category.id == category_id)
-            .values(name=to_update.name, status=to_update.status)
+            .values(name=to_update.name, is_active=to_update.is_active)
         )
         self.session.execute(stmt)
         self.session.commit()

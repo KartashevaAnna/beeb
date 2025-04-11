@@ -29,14 +29,14 @@
                                 <div class="row align-items-center justify-content-lg-center my-1 p-2">
                                     <div class="col justify-content-center">
                                         {% if form_disabled %}
-                                        <input name="status" id="status" type="text" placeholder="статус"
-                                        value="{{ category.status or '' }}" disabled class="beeb-input ">
+                                        <input name="is_active" id="is_active" type="text" placeholder="статус"
+                                        value="{{ category.is_active or '' }}" disabled class="beeb-input ">
                                         {% else %}
-                                        <select id="category_status" name="category_status" type="text" placeholder="статус"
+                                        <select id="is_active" name="is_active" type="text" placeholder="статус"
                                          class="beeb-input">
                                             {% for option in options %}
                                                 <option value="{{ option }}" 
-                                                {% if value == category.status %} selected="selected" {% endif %}
+                                                {% if value == category.is_active %} selected="selected" {% endif %}
                                                 >{{ option }}</option>
                                             {% endfor %}
                                         </select>

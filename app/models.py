@@ -12,7 +12,7 @@ class Category(AlchemyBaseModel):
     __tablename__ = "category"
     id: Mapped[int] = mapped_column(Integer, primary_key=True)
     name: Mapped[str] = mapped_column(String(255), nullable=False)
-    status: Mapped[str] = mapped_column(String(255), nullable=False)
+    is_active: Mapped[bool] = mapped_column(nullable=False, default=True)
     expense_list: Mapped[list["Expense"]] = relationship(
         back_populates="expense_category",
     )

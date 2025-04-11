@@ -29,7 +29,7 @@ def serve_update_category_template(
                 "category": category,
                 "form_disabled": False,
                 "options": repo.get_status_options(
-                    current_option=category.status
+                    current_option=category.is_active
                 ),
             },
         )
@@ -56,13 +56,13 @@ def serve_update_category_template(
 @update_category_router.post(SETTINGS.urls.update_category)
 def update_category(
     name: Annotated[str, Form()],
-    category_status: Annotated[str, Form()],
+    is_active: Annotated[str, Form()],
     category_id: int,
     repo: Annotated[CategoryRepo, Depends(categories_repo)],
     request: Request,
 ):
     try:
-        to_update = CategoryCreate(name=name, status=category_status)
+        to_update = CategoryCreate(name=name, is_active=is_active)
         category_with_the_same_name = repo.read_name(name)
         if category_with_the_same_name:
             if category_with_the_same_name.id != category_id:

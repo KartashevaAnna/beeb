@@ -5,21 +5,20 @@ from fastapi import status
 from app.models import Category
 from app.repositories.categories import CategoryRepo
 from app.settings import SETTINGS
-from app.utils.enums import CategoryStatus
 from tests.conftest import get_categories, raise_always
 
 NAME = "exotic_category"
 
 
-def test_serve_template_update_expense(client, category):
-    """Case: endpoint returns form to update an expense."""
+def test_serve_template_update_category(client, category):
+    """Case: endpoint returns form to update a category."""
     category_id = category.id
     response = client.get(
         SETTINGS.urls.update_category.format(category_id=category_id)
     )
     assert response.status_code == 200
     assert category.name.title() in response.text
-    assert category.status in response.text
+    assert str(category.is_active) in response.text
 
 
 def test_update__category_name(client, category, session):
@@ -28,7 +27,7 @@ def test_update__category_name(client, category, session):
 
     response = client.post(
         SETTINGS.urls.update_category.format(category_id=category_id),
-        data={"name": NAME, "category_status": category.status},
+        data={"name": NAME, "is_active": category.is_active},
     )
     assert response.status_code == 303
     assert response.headers.get("location") == SETTINGS.urls.categories
@@ -36,7 +35,7 @@ def test_update__category_name(client, category, session):
     updated_category = session.get(Category, category_id)
     assert category_id == updated_category.id
     assert updated_category.name == NAME
-    assert updated_category.status == category.status
+    assert updated_category.is_active == category.is_active
 
 
 def test_update__category_change_status(client, category):
@@ -47,7 +46,7 @@ def test_update__category_change_status(client, category):
         SETTINGS.urls.update_category.format(category_id=category_id),
         data={
             "name": category.name,
-            "category_status": CategoryStatus.deprecated.value,
+            "is_active": False,
         },
     )
     assert response.status_code == status.HTTP_303_SEE_OTHER
@@ -62,7 +61,7 @@ def test_update__category_duplicate_name(client, categories, session):
         SETTINGS.urls.update_category.format(category_id=category_id),
         data={
             "name": categories[1].name,
-            "category_status": categories[0].status,
+            "is_active": categories[0].is_active,
         },
     )
     assert response.status_code == status.HTTP_304_NOT_MODIFIED
@@ -74,7 +73,7 @@ def test_update__category_name_is_None(client, category):
 
     response = client.post(
         SETTINGS.urls.update_category.format(category_id=category_id),
-        data={"name": None, "category_status": category.status},
+        data={"name": None, "is_active": category.is_active},
     )
     assert response.status_code == 422
 
@@ -94,7 +93,7 @@ def test_update_expense_exception(client, category):
     category_id = category.id
     response = client.post(
         SETTINGS.urls.update_category.format(category_id=category_id),
-        data={"name": NAME, "category_status": category.status},
+        data={"name": NAME, "is_active": category.is_active},
     )
     assert response.status_code == 501
     assert "exception" in response.text

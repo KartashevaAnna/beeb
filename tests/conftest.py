@@ -12,7 +12,6 @@ from app.application import build_app
 from app.models import AlchemyBaseModel, Category, Expense
 from app.settings import ENGINE
 from app.utils.constants import CATEGORIES, PRODUCTS
-from app.utils.enums import CategoryStatus
 
 
 @pytest.fixture(scope="session")
@@ -66,9 +65,7 @@ def add_categories(session):
     categories = get_categories(session)
     if not categories:
         for i in range(len(CATEGORIES)):
-            category = Category(
-                name=CATEGORIES[i], status=CategoryStatus.active.value
-            )
+            category = Category(name=CATEGORIES[i], is_active=True)
             session.add(category)
             session.flush()
         session.commit()

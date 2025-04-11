@@ -3,7 +3,7 @@ SET TIME ZONE "Europe/Moscow";
 CREATE TABLE IF NOT EXISTS "main"."category" (
     "id" SERIAL PRIMARY KEY,
     "name" VARCHAR (255) NOT NULL UNIQUE,
-    "status" VARCHAR (255) NOT NULL
+    "is_active" BOOLEAN NOT NULL DEFAULT TRUE
 );
 
 
