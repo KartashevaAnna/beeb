@@ -17,6 +17,7 @@
 <table class="table table-hover">
 
 {% for expense in expenses %}
+<tr>
     <td scope="row">{{ expense.name.title() }}</td>
     <td>{{ expense.price_in_rub }}</td>
     <td><a href="/expenses/{{expense.id}}"><i class="material-icons">👁️</i></a></td>
