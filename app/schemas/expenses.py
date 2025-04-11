@@ -15,6 +15,7 @@ class ExpenseShow(BaseModel):
     id: Annotated[int, Field()]
     name: Annotated[str, Field()]
     price: Annotated[int, Field()]
+    category: Annotated[str, Field()]
 
     @computed_field
     @property

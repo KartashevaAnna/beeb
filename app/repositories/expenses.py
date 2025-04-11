@@ -27,10 +27,19 @@ class ExpenseRepo:
         self.session = session
 
     def read_all(self) -> List[Expense]:
-        statement = select(Expense).order_by(Expense.created_at.desc())
+        statement = (
+            select(Expense, Category.name)
+            .join(Expense.expense_category)
+            .order_by(Expense.created_at.desc())
+        )
         res = self.session.execute(statement)
         results = res.scalars().all()
-        return [ExpenseShow(**expense.__dict__) for expense in results]
+        return [
+            ExpenseShow(
+                **expense.__dict__, category=expense.expense_category.name
+            )
+            for expense in results
+        ]
 
     def get_total(self) -> int:
         statement = select(functions.sum(Expense.price))

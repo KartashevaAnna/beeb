@@ -13,6 +13,7 @@
             <a href="/expenses/create" class="btn beeb-secondary-button float-right" >➕</a>
         </div>
     </div>
+</div>
 
 <table class="table table-hover">
 
@@ -20,6 +21,7 @@
 <tr>
     <td scope="row">{{ expense.name.title() }}</td>
     <td>{{ expense.price_in_rub }}</td>
+    <td>{{ expense.category}} </td>
     <td><a href="/expenses/{{expense.id}}"><i class="material-icons">👁️</i></a></td>
 </tr>
 {% endfor %}
