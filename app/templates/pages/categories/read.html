@@ -28,22 +28,12 @@
                                 </div>
                                 <div class="row align-items-center justify-content-lg-center my-1 p-2">
                                     <div class="col justify-content-center">
-                                        {% if form_disabled %}
-                                            {% if category.is_active %}
-                                                <input class=form-check-input name="is_active" id="is_active" type="checkbox" checked 
-                                                class="beeb-input">
-                                            {% else %}
-                                                <input class=form-check-input name="is_active" id="is_active" type="checkbox" 
-                                                class="beeb-input">
-                                            {% endif %}
+                                        {% if category.is_active %}
+                                            <input class=form-check-input name="is_active" id="is_active" type="checkbox" checked
+                                            class="beeb-input">
                                         {% else %}
-                                            {% if category.is_active %}
-                                                <input class=form-check-input name="is_active" id="is_active" type="checkbox" checked
-                                                class="beeb-input">
-                                            {% else %}
-                                                <input class=form-check-input name="is_active" id="is_active" type="checkbox" 
-                                                class="beeb-input">
-                                            {% endif %}
+                                            <input class=form-check-input name="is_active" id="is_active" type="checkbox" 
+                                            class="beeb-input">
                                         {% endif %}
                                         <label class="form-check-label" for="form-check-input">
                                             Показывать в меню
