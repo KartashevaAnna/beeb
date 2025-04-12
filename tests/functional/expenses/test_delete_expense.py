@@ -3,14 +3,14 @@ from unittest.mock import patch
 from sqlalchemy import select
 
 from app.models import Expense
-from app.repositories.expenses import ExpensesRepo
+from app.repositories.expenses import ExpenseRepo
 from app.settings import SETTINGS
 from tests.conftest import fill_db, raise_always
 
 
-def test_delete_expense(client, fill_db, session):
+def test_delete_expense(client, expense, session):
     """Case: endpoint deletes an expense."""
-    expense_id = session.scalars(select(Expense)).first().id
+    expense_id = expense.id
     response = client.post(
         SETTINGS.urls.delete_expense.format(expense_id=expense_id),
     )
@@ -23,7 +23,7 @@ def test_delete_expense(client, fill_db, session):
     assert not deleted_expense
 
 
-@patch.object(ExpensesRepo, "delete", raise_always, fill_db)
+@patch.object(ExpenseRepo, "delete", raise_always, fill_db)
 def test_delete_expense_that_does_not_exist(client):
     """Case: any exception is thrown."""
     response = client.post(SETTINGS.urls.delete_expense.format(expense_id=1))

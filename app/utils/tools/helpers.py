@@ -1,19 +1,28 @@
 import locale
+import math
 import random
 
-from app.models import Expense
+from app.models import Category, Expense
+from app.schemas.categories import CategoryCreate
 from app.utils.constants import PRODUCTS
-from app.utils.enums import ExpenseCategory
 
 
-def add_expenses_to_db(session) -> Expense:
+def add_expenses_to_db(session, category_id: int) -> Expense:
     expense = Expense(
         name=random.choice(PRODUCTS),
         price=random.randrange(100, 5000, 100),
-        category=random.choice(ExpenseCategory.list_names()),
+        category_id=category_id,
     )
     session.add(expense)
     session.commit()
+    return expense
+
+
+def add_category_to_db(session, name: str) -> Category:
+    category = Category(**CategoryCreate(name=name).__dict__)
+    session.add(category)
+    session.commit()
+    return category
 
 
 def get_readable_price(price: int) -> str:
@@ -30,19 +39,6 @@ def get_number_for_db(frontend_input: str) -> int:
     removed_currency_symbol = frontend_input.replace(currency_symbol, "")
     removed_decimal = removed_currency_symbol.replace(",", "")
     return locale.atoi(removed_decimal)
-
-
-def get_expenses_options(current_option: str) -> list:
-    """Gets all expenses options.
-
-    Sorts options so that the one currently selected is on top.
-    """
-    all_options = ExpenseCategory.list_names()
-    sorted_options = [current_option]
-    all_options.remove(current_option)
-    all_options = sorted(all_options)
-    sorted_options.extend(iter(all_options))
-    return sorted_options
 
 
 def get_monthly_expenses(all_expenses: list[Expense]) -> dict[int, str]:
@@ -63,17 +59,45 @@ def get_expenses_sums_per_category(
 ) -> dict[int, str]:
     expenses_sums_per_category = {}
     for expense in all_expenses:
-        if expense.category not in expenses_sums_per_category.keys():
-            expenses_sums_per_category[expense.category] = expense.price
+        if (
+            expense.expense_category.name
+            not in expenses_sums_per_category.keys()
+        ):
+            expenses_sums_per_category[expense.expense_category.name] = (
+                expense.price
+            )
         else:
-            expenses_sums_per_category[expense.category] = (
-                expense.price + expenses_sums_per_category[expense.category]
+            expenses_sums_per_category[expense.expense_category.name] = (
+                expense.price
+                + expenses_sums_per_category[expense.expense_category.name]
             )
     return expenses_sums_per_category
 
 
 def get_expenses_shares(expenses_per_categories: dict, total: int) -> dict:
     return {
-        key: int(round(expenses_per_categories[key] * 100 / total, 0))
+        key: math.floor(expenses_per_categories[key] * 100 / total)
         for key in expenses_per_categories
     }
+
+
+def sort_options(
+    all_options: list[str], current_option: str | None = None
+) -> list:
+    """Gets all options.
+
+    Sorts options so that:
+    - the one currently selected is on top
+    - if nothing is selected, first created item shall always be on top
+    """
+    first_option = all_options[0]
+    all_options.remove(first_option)
+    if current_option not in all_options:
+        sorted_options = []
+    else:
+        sorted_options = [current_option]
+        all_options.remove(current_option)
+    all_options = sorted(all_options)
+    sorted_options.append((first_option))
+    sorted_options.extend(iter(all_options))
+    return sorted_options

@@ -3,7 +3,7 @@ from typing import Annotated
 import fastapi
 from fastapi import Depends, Request
 
-from app.repositories.expenses import ExpensesRepo
+from app.repositories.expenses import ExpenseRepo
 from app.settings import SETTINGS, TEMPLATES
 from app.utils.dependencies import expenses_repo
 
@@ -12,7 +12,7 @@ total_expenses_router = fastapi.APIRouter()
 
 @total_expenses_router.get(SETTINGS.urls.total_expenses)
 def read_all_expenses(
-    repo: Annotated[ExpensesRepo, Depends(expenses_repo)],
+    repo: Annotated[ExpenseRepo, Depends(expenses_repo)],
     request: Request,
 ):
     return TEMPLATES.TemplateResponse(
@@ -31,7 +31,7 @@ def read_all_expenses(
 
 @total_expenses_router.get(SETTINGS.urls.total_expenses_monthly)
 def read_monthly_expenses_breakdown(
-    repo: Annotated[ExpensesRepo, Depends(expenses_repo)],
+    repo: Annotated[ExpenseRepo, Depends(expenses_repo)],
     request: Request,
 ):
     return TEMPLATES.TemplateResponse(

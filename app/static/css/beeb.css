@@ -61,39 +61,5 @@
   --bs-form-invalid-border-color: #e685b5;
 }
 
-.beeb-submit-button {
-  background-color: #20c997;
-  border-color: #0cca91a5;
-  color: black;
-  display: block;
-  width: 100%;
-}
-.beeb-submit-button:hover {
-  background-color: #37bd74;
-  border-color: #0cca91a5;
-  color: black;
-}
-
-.beeb-secondary-button
-{background-color: rgba(222, 226, 230, 0.75);}
-
-.beeb-secondary-button:hover {background-color: #e1e3e6;}
 
 
-.beeb-input{
-  background-color: rgba(222, 226, 230, 0.75);
-  text-align: center;
-}
-.beeb-input:disabled{
-  color: rgb(34, 33, 33);
-  text-align: center;
-}
-
-.beeb-input-create{
-  background-color: #a0b7bc;
-  text-align: center;
-}
-.beeb-input-create:disabled{
-  color: rgb(34, 33, 33);
-  text-align: center;
-}

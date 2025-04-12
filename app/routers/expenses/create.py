@@ -5,19 +5,26 @@ from fastapi import Depends, Form, Request, status
 from fastapi.responses import RedirectResponse
 from pydantic import ValidationError
 
-from app.repositories.expenses import ExpensesRepo
+from app.repositories.categories import CategoryRepo
+from app.repositories.expenses import ExpenseRepo
 from app.schemas.expenses import ExpenseCreate
 from app.settings import SETTINGS, TEMPLATES
-from app.utils.dependencies import expenses_repo
+from app.utils.dependencies import categories_repo, expenses_repo
 
 create_expenses_router = fastapi.APIRouter()
 
 
 @create_expenses_router.get(SETTINGS.urls.create_expense)
-def serve_create_expense_template(request: Request):
+def serve_create_expense_template(
+    request: Request,
+    repo: Annotated[ExpenseRepo, Depends(categories_repo)],
+):
     return TEMPLATES.TemplateResponse(
         SETTINGS.templates.create_expense,
-        context={"request": request},
+        context={
+            "request": request,
+            "options": repo.list_names(),
+        },
     )
 
 
@@ -26,11 +33,17 @@ def create_expense(
     name: Annotated[str, Form()],
     price: Annotated[str, Form()],
     category: Annotated[str, Form()],
-    repo: Annotated[ExpensesRepo, Depends(expenses_repo)],
+    repo: Annotated[ExpenseRepo, Depends(expenses_repo)],
+    category_repo: Annotated[CategoryRepo, Depends(categories_repo)],
     request: Request,
 ):
     try:
-        new_expense = ExpenseCreate(name=name, price=price, category=category)
+        options = category_repo.get_dict_names()
+
+        new_expense = ExpenseCreate(
+            name=name, price=price, category_id=options[category]
+        )
+
         repo.create(new_expense)
 
         return RedirectResponse(

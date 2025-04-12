@@ -70,6 +70,10 @@ class Urls(BaseModel):
     delete_expense: str
     total_expenses: str
     total_expenses_monthly: str
+    create_category: str
+    category: str
+    categories: str
+    update_category: str
 
 
 class Templates(BaseModel):
@@ -79,6 +83,9 @@ class Templates(BaseModel):
     delete_expense: str
     total_expenses_monthly: str
     total_expenses: str
+    create_category: str
+    read_category: str
+    read_categories: str
 
 
 class Settings(CustomSettings):

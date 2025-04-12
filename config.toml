@@ -12,6 +12,7 @@ password = "{{ secrets.DATABASE_PASSWORD }}"
 
 [urls]
 ping = "{{ urls.URL_PING }}"
+
 expenses = "{{ urls.URL_EXPENSES }}"
 create_expense = "{{ urls.URL_CREATE_EXPENSE }}"
 update_expense = "{{ urls.URL_UPDATE_EXPENSE }}"
@@ -19,6 +20,11 @@ delete_expense = "{{ urls.URL_DELETE_EXPENSE }}"
 expense = "{{ urls.URL_EXPENSE }}"
 total_expenses = "{{ urls.URL_EXPENSES_TOTAL }}"
 total_expenses_monthly = "{{ urls.URL_EXPENSES_TOTAL_MONTHLY }}"
+
+categories = "{{ urls.URL_CATEGORIES }}"
+create_category = "{{ urls.URL_CREATE_CATEGORY }}"
+update_category = "{{ urls.URL_UPDATE_CATEGORY }}"
+category = "{{ urls.URL_CATEGORY }}"
 
 [templates]
 read_expenses = "{{ templates.TEMPLATE_READ_EXPENSES }}"
@@ -28,3 +34,6 @@ delete_expense = "{{ templates.TEMPLATE_DELETE_EXPENSE }}"
 total_expenses = "{{ templates.TEMPLATE_EXPENSES_TOTAL }}"
 total_expenses_monthly = "{{ templates.TEMPLATE_EXPENSES_TOTAL_MONTLY }}"
 
+read_categories = "{{ templates.TEMPLATE_READ_CATEGORIES }}"
+create_category = "{{ templates.TEMPLATE_CREATE_CATEGORY }}"
+read_category = "{{ templates.TEMPLATE_READ_CATEGORY }}"

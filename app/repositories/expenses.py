@@ -5,8 +5,13 @@ from sqlalchemy import delete, func, select, update
 from sqlalchemy.orm import Session
 from sqlalchemy.sql import functions
 
-from app.models import Expense
-from app.schemas.expenses import ExpenseCreate, ExpenseShow, ExpenseUpdate
+from app.models import Category, Expense
+from app.schemas.expenses import (
+    ExpenseCreate,
+    ExpenseShow,
+    ExpenseShowOne,
+    ExpenseUpdate,
+)
 from app.utils.constants import MONTHES
 from app.utils.tools.helpers import (
     get_expenses_shares,
@@ -17,15 +22,24 @@ from app.utils.tools.helpers import (
 )
 
 
-class ExpensesRepo:
+class ExpenseRepo:
     def __init__(self, session: Session) -> None:
         self.session = session
 
     def read_all(self) -> List[Expense]:
-        statement = select(Expense).order_by(Expense.created_at.desc())
+        statement = (
+            select(Expense, Category.name)
+            .join(Expense.expense_category)
+            .order_by(Expense.created_at.desc())
+        )
         res = self.session.execute(statement)
         results = res.scalars().all()
-        return [ExpenseShow(**expense.__dict__) for expense in results]
+        return [
+            ExpenseShow(
+                **expense.__dict__, category=expense.expense_category.name
+            )
+            for expense in results
+        ]
 
     def get_total(self) -> int:
         statement = select(functions.sum(Expense.price))
@@ -62,7 +76,7 @@ class ExpensesRepo:
         }
 
     def get_total_monthly_expenses_shares(self) -> dict:
-        stmt = select(Expense)
+        stmt = select(Expense).join(Expense.expense_category)
         results = self.session.execute(stmt)
         all_expenses = results.scalars().all()
         total = get_number_for_db(self.get_total())
@@ -72,10 +86,20 @@ class ExpensesRepo:
         )
 
     def read(self, expense_id: int) -> Expense | None:
-        statement = select(Expense).where(Expense.id == expense_id)
+        statement = (
+            select(Expense, Category.name)
+            .join(Expense.expense_category)
+            .where(Expense.id == expense_id)
+        )
         results = self.session.execute(statement)
-        expense = results.scalars().one_or_none()
-        return ExpenseShow(**expense.__dict__) if expense else None
+        expense = results.scalars().all()
+        return (
+            ExpenseShowOne(
+                **expense[0].__dict__, category=expense[0].expense_category.name
+            )
+            if expense
+            else None
+        )
 
     def create(self, expense: ExpenseCreate) -> Expense:
         new_expense = Expense(**expense.model_dump())
@@ -83,8 +107,7 @@ class ExpensesRepo:
         self.session.commit()
         statement = select(Expense).where(Expense.id == new_expense.id)
         results = self.session.execute(statement)
-        expense = results.scalars().one_or_none()
-        return expense
+        return results.scalars().one_or_none()
 
     def update(self, expense_id: int, to_upate: ExpenseUpdate):
         stmt = (
@@ -93,7 +116,7 @@ class ExpensesRepo:
             .values(
                 name=to_upate.name,
                 price=to_upate.price_in_kopecks,
-                category=to_upate.category,
+                category_id=to_upate.category_id,
             )
         )
         self.session.execute(stmt)

@@ -1,0 +1,42 @@
+{% extends "base.html" %}
+
+{% block bodycontent %}
+<div class="form-group">
+    <form method="post" enctype="multipart/form-data" action="create">
+    
+            <div class="container-fluid">
+                    <div class="row align-items-center justify-content-lg-center my-4 p-2">
+                        <div class="col-lg-4 justify-content-center">
+                                <div class="card" style="border-radius: .80rem; background-color:#3c4055; border: 2px solid; border-color: #a7acb1">
+                                <div class="card-body" id="my_card_body"style="background-color:#3c4055; border-radius: 20px; overflow: hidden;">
+                                    <div class="row align-items-center justify-content-sm-center my-1 p-2">
+                                        <div class="col-xs-2 justify-content-center align-items-*-center">
+                                            <legend style="text-align: center;">
+                                                Создание категории
+                                            </legend> 
+                                        </div>
+                                    <div class="row align-items-center justify-content-lg-center my-1 p-2">
+                                        <div class="col justify-content-center">
+                                            <input name="name" id="name" type="text" placeholder="название"
+                                             class="beeb-input ">
+                                        </div>
+                                    </div>
+                                    <div class="row align-items-center justify-content-center my-1 p-2">
+                                        <div class="col-12 justify-content-center align-items-xs-center">
+                                    
+                                            <button 
+                                            type="submit" 
+                                   
+                                            class="btn beeb-submit-button"
+                                            >OK
+                                        </button>
+        
+                                        </div>
+                                    </div>
+                                    
+                                  </form> 
+                                </div>
+                              </div>
+
+{% endblock %}
+

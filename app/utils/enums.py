@@ -1,10 +1,10 @@
 from enum import StrEnum
 
 
-class ExpenseCategory(StrEnum):
-    food = "food"
-    non_food = "non_food"
+class CategoryStatus(StrEnum):
+    active = "категория актуальна"
+    deprecated = "категория устарела"
 
     @classmethod
     def list_names(cls):
-        return list(map(lambda c: c.name, cls))
+        return list(map(lambda c: c.value, cls))
