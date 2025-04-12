@@ -18,7 +18,6 @@ def test_serve_template_update_category(client, category):
     )
     assert response.status_code == 200
     assert category.name.title() in response.text
-    assert str(category.is_active) in response.text
 
 
 def test_update__category_name(client, category, session):

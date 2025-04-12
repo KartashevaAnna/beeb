@@ -56,10 +56,10 @@ def serve_update_category_template(
 @update_category_router.post(SETTINGS.urls.update_category)
 def update_category(
     name: Annotated[str, Form()],
-    is_active: Annotated[str, Form()],
     category_id: int,
     repo: Annotated[CategoryRepo, Depends(categories_repo)],
     request: Request,
+    is_active: bool = Form(False),
 ):
     try:
         to_update = CategoryCreate(name=name, is_active=is_active)
