@@ -11,7 +11,7 @@ from pydantic import (
 from app.utils.tools.helpers import get_number_for_db, get_readable_price
 
 
-class ExpenseShow(BaseModel):
+class Paymentshow(BaseModel):
     id: Annotated[int, Field()]
     name: Annotated[str, Field()]
     price: Annotated[int, Field()]
@@ -23,11 +23,11 @@ class ExpenseShow(BaseModel):
         return get_readable_price(cls.price)
 
 
-class ExpenseShowOne(ExpenseShow):
+class PaymentshowOne(Paymentshow):
     category: Annotated[str, Field()]
 
 
-class ExpenseCreate(BaseModel):
+class PaymentCreate(BaseModel):
     name: Annotated[
         str,
         StringConstraints(
@@ -45,7 +45,7 @@ class ExpenseCreate(BaseModel):
         return value
 
 
-class ExpenseUpdate(ExpenseCreate):
+class PaymentUpdate(PaymentCreate):
     price: Annotated[str, Field()]
 
     def get_positive_number(self, number) -> int:

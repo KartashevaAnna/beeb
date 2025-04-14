@@ -4,37 +4,37 @@ import fastapi
 from fastapi import Depends, Request, status
 from fastapi.responses import RedirectResponse
 
-from app.repositories.expenses import ExpenseRepo
+from app.repositories.payments import PaymentRepo
 from app.settings import SETTINGS, TEMPLATES
-from app.utils.dependencies import expenses_repo
+from app.utils.dependencies import payments_repo
 
-delete_expenses_router = fastapi.APIRouter()
+delete_payments_router = fastapi.APIRouter()
 
 
-@delete_expenses_router.get(SETTINGS.urls.delete_expense)
+@delete_payments_router.get(SETTINGS.urls.delete_payment)
 def delete_template(
     request: Request,
 ):
     return TEMPLATES.TemplateResponse(
-        SETTINGS.templates.delete_expense,
+        SETTINGS.templates.delete_payment,
         context={"request": request},
     )
 
 
-@delete_expenses_router.post(SETTINGS.urls.delete_expense)
-def delete_expense(
-    expense_id: int,
-    repo: Annotated[ExpenseRepo, Depends(expenses_repo)],
+@delete_payments_router.post(SETTINGS.urls.delete_payment)
+def delete_payment(
+    payment_id: int,
+    repo: Annotated[PaymentRepo, Depends(payments_repo)],
     request: Request,
 ):
     try:
-        repo.delete(expense_id)
+        repo.delete(payment_id)
         return RedirectResponse(
-            url="/expenses", status_code=status.HTTP_303_SEE_OTHER
+            url=SETTINGS.urls.payments, status_code=status.HTTP_303_SEE_OTHER
         )
     except Exception as exc:
         return TEMPLATES.TemplateResponse(
-            SETTINGS.templates.read_expense,
+            SETTINGS.templates.read_payment,
             context={
                 "request": request,
                 "exception": f"There was an error: {str(exc)}",

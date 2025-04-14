@@ -9,7 +9,7 @@ from sqlalchemy.orm import Session
 from app.repositories.categories import CategoryRepo
 from app.utils.constants import CATEGORIES, PRODUCTS
 from app.utils.dependencies import categories_repo, get_session
-from app.utils.tools.helpers import add_category_to_db, add_expenses_to_db
+from app.utils.tools.helpers import add_category_to_db, add_payments_to_db
 
 dev_router = fastapi.APIRouter(tags=["Dev"], include_in_schema=True)
 
@@ -34,8 +34,8 @@ def create_category_in_db(
         my_categories.remove(choice)
 
 
-@dev_router.post("/populate-expenses")
-def create_expenses_in_db(
+@dev_router.post("/populate-payments")
+def create_payments_in_db(
     session: Annotated[Session, Depends(get_session)],
     repo: Annotated[CategoryRepo, Depends(categories_repo)],
 ):
@@ -46,4 +46,4 @@ def create_expenses_in_db(
         categories = repo.read_all()
     category_ids = [x.id for x in categories]
     for _ in range(len(PRODUCTS)):
-        add_expenses_to_db(session, category_id=random.choice(category_ids))
+        add_payments_to_db(session, category_id=random.choice(category_ids))

@@ -87,7 +87,7 @@ def test_update_category_serve_template_404(client):
 
 
 @patch.object(CategoryRepo, "update", raise_always)
-def test_update_expense_exception(client, category):
+def test_update_payment_exception(client, category):
     """Case: any exception is thrown."""
     category_id = category.id
     response = client.post(

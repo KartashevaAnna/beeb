@@ -5,14 +5,14 @@ from sqlalchemy import func, select
 from app.models import Category
 from app.repositories.categories import CategoryRepo
 from app.settings import SETTINGS
-from tests.conftest import expense, raise_always
+from tests.conftest import payment, raise_always
 
 
 def test_category_normal_function(client, category):
     """Case: normal mode.
 
     Checks that the endpoint returns page
-    with one expense in context.
+    with one payment in context.
     """
     response = client.get(
         SETTINGS.urls.category.format(category_id=category.id)
@@ -43,7 +43,7 @@ def test_category_empty_db_404(client):
     assert response.status_code == 404
 
 
-@patch.object(CategoryRepo, "read", raise_always, expense)
+@patch.object(CategoryRepo, "read", raise_always, payment)
 def test_category_exception(client):
     """Case: any exception is thrown."""
     response = client.get(SETTINGS.urls.category.format(category_id=1))
