@@ -1,9 +1,8 @@
+import datetime
 import locale
-import math
 import random
 
-from app.models import Category, Payment
-from app.schemas.categories import CategoryCreate
+from app.models import Payment
 from app.utils.constants import PRODUCTS
 
 
@@ -16,13 +15,6 @@ def add_payments_to_db(session, category_id: int) -> Payment:
     session.add(payment)
     session.commit()
     return payment
-
-
-def add_category_to_db(session, name: str) -> Category:
-    category = Category(**CategoryCreate(name=name).__dict__)
-    session.add(category)
-    session.commit()
-    return category
 
 
 def get_readable_price(price: int) -> str:
@@ -54,33 +46,6 @@ def get_monthly_payments(all_payments: list[Payment]) -> dict[int, str]:
     return monthly_payments
 
 
-def get_payments_sums_per_category(
-    all_payments: list[Payment],
-) -> dict[int, str]:
-    payments_sums_per_category = {}
-    for payment in all_payments:
-        if (
-            payment.payment_category.name
-            not in payments_sums_per_category.keys()
-        ):
-            payments_sums_per_category[payment.payment_category.name] = (
-                payment.price
-            )
-        else:
-            payments_sums_per_category[payment.payment_category.name] = (
-                payment.price
-                + payments_sums_per_category[payment.payment_category.name]
-            )
-    return payments_sums_per_category
-
-
-def get_payments_shares(payments_per_categories: dict, total: int) -> dict:
-    return {
-        key: math.floor(payments_per_categories[key] * 100 / total)
-        for key in payments_per_categories
-    }
-
-
 def sort_options(
     all_options: list[str], current_option: str | None = None
 ) -> list:
@@ -101,3 +66,13 @@ def sort_options(
     sorted_options.append((first_option))
     sorted_options.extend(iter(all_options))
     return sorted_options
+
+
+def get_date_from_datetime(date: datetime.datetime) -> str:
+    return (
+        date.strftime("%d")
+        + " "
+        + date.strftime("%B")
+        + " "
+        + date.strftime("%Y")
+    )

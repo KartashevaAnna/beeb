@@ -1,6 +1,11 @@
 from typing import Annotated
 
-from pydantic import BaseModel, Field, StringConstraints, field_validator
+from pydantic import (
+    BaseModel,
+    Field,
+    StringConstraints,
+    field_validator,
+)
 
 
 class CategoryCreate(BaseModel):

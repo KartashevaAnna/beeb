@@ -9,7 +9,8 @@ from sqlalchemy.orm import Session
 from app.repositories.categories import CategoryRepo
 from app.utils.constants import CATEGORIES, PRODUCTS
 from app.utils.dependencies import categories_repo, get_session
-from app.utils.tools.helpers import add_category_to_db, add_payments_to_db
+from app.utils.tools.category_helpers import add_category_to_db
+from app.utils.tools.helpers import add_payments_to_db
 
 dev_router = fastapi.APIRouter(tags=["Dev"], include_in_schema=True)
 

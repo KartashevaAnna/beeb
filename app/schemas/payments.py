@@ -1,3 +1,4 @@
+import datetime
 from typing import Annotated
 
 from pydantic import (
@@ -8,7 +9,11 @@ from pydantic import (
     field_validator,
 )
 
-from app.utils.tools.helpers import get_number_for_db, get_readable_price
+from app.utils.tools.helpers import (
+    get_date_from_datetime,
+    get_number_for_db,
+    get_readable_price,
+)
 
 
 class Paymentshow(BaseModel):
@@ -16,11 +21,17 @@ class Paymentshow(BaseModel):
     name: Annotated[str, Field()]
     price: Annotated[int, Field()]
     category: Annotated[str, Field()]
+    created_at: Annotated[datetime.datetime, Field(exclude=True)]
 
     @computed_field
     @property
     def price_in_rub(cls) -> str:
         return get_readable_price(cls.price)
+
+    @computed_field
+    @property
+    def date(cls) -> str:
+        return get_date_from_datetime(date=cls.created_at)
 
 
 class PaymentshowOne(Paymentshow):

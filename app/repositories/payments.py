@@ -13,11 +13,13 @@ from app.schemas.payments import (
     PaymentUpdate,
 )
 from app.utils.constants import MONTHES
+from app.utils.tools.category_helpers import (
+    get_payments_shares,
+    get_payments_sums_per_category,
+)
 from app.utils.tools.helpers import (
     get_monthly_payments,
     get_number_for_db,
-    get_payments_shares,
-    get_payments_sums_per_category,
     get_readable_price,
 )
 
