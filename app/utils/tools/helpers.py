@@ -2,20 +2,20 @@ import locale
 import math
 import random
 
-from app.models import Category, Expense
+from app.models import Category, Payment
 from app.schemas.categories import CategoryCreate
 from app.utils.constants import PRODUCTS
 
 
-def add_expenses_to_db(session, category_id: int) -> Expense:
-    expense = Expense(
+def add_payments_to_db(session, category_id: int) -> Payment:
+    payment = Payment(
         name=random.choice(PRODUCTS),
         price=random.randrange(100, 5000, 100),
         category_id=category_id,
     )
-    session.add(expense)
+    session.add(payment)
     session.commit()
-    return expense
+    return payment
 
 
 def add_category_to_db(session, name: str) -> Category:
@@ -41,43 +41,43 @@ def get_number_for_db(frontend_input: str) -> int:
     return locale.atoi(removed_decimal)
 
 
-def get_monthly_expenses(all_expenses: list[Expense]) -> dict[int, str]:
-    monthly_expenses = {}
-    for expense in all_expenses:
-        if expense.created_at.strftime("%m") not in monthly_expenses.keys():
-            monthly_expenses[expense.created_at.strftime("%m")] = expense.price
+def get_monthly_payments(all_payments: list[Payment]) -> dict[int, str]:
+    monthly_payments = {}
+    for payment in all_payments:
+        if payment.created_at.strftime("%m") not in monthly_payments.keys():
+            monthly_payments[payment.created_at.strftime("%m")] = payment.price
         else:
-            monthly_expenses[expense.created_at.strftime("%m")] = (
-                expense.price
-                + monthly_expenses[expense.created_at.strftime("%m")]
+            monthly_payments[payment.created_at.strftime("%m")] = (
+                payment.price
+                + monthly_payments[payment.created_at.strftime("%m")]
             )
-    return monthly_expenses
+    return monthly_payments
 
 
-def get_expenses_sums_per_category(
-    all_expenses: list[Expense],
+def get_payments_sums_per_category(
+    all_payments: list[Payment],
 ) -> dict[int, str]:
-    expenses_sums_per_category = {}
-    for expense in all_expenses:
+    payments_sums_per_category = {}
+    for payment in all_payments:
         if (
-            expense.expense_category.name
-            not in expenses_sums_per_category.keys()
+            payment.payment_category.name
+            not in payments_sums_per_category.keys()
         ):
-            expenses_sums_per_category[expense.expense_category.name] = (
-                expense.price
+            payments_sums_per_category[payment.payment_category.name] = (
+                payment.price
             )
         else:
-            expenses_sums_per_category[expense.expense_category.name] = (
-                expense.price
-                + expenses_sums_per_category[expense.expense_category.name]
+            payments_sums_per_category[payment.payment_category.name] = (
+                payment.price
+                + payments_sums_per_category[payment.payment_category.name]
             )
-    return expenses_sums_per_category
+    return payments_sums_per_category
 
 
-def get_expenses_shares(expenses_per_categories: dict, total: int) -> dict:
+def get_payments_shares(payments_per_categories: dict, total: int) -> dict:
     return {
-        key: math.floor(expenses_per_categories[key] * 100 / total)
-        for key in expenses_per_categories
+        key: math.floor(payments_per_categories[key] * 100 / total)
+        for key in payments_per_categories
     }
 
 

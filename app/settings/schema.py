@@ -63,13 +63,13 @@ class DatabaseSettings(BaseModel):
 
 class Urls(BaseModel):
     ping: str
-    create_expense: str
-    expense: str
-    expenses: str
-    update_expense: str
-    delete_expense: str
-    total_expenses: str
-    total_expenses_monthly: str
+    create_payment: str
+    payment: str
+    payments: str
+    update_payment: str
+    delete_payment: str
+    total_payments: str
+    total_payments_monthly: str
     create_category: str
     category: str
     categories: str
@@ -77,12 +77,12 @@ class Urls(BaseModel):
 
 
 class Templates(BaseModel):
-    read_expense: str
-    read_expenses: str
-    create_expense: str
-    delete_expense: str
-    total_expenses_monthly: str
-    total_expenses: str
+    read_payment: str
+    read_payments: str
+    create_payment: str
+    delete_payment: str
+    total_payments_monthly: str
+    total_payments: str
     create_category: str
     read_category: str
     read_categories: str

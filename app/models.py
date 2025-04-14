@@ -13,13 +13,13 @@ class Category(AlchemyBaseModel):
     id: Mapped[int] = mapped_column(Integer, primary_key=True)
     name: Mapped[str] = mapped_column(String(255), nullable=False)
     is_active: Mapped[bool] = mapped_column(nullable=False, default=True)
-    expense_list: Mapped[list["Expense"]] = relationship(
-        back_populates="expense_category",
+    payments_list: Mapped[list["Payment"]] = relationship(
+        back_populates="payment_category",
     )
 
 
-class Expense(AlchemyBaseModel):
-    __tablename__ = "expenses"
+class Payment(AlchemyBaseModel):
+    __tablename__ = "payments"
     id: Mapped[int] = mapped_column(Integer, primary_key=True)
     name: Mapped[str] = mapped_column(String(255), nullable=False)
     price: Mapped[str] = mapped_column(String(255), nullable=False)
@@ -29,6 +29,6 @@ class Expense(AlchemyBaseModel):
     category_id: Mapped[int] = mapped_column(
         Integer, ForeignKey("category.id"), nullable=False
     )
-    expense_category: Mapped["Category"] = relationship(
-        back_populates="expense_list",
+    payment_category: Mapped["Category"] = relationship(
+        back_populates="payments_list",
     )

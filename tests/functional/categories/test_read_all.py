@@ -34,7 +34,7 @@ def test_categories_empty_db(client):
 
 
 @patch.object(CategoryRepo, "read_all", raise_always)
-def test_expenses_exception(client):
+def test_payments_exception(client):
     """Case: any exception is thrown.
 
     Checks that the endpoint returns an error page.

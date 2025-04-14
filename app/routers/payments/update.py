@@ -5,36 +5,36 @@ from fastapi import Depends, Form, HTTPException, Request, status
 from fastapi.responses import RedirectResponse
 
 from app.repositories.categories import CategoryRepo
-from app.repositories.expenses import ExpenseRepo
-from app.schemas.expenses import ExpenseUpdate
+from app.repositories.payments import PaymentRepo
+from app.schemas.payments import PaymentUpdate
 from app.settings import SETTINGS, TEMPLATES
-from app.utils.dependencies import categories_repo, expenses_repo
+from app.utils.dependencies import categories_repo, payments_repo
 
-update_expense_router = fastapi.APIRouter()
+update_payment_router = fastapi.APIRouter()
 
 
-@update_expense_router.post(SETTINGS.urls.update_expense)
-def update_expense(
+@update_payment_router.post(SETTINGS.urls.update_payment)
+def update_payment(
     name: Annotated[str, Form()],
     price: Annotated[str, Form()],
     category: Annotated[str, Form()],
-    expense_id: int,
-    repo: Annotated[ExpenseRepo, Depends(expenses_repo)],
+    payment_id: int,
+    repo: Annotated[PaymentRepo, Depends(payments_repo)],
     category_repo: Annotated[CategoryRepo, Depends(categories_repo)],
     request: Request,
 ):
     try:
         options = category_repo.get_dict_names()
-        to_update = ExpenseUpdate(
+        to_update = PaymentUpdate(
             name=name, price=price, category_id=options[category]
         )
-        repo.update(expense_id=expense_id, to_upate=to_update)
+        repo.update(payment_id=payment_id, to_upate=to_update)
         return RedirectResponse(
-            url="/expenses", status_code=status.HTTP_303_SEE_OTHER
+            url=SETTINGS.urls.payments, status_code=status.HTTP_303_SEE_OTHER
         )
     except Exception as exc:
         return TEMPLATES.TemplateResponse(
-            SETTINGS.templates.read_expense,
+            SETTINGS.templates.read_payment,
             context={
                 "request": request,
                 "exception": f"There was an error: {str(exc)}",
@@ -43,30 +43,30 @@ def update_expense(
         )
 
 
-@update_expense_router.get(SETTINGS.urls.update_expense)
-def serve_update_expense_template(
-    expense_id: int,
-    repo: Annotated[ExpenseRepo, Depends(expenses_repo)],
+@update_payment_router.get(SETTINGS.urls.update_payment)
+def serve_update_payment_template(
+    payment_id: int,
+    repo: Annotated[PaymentRepo, Depends(payments_repo)],
     category_repo: Annotated[CategoryRepo, Depends(categories_repo)],
     request: Request,
 ):
     try:
-        if not (expense := repo.read(expense_id)):
-            raise HTTPException(status.HTTP_404_NOT_FOUND, "Expense not found")
+        if not (payment := repo.read(payment_id)):
+            raise HTTPException(status.HTTP_404_NOT_FOUND, "payment not found")
         return TEMPLATES.TemplateResponse(
-            SETTINGS.templates.read_expense,
+            SETTINGS.templates.read_payment,
             context={
                 "request": request,
-                "expense": expense,
+                "payment": payment,
                 "form_disabled": False,
-                "options": category_repo.get_expenses_options(
-                    current_option=expense.category
+                "options": category_repo.get_payments_options(
+                    current_option=payment.category
                 ),
             },
         )
     except HTTPException as exc:
         return TEMPLATES.TemplateResponse(
-            SETTINGS.templates.read_expense,
+            SETTINGS.templates.read_payment,
             context={
                 "request": request,
                 "exception": f"There was an error: {str(exc)}",
@@ -75,7 +75,7 @@ def serve_update_expense_template(
         )
     except Exception as exc:
         return TEMPLATES.TemplateResponse(
-            SETTINGS.templates.read_expense,
+            SETTINGS.templates.read_payment,
             context={
                 "request": request,
                 "exception": f"There was an error: {str(exc)}",

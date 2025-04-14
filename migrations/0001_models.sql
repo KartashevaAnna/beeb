@@ -7,7 +7,7 @@ CREATE TABLE IF NOT EXISTS "main"."category" (
 );
 
 
-CREATE TABLE IF NOT EXISTS "main"."expenses" (
+CREATE TABLE IF NOT EXISTS "main"."payments" (
     "id" SERIAL PRIMARY KEY,
     "name" VARCHAR (255) NOT NULL,
     "price" INT NOT NULL,

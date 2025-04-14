@@ -31,8 +31,8 @@ class CategoryRepo:
         all_values = [x["id"] for x in tmp_list]
         return dict(zip(all_keys, all_values))
 
-    def get_expenses_options(self, current_option: str | None = None) -> list:
-        """Gets all expenses options.
+    def get_payments_options(self, current_option: str | None = None) -> list:
+        """Gets all payments options.
 
         Sorts options so that:
         - the one currently selected is on top

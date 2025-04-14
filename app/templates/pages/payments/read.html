@@ -3,7 +3,7 @@
 {% block bodycontent %}
 
 
-<form action="/expenses/update/{{expense.id}}" method="post">
+<form action="/payments/update/{{payment.id}}" method="post">
     <fieldset>
         <div class="container-fluid">
                 <div class="row align-items-center justify-content-lg-center my-4 p-2">
@@ -13,17 +13,17 @@
                                 <div class="row align-items-center justify-content-sm-center my-1 p-2">
                                     <div class="col-xs-2 justify-content-center align-items-*-center">
                                         <legend style="text-align: center;">
-                                            Расход №{{expense.id}}
+                                            Расход №{{payment.id}}
                                         </legend> 
                                     </div>
                                 <div class="row align-items-center justify-content-lg-center my-1 p-2">
                                     <div class="col justify-content-center">
                                         {% if form_disabled %}
                                         <input name="name" id="name" type="text" placeholder="name"
-                                        value="{{ expense.name.title() or '' }}" disabled class="beeb-input ">
+                                        value="{{ payment.name.title() or '' }}" disabled class="beeb-input ">
                                         {% else %}
                                         <input name="name" id="name" type="text" placeholder="name"
-                                        value="{{ expense.name.title() or '' }}" class="beeb-input ">
+                                        value="{{ payment.name.title() or '' }}" class="beeb-input ">
                                         {% endif %}
                                     </div>
                                 </div>
@@ -31,10 +31,10 @@
                                     <div class="col justify-content-center">
                                         {% if form_disabled %}
                                         <input name="price" id="price" type="text" placeholder="стоимость"
-                                        value="{{ expense.price_in_rub or '' }}" disabled class="beeb-input">
+                                        value="{{ payment.price_in_rub or '' }}" disabled class="beeb-input">
                                         {% else %}
                                         <input name="price" id="price" type="text" placeholder="стоимость"
-                                        value="{{ expense.price_in_rub or '' }}" class="beeb-input">
+                                        value="{{ payment.price_in_rub or '' }}" class="beeb-input">
                                         {% endif %}
                                     </div> 
                                 </div>
@@ -42,13 +42,13 @@
                                     <div class="col justify-content-center">
                                         {% if form_disabled %}
                                         <input name="category" id="category" type="text" placeholder="категория"
-                                        value="{{ expense.category or '' }}" disabled class="beeb-input">
+                                        value="{{ payment.category or '' }}" disabled class="beeb-input">
                                         {% else %}
                                         <select id="category" name="category" type="text" placeholder="категория"
                                          class="beeb-input">
                                             {% for option in options %}
                                                 <option value="{{ option }}" 
-                                                {% if value == expense.category %} selected="selected" {% endif %}
+                                                {% if value == payment.category %} selected="selected" {% endif %}
                                                 >{{ option }}</option>
                                             {% endfor %}
                                         </select>
@@ -58,7 +58,7 @@
                                 <div class="row align-items-center justify-content-center my-1 p-2">
                                     <div class="col-12 justify-content-center align-items-xs-center">
                                         {% if form_disabled %}
-                                        <a href="/expenses/update/{{expense.id}}" class="btn beeb-submit-button" style="display: block;
+                                        <a href="/payments/update/{{payment.id}}" class="btn beeb-submit-button" style="display: block;
             width: 100%;">✏️ отредактировать</a>
                                         {% else %}
         
@@ -75,16 +75,16 @@
                                 {% if form_disabled %}
                                 <div class="row align-items-center justify-content-center my-1 p-2">
                                     <div class="col-12 justify-content-center align-items-xs-center">
-                                        <a href="/expenses/create" class="btn beeb-add-button" style="display: block;
+                                        <a href="/payments/create" class="btn beeb-add-button" style="display: block;
             width: 100%;">➕ добавить</a>
                                     </div> 
                                 </div>
 </form>
-<form id="delete_expense" action="/expenses/delete/{{expense.id}}" method="post">
+<form id="delete_payment" action="/payments/delete/{{payment.id}}" method="post">
     <div class="row align-items-center justify-content-center my-1 p-2">
         <div class="col-12 justify-content-center align-items-xs-center">
           <button 
-          hx-get={{ URLS.delete_expense  }} 
+          hx-get={{ URLS.delete_payment  }} 
           hx-target="#modals-here" 
           hx-trigger="click" 
           hx-push-url="false"

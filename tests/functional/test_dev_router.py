@@ -1,17 +1,17 @@
 from app.utils.constants import PRODUCTS
-from tests.conftest import clean_db, get_categories, get_expenses
+from tests.conftest import clean_db, get_categories, get_payments
 
 
-def test_dev_router_populating_the_database_with_expenses(client, session):
-    #  check that there are no expenses in the database
-    all_expenses = get_expenses(session)
-    assert not all_expenses
-    response = client.post("/populate-expenses")
+def test_dev_router_populating_the_database_with_payments(client, session):
+    #  check that there are no payments in the database
+    all_payments = get_payments(session)
+    assert not all_payments
+    response = client.post("/populate-payments")
     assert response.status_code == 200
-    # verify that expenses appered in the database
-    all_expenses = get_expenses(session)
-    assert all_expenses
-    assert len(all_expenses) == len(PRODUCTS)
+    # verify that payments appered in the database
+    all_payments = get_payments(session)
+    assert all_payments
+    assert len(all_payments) == len(PRODUCTS)
     clean_db(session)
 
 
