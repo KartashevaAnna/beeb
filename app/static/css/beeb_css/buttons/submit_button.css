@@ -2,10 +2,22 @@
     background-color: #20c997;
     border-color: #0cca91a5;
     color: black;
+  }
+  .beeb-submit-button:hover {
+    background-color: #37bd74;
+    border-color: #0cca91a5;
+    color: black;
+  }
+
+
+  .beeb-submit-button-large {
+    background-color: #20c997;
+    border-color: #0cca91a5;
+    color: black;
     display: block;
     width: 100%;
   }
-  .beeb-submit-button:hover {
+  .beeb-submit-button-large:hover {
     background-color: #37bd74;
     border-color: #0cca91a5;
     color: black;
