@@ -23,9 +23,23 @@
     <td>{{ payment.price_in_rub }}</td>
     <td>{{ payment.category}} </td>
     <td>{{ payment.date }} </td>
-    <td><a href="/payments/{{payment.id}}"><i class="material-icons">👁️</i></a></td>
+    <td><a href="/payments/update/{{payment.id}}" class="btn beeb-submit-button">✏️ изменить</a></td>
+    <td><form id="delete_payment" action="/payments/delete/{{payment.id}}" method="post">
+              <button 
+              hx-get={{ URLS.delete_payment  }} 
+              hx-target="#modals-here" 
+              hx-trigger="click" 
+              hx-push-url="false"
+              data-bs-toggle="modal"
+              data-bs-target="#modals-here" 
+              class="btn beeb-delete-button">✖️ удалить</button>
+    </td>
 </tr>
 {% endfor %}
 </table>
-
+<div id="modals-here" class="modal modal-blur fade" style="display: none" tabindex="-1">
+    <div class="modal-dialog modal-lg modal-dialog-centered" role="document">
+        <div class="modal-content"></div>
+    </div>
+</div>
 {% endblock %}
