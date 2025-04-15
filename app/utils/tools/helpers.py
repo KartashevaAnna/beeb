@@ -69,10 +69,10 @@ def sort_options(
 
 
 def get_date_from_datetime(date: datetime.datetime) -> str:
-    return (
-        date.strftime("%d")
-        + " "
-        + date.strftime("%B")
-        + " "
-        + date.strftime("%Y")
-    )
+    return date.strftime("%d %B %Y %H:%M:%S")
+
+
+def get_datetime_from_date(date: str) -> datetime.datetime:
+    date_str = f"{date}.000001"
+    date = datetime.datetime.strptime(date_str, "%d %B %Y %H:%M:%S.%f")
+    return date.astimezone()

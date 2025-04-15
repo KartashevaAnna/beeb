@@ -8,8 +8,8 @@ from sqlalchemy.sql import functions
 from app.models import Category, Payment
 from app.schemas.payments import (
     PaymentCreate,
-    Paymentshow,
-    PaymentshowOne,
+    PaymentShow,
+    PaymentShowOne,
     PaymentUpdate,
 )
 from app.utils.constants import MONTHES
@@ -37,7 +37,7 @@ class PaymentRepo:
         res = self.session.execute(statement)
         results = res.scalars().all()
         return [
-            Paymentshow(
+            PaymentShow(
                 **payment.__dict__, category=payment.payment_category.name
             )
             for payment in results
@@ -96,7 +96,7 @@ class PaymentRepo:
         results = self.session.execute(statement)
         payment = results.scalars().all()
         return (
-            PaymentshowOne(
+            PaymentShowOne(
                 **payment[0].__dict__, category=payment[0].payment_category.name
             )
             if payment
@@ -119,6 +119,7 @@ class PaymentRepo:
                 name=to_upate.name,
                 price=to_upate.price_in_kopecks,
                 category_id=to_upate.category_id,
+                created_at=to_upate.date_to_update,
             )
         )
         self.session.execute(stmt)
