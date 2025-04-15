@@ -1,9 +1,10 @@
+import datetime
 from unittest.mock import patch
 
 from app.models import Payment
 from app.repositories.payments import PaymentRepo
 from app.settings import SETTINGS
-from app.utils.tools.helpers import get_readable_price
+from app.utils.tools.helpers import get_date_from_datetime, get_readable_price
 from tests.conftest import get_categories, raise_always
 
 NAME = "potatoe"
@@ -38,6 +39,7 @@ def test_update_payment_standard_mode_name_lowercase_price_int(
             "payment_id": payment.id,
             "category": payment.payment_category.name,
             "form_disabled": True,
+            "date": get_date_from_datetime(payment.created_at),
         },
     )
     assert response.status_code == 303
@@ -64,6 +66,7 @@ def test_update_payment_standard_mode_name_title_price_int(
             "price": PRICE,
             "category": payment.payment_category.name,
             "form_disabled": True,
+            "date": get_date_from_datetime(payment.created_at),
         },
     )
     assert response.status_code == 303
@@ -88,6 +91,7 @@ def test_update_payment_standard_mode_name_upper_price_int(
             "price": PRICE,
             "category": payment.payment_category.name,
             "form_disabled": True,
+            "date": get_date_from_datetime(payment.created_at),
         },
     )
     assert response.status_code == 303
@@ -115,6 +119,7 @@ def test_update_payment_standard_mode_name_lowercase_price_frontend(
             "price": "65,00₽",
             "category": payment.payment_category.name,
             "form_disabled": True,
+            "date": get_date_from_datetime(payment.created_at),
         },
     )
     assert response.status_code == 303
@@ -141,6 +146,7 @@ def test_update_payment_name_lowercase_price_int_zero(client, payment):
             "price": 0,
             "category": payment.payment_category.name,
             "form_disabled": True,
+            "date": get_date_from_datetime(payment.created_at),
         },
     )
     assert "number must be positive" in response.text
@@ -161,6 +167,7 @@ def test_update_payment_name_lowercase_price_frontend_zero(
             "price": "00,00₽",
             "category": payment.payment_category.name,
             "form_disabled": True,
+            "date": get_date_from_datetime(payment.created_at),
         },
     )
     assert "number must be positive" in response.text
@@ -182,6 +189,7 @@ def test_update_payment_name_lowercase_price_frontend_negative(
             "price": "-56,00₽",
             "category": payment.payment_category.name,
             "form_disabled": True,
+            "date": get_date_from_datetime(payment.created_at),
         },
     )
     assert "number must be positive" in response.text
@@ -199,6 +207,7 @@ def test_update_payment_name_lowercase_price_int_negative(client, payment):
             "price": -56,
             "category": payment.payment_category.name,
             "form_disabled": True,
+            "date": get_date_from_datetime(payment.created_at),
         },
     )
     assert "number must be positive" in response.text
@@ -223,6 +232,7 @@ def test_update_payment_exception(client, payment):
             "price": 56,
             "category": payment.payment_category.name,
             "form_disabled": True,
+            "date": get_date_from_datetime(payment.created_at),
         },
     )
     assert response.status_code == 501
@@ -245,6 +255,7 @@ def test_update_payment_update_category(client, session, fill_db, payment):
             "price": PRICE,
             "category": categories[0],
             "form_disabled": True,
+            "date": get_date_from_datetime(payment.created_at),
         },
     )
     assert response.status_code == 303
@@ -255,3 +266,26 @@ def test_update_payment_update_category(client, session, fill_db, payment):
     assert updated_payment.name == NAME
     assert updated_payment.price == PRICE
     assert updated_payment.payment_category.name != previous_category
+
+
+def test_update_payment_update_date(client, session, payment):
+    previous_date = payment.created_at
+    new_date = payment.created_at - datetime.timedelta(weeks=-4)
+    new_date = new_date.astimezone()
+    response = client.post(
+        SETTINGS.urls.update_payment.format(payment_id=payment.id),
+        data={
+            "name": NAME.upper(),
+            "price": PRICE,
+            "category": payment.payment_category.name,
+            "form_disabled": True,
+            "date": get_date_from_datetime(new_date),
+        },
+    )
+    assert response.status_code == 303
+    assert response.headers.get("location") == SETTINGS.urls.payments
+    session.expire_all()
+    updated_payment = session.get(Payment, payment.id)
+    assert payment.id == updated_payment.id
+    assert updated_payment.created_at != previous_date
+    assert updated_payment.created_at.date() == new_date.date()

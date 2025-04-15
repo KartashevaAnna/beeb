@@ -22,6 +22,7 @@
     <td scope="row">{{ payment.name.title() }}</td>
     <td>{{ payment.price_in_rub }}</td>
     <td>{{ payment.category}} </td>
+    <td>{{ payment.date }} </td>
     <td><a href="/payments/{{payment.id}}"><i class="material-icons">👁️</i></a></td>
 </tr>
 {% endfor %}
