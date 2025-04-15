@@ -25,9 +25,9 @@
     <td>{{ payment.price_in_rub }}</td>
     <td>{{ payment.category}} </td>
     <td>{{ payment.date }} </td>
-    <td><a href="/payments/update/{{payment.id}}" class="btn beeb-submit-button"><i class="material-icons">edit</i></a></td>
+    <td><a href="/payments/update/{{payment.id}}" class="btn beeb-submit-button"><i class="material-icons" style="color: #191919d6 !important">edit</i></a></td>
     <form action="/payments/delete/{{payment.id}}" method="post">
-    <td><button class="btn beeb-delete-button"><i class="material-icons">delete</i></button></td>
+    <td><button class="btn beeb-delete-button"><i class="material-icons" style="color: #191919d6 !important">delete</i></button></td>
     </form>
 </tr>
 {% endfor %}
