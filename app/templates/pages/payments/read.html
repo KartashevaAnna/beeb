@@ -30,10 +30,10 @@
                                 <div class="row justify-content-center my-1 p-2">
                                     <div class="col justify-content-center">
                                         {% if form_disabled %}
-                                        <input name="price" id="price" type="text" placeholder="стоимость"
+                                        <input name="price" id="price" type="text" placeholder="сумма"
                                         value="{{ payment.price_in_rub or '' }}" disabled class="beeb-input">
                                         {% else %}
-                                        <input name="price" id="price" type="text" placeholder="стоимость"
+                                        <input name="price" id="price" type="text" placeholder="сумма"
                                         value="{{ payment.price_in_rub or '' }}" class="beeb-input">
                                         {% endif %}
                                     </div> 
@@ -45,7 +45,11 @@
                                         value="{{ payment.category or '' }}" disabled class="beeb-input">
                                         {% else %}
                                         <select id="category" name="category" type="text" placeholder="категория"
-                                         class="beeb-input">
+                                        style="background-color: rgba(222, 226, 230, 0.75);
+                                        text-align: center; 
+                                        width: 310px !important; 
+                                        min-width: 310px !important; 
+                                        max-width: 310px !important; ">
                                             {% for option in options %}
                                                 <option value="{{ option }}" 
                                                 {% if value == payment.category %} selected="selected" {% endif %}
@@ -76,8 +80,8 @@
                                         <button 
                                         type="submit" 
                                
-                                        class="btn beeb-submit-button"
-                                        >OK
+                                        class="btn beeb-submit-button-large"
+                                        >Сохранить
                                     </button>
                                         {% endif %}
                           

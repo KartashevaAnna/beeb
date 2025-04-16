@@ -17,10 +17,18 @@ def add_payments_to_db(session, category_id: int) -> Payment:
     return payment
 
 
+def convert_to_copecks(price: int) -> int:
+    return price * 100
+
+
+def convert_to_rub(price: int) -> int:
+    return price / 100
+
+
 def get_readable_price(price: int) -> str:
     """Formats price as per Russian locale and appends currency symbol."""
     return (
-        locale.format_string("%.2f", (price / 100), grouping=True)
+        locale.format_string("%.0f", (convert_to_rub(price)), grouping=True)
         + locale.localeconv()["currency_symbol"]
     )
 
@@ -29,8 +37,7 @@ def get_number_for_db(frontend_input: str) -> int:
     """Removes price format as per Russian locale, returns price in kopecks."""
     currency_symbol = locale.localeconv()["currency_symbol"]
     removed_currency_symbol = frontend_input.replace(currency_symbol, "")
-    removed_decimal = removed_currency_symbol.replace(",", "")
-    return locale.atoi(removed_decimal)
+    return convert_to_copecks(locale.atoi(removed_currency_symbol))
 
 
 def get_monthly_payments(all_payments: list[Payment]) -> dict[int, str]:
@@ -69,10 +76,15 @@ def sort_options(
 
 
 def get_date_from_datetime(date: datetime.datetime) -> str:
-    return date.strftime("%d %B %Y %H:%M:%S")
+    return f"{date.strftime('%d %B %Y')} года"
+
+
+def get_date_from_datetime_without_year(date: datetime.datetime) -> str:
+    return date.strftime("%d %B")
 
 
 def get_datetime_from_date(date: str) -> datetime.datetime:
-    date_str = f"{date}.000001"
+    date = date[:-5]
+    date_str = f"{date} 00:00:00.000001"
     date = datetime.datetime.strptime(date_str, "%d %B %Y %H:%M:%S.%f")
     return date.astimezone()
