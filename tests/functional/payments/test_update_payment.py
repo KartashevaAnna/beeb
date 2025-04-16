@@ -4,7 +4,11 @@ from unittest.mock import patch
 from app.models import Payment
 from app.repositories.payments import PaymentRepo
 from app.settings import SETTINGS
-from app.utils.tools.helpers import get_date_from_datetime, get_readable_price
+from app.utils.tools.helpers import (
+    convert_to_copecks,
+    get_date_from_datetime,
+    get_readable_price,
+)
 from tests.conftest import get_categories, raise_always
 
 NAME = "potatoe"
@@ -48,7 +52,7 @@ def test_update_payment_standard_mode_name_lowercase_price_int(
     updated_payment = session.get(Payment, payment.id)
     assert payment.id == updated_payment.id
     assert updated_payment.name == NAME
-    assert updated_payment.price == PRICE
+    assert updated_payment.price == convert_to_copecks(PRICE)
     assert updated_payment.payment_category == payment.payment_category
 
 
@@ -116,7 +120,7 @@ def test_update_payment_standard_mode_name_lowercase_price_frontend(
         SETTINGS.urls.update_payment.format(payment_id=payment.id),
         data={
             "name": NAME,
-            "price": "65,00₽",
+            "price": "65₽",
             "category": payment.payment_category.name,
             "form_disabled": True,
             "date": get_date_from_datetime(payment.created_at),
@@ -164,7 +168,7 @@ def test_update_payment_name_lowercase_price_frontend_zero(
         SETTINGS.urls.update_payment.format(payment_id=payment.id),
         data={
             "name": NAME,
-            "price": "00,00₽",
+            "price": "00₽",
             "category": payment.payment_category.name,
             "form_disabled": True,
             "date": get_date_from_datetime(payment.created_at),
@@ -186,7 +190,7 @@ def test_update_payment_name_lowercase_price_frontend_negative(
         SETTINGS.urls.update_payment.format(payment_id=payment.id),
         data={
             "name": NAME,
-            "price": "-56,00₽",
+            "price": "-56₽",
             "category": payment.payment_category.name,
             "form_disabled": True,
             "date": get_date_from_datetime(payment.created_at),
@@ -264,7 +268,7 @@ def test_update_payment_update_category(client, session, fill_db, payment):
     updated_payment = session.get(Payment, payment.id)
     assert payment.id == updated_payment.id
     assert updated_payment.name == NAME
-    assert updated_payment.price == PRICE
+    assert updated_payment.price == convert_to_copecks(PRICE)
     assert updated_payment.payment_category.name != previous_category
 
 

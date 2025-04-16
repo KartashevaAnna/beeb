@@ -1,3 +1,4 @@
+from datetime import datetime
 from unittest.mock import patch
 
 from sqlalchemy import select
@@ -5,6 +6,7 @@ from sqlalchemy import select
 from app.models import Payment
 from app.repositories.payments import PaymentRepo
 from app.settings import SETTINGS
+from app.utils.tools.helpers import convert_to_copecks, get_date_from_datetime
 from tests.conftest import raise_always
 
 NAME = "milk"
@@ -16,7 +18,7 @@ def test_create_payment_template(client):
     response = client.get(url=SETTINGS.urls.create_payment)
     assert response.status_code == 200
     assert "название" in response.text
-    assert "стоимость" in response.text
+    assert "сумма" in response.text
     assert "категория" in response.text
 
 
@@ -29,13 +31,14 @@ def test_create_payment_valid_data(session, client, category):
             "name": NAME,
             "price": PRICE,
             "category": category.name,
+            "date": get_date_from_datetime(datetime.now()),
         },
     )
     assert response.status_code == 303
 
     statement = select(Payment).where(
         Payment.name == NAME,
-        Payment.price == PRICE,
+        Payment.price == convert_to_copecks(PRICE),
         Payment.category_id == category.id,
     )
     results = session.execute(statement)
@@ -48,7 +51,12 @@ def test_create_payment_invalid_data_negative_price(client, category):
     """Case: endpoint raises ValidationError if price is negative."""
     response = client.post(
         url=SETTINGS.urls.create_payment,
-        data={"name": NAME, "price": -100, "category": category.name},
+        data={
+            "name": NAME,
+            "price": -100,
+            "category": category.name,
+            "date": get_date_from_datetime(datetime.now()),
+        },
     )
     assert response.status_code == 422
 
@@ -57,7 +65,12 @@ def test_create_payment_invalid_data_zero_price(client, category):
     """Case: endpoint raises ValidationError if price is zero."""
     response = client.post(
         url=SETTINGS.urls.create_payment,
-        data={"name": NAME, "price": 0, "category": category.name},
+        data={
+            "name": NAME,
+            "price": 0,
+            "category": category.name,
+            "date": get_date_from_datetime(datetime.now()),
+        },
     )
     assert response.status_code == 422
 
@@ -78,6 +91,7 @@ def test_create_payment_any_other_exception(client, category):
             "name": NAME,
             "price": PRICE,
             "category": category.name,
+            "date": get_date_from_datetime(datetime.now()),
         },
     )
     assert response.status_code == 501

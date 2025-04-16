@@ -7,7 +7,16 @@
     color: rgb(34, 33, 33);
     text-align: center;
   }
-  
+
+  .select {
+    background-color: rgba(222, 226, 230, 0.75);
+    text-align: center; 
+    width: 300px !important; 
+    min-width: 300px !important; 
+    max-width: 300px !important; 
+  }
+
+
   .beeb-input-create{
     background-color: #a0b7bc;
     text-align: center;
