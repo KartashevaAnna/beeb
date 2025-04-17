@@ -7,16 +7,16 @@ from app.repositories.payments import PaymentRepo
 from app.settings import SETTINGS, TEMPLATES
 from app.utils.dependencies import payments_repo
 
-total_payments_router = fastapi.APIRouter()
+payments_dashboard_router = fastapi.APIRouter()
 
 
-@total_payments_router.get(SETTINGS.urls.total_payments)
+@payments_dashboard_router.get(SETTINGS.urls.payments_dashboard)
 def read_all_payments(
     repo: Annotated[PaymentRepo, Depends(payments_repo)],
     request: Request,
 ):
     return TEMPLATES.TemplateResponse(
-        SETTINGS.templates.total_payments,
+        SETTINGS.templates.payments_dashboard,
         context={
             "request": request,
             "total": repo.get_total(),
@@ -29,7 +29,7 @@ def read_all_payments(
     )
 
 
-@total_payments_router.get(SETTINGS.urls.total_payments_monthly)
+@payments_dashboard_router.get(SETTINGS.urls.total_payments_monthly)
 def read_monthly_payments_breakdown(
     repo: Annotated[PaymentRepo, Depends(payments_repo)],
     request: Request,

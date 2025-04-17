@@ -6,7 +6,7 @@ def test_total_payment(client, fill_db):
 
     The endpoint returns total spent per month.
     """
-    response = client.get(SETTINGS.urls.total_payments)
+    response = client.get(SETTINGS.urls.payments_dashboard)
     assert response.status_code == 200
 
 
