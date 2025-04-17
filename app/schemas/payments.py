@@ -32,6 +32,7 @@ class PaymentShow(PaymentBase):
     id: Annotated[int, Field()]
     price: Annotated[int, Field()]
     created_at: Annotated[datetime.datetime, Field(exclude=True)]
+    category: Annotated[str, Field()]
 
     @computed_field
     @property
@@ -45,8 +46,6 @@ class PaymentShow(PaymentBase):
 
 
 class PaymentShowOne(PaymentShow):
-    category: Annotated[str, Field()]
-
     @computed_field
     @property
     def date(cls) -> str:
