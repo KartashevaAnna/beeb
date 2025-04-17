@@ -41,34 +41,25 @@
   <div class="col-sm-6">
     <div class="card">
       <div class="card-body">
-       {% if total %}
           <div class="col-xs-12 text-center">
-            <h6 align="left">всего: {{ total if total is not none }} </h6>
+            <h6 align="left">расход в день: {{ total_per_day if total_per_day is not none }} </h6>
           </div>
-          {% endif %}
-          
-          {% if total_per_day %}
-          <div class="col-xs-12 text-center">
-            <h6 align="left">в день: {{ total_per_day if total_per_day is not none }} </h6>
-          </div>
-          {% endif %}
       </div>
     </div>
   </div>
 </div>
 
-
+{{total_shares}}
 
 
     <script src="https://cdn.jsdelivr.net/npm/apexcharts"></script>
     <script>
+      const shares = {{ total_shares|tojson }};
+      const mycolumns = shares.map(item => [item[0], item[1]]);
+
       let chart = bb.generate({
           data: {
-              columns: [
-                  ['{{total_shares[0][0]}}', '{{total_shares[0][1]}}'],
-                  ['{{total_shares[1][0]}}', '{{total_shares[1][1]}}'],
-
-              ],
+            columns: mycolumns,
               type: "donut",
               onclick: function (d, i) {
                   console.log("onclick", d, i);
@@ -86,9 +77,13 @@
 
 
 
-{% if total_per_month %}
+{% if total_per_month.items()|length > 0 %}
 <table class="table table-hover">
-
+  <tr>
+    <th>месяц</th>
+    <th>сумма</th>
+    <th>просмотр</th>
+  </tr>
     {% for payment in total_per_month.items() %}
         <td scope="row">{{ payment[0] }}</td>
         <td>{{ payment[1] }}</td>
