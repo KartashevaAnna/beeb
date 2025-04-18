@@ -25,6 +25,7 @@ def read_all_payments(
             "total_shares": list(
                 repo.get_total_monthly_payments_shares().items()
             ),
+            "header_text": "Общие расходы за 2025 год",
         },
     )
 
