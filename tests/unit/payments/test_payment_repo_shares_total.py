@@ -1,7 +1,7 @@
 from app.repositories.payments import PaymentRepo
 
 
-def test_get_monthly_payments_shares_total(client, fill_db, session):
+def test_get_monthly_payments_shares_total(fill_db, session):
     """Case: normal mode. Verify monthly payments.
 
     Checks that the helper function called by the repo
@@ -10,5 +10,5 @@ def test_get_monthly_payments_shares_total(client, fill_db, session):
     monthly_payments_shares_total = PaymentRepo(
         session
     ).get_total_monthly_payments_shares()
-    checksum = int(sum(list(monthly_payments_shares_total.values())))
+    checksum = int(sum(monthly_payments_shares_total.keys()))
     assert checksum <= 100

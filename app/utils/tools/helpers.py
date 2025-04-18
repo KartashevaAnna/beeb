@@ -36,8 +36,9 @@ def get_readable_price(price: int) -> str:
 def get_number_for_db(frontend_input: str) -> int:
     """Removes price format as per Russian locale, returns price in kopecks."""
     currency_symbol = locale.localeconv()["currency_symbol"]
-    removed_currency_symbol = frontend_input.replace(currency_symbol, "")
-    return convert_to_copecks(locale.atoi(removed_currency_symbol))
+    if frontend_input:
+        removed_currency_symbol = frontend_input.replace(currency_symbol, "")
+        return convert_to_copecks(locale.atoi(removed_currency_symbol))
 
 
 def get_monthly_payments(all_payments: list[Payment]) -> dict[int, str]:

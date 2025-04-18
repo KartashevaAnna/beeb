@@ -2,6 +2,7 @@ import math
 
 from app.models import Category, Payment
 from app.schemas.categories import CategoryCreate
+from app.utils.tools.helpers import get_readable_price
 
 
 def get_payments_sums_per_category(
@@ -26,9 +27,22 @@ def get_payments_sums_per_category(
 
 def get_payments_shares(payments_per_categories: dict, total: int) -> dict:
     return {
-        key: math.floor(payments_per_categories[key] * 100 / total)
+        math.floor(payments_per_categories[key] * 100 / total): (
+            key,
+            get_readable_price(payments_per_categories[key]),
+        )
         for key in payments_per_categories
     }
+
+
+def sort_payment_shares(payments_per_categories: dict) -> dict:
+    return dict(
+        sorted(
+            payments_per_categories.items(),
+            key=lambda item: item[0],
+            reverse=True,
+        )
+    )
 
 
 def add_category_to_db(session, name: str) -> Category:
