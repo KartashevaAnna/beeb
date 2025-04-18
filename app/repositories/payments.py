@@ -16,6 +16,7 @@ from app.utils.constants import MONTHES
 from app.utils.tools.category_helpers import (
     get_payments_shares,
     get_payments_sums_per_category,
+    sort_payment_shares,
 )
 from app.utils.tools.helpers import (
     get_monthly_payments,
@@ -65,6 +66,8 @@ class PaymentRepo:
             )
         except ZeroDivisionError:
             return None
+        except TypeError:
+            return None
 
     def get_total_per_month(self) -> dict[str, str]:
         stmt = select(Payment)
@@ -83,9 +86,10 @@ class PaymentRepo:
         all_payments = results.scalars().all()
         total = get_number_for_db(self.get_total())
         payments_per_categories = get_payments_sums_per_category(all_payments)
-        return get_payments_shares(
+        payment_shares = get_payments_shares(
             payments_per_categories=payments_per_categories, total=total
         )
+        return sort_payment_shares(payment_shares)
 
     def read(self, payment_id: int) -> Payment | None:
         statement = (
