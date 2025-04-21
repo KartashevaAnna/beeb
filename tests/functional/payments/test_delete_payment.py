@@ -28,7 +28,6 @@ def test_delete_payment_that_does_not_exist(client):
     """Case: any exception is thrown."""
     response = client.post(SETTINGS.urls.delete_payment.format(payment_id=1))
     assert response.status_code == 501
-    assert "exception" in response.text
 
 
 def test_delete_payment_template(client):

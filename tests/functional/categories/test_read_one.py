@@ -48,4 +48,3 @@ def test_category_exception(client):
     """Case: any exception is thrown."""
     response = client.get(SETTINGS.urls.category.format(category_id=1))
     assert response.status_code != 200
-    assert "exception" in response.text

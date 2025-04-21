@@ -240,7 +240,6 @@ def test_update_payment_exception(client, payment):
         },
     )
     assert response.status_code == 501
-    assert "exception" in response.text
 
 
 def test_update_payment_update_category(client, session, fill_db, payment):

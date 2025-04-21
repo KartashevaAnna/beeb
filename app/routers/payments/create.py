@@ -4,13 +4,13 @@ from typing import Annotated
 import fastapi
 from fastapi import Depends, Form, Request, status
 from fastapi.responses import RedirectResponse
-from pydantic import ValidationError
 
 from app.repositories.categories import CategoryRepo
 from app.repositories.payments import PaymentRepo
 from app.schemas.payments import PaymentCreate
 from app.settings import SETTINGS, TEMPLATES
 from app.utils.dependencies import categories_repo, payments_repo
+from app.utils.exceptions import BeebError
 from app.utils.tools.helpers import (
     get_date_from_datetime,
 )
@@ -56,15 +56,15 @@ def create_payment(
             SETTINGS.urls.create_payment,
             status_code=status.HTTP_303_SEE_OTHER,
         )
-
-    except ValidationError as exc:
+    except BeebError as exc:
         return TEMPLATES.TemplateResponse(
             SETTINGS.templates.create_payment,
             context={
                 "request": request,
-                "exception": f"Error: {str(exc)}",
+                "exception": exc.detail,
+                "status_code": exc.status_code,
             },
-            status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
+            status_code=exc.status_code,
         )
     except Exception as exc:
         return TEMPLATES.TemplateResponse(
