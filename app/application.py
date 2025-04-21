@@ -9,6 +9,7 @@ from app.routers.dev_router import dev_router
 from app.routers.payments_router import payments_router
 from app.routers.ping_router import ping_router
 from app.settings import ENGINE
+from app.utils.exceptions import beeb_exception_handler
 
 
 @asynccontextmanager
@@ -19,6 +20,7 @@ async def lifespan(app: FastAPI):
 
 def build_app():
     app = FastAPI(lifespan=lifespan)
+    app.add_exception_handler(Exception, beeb_exception_handler)
     app.include_router(ping_router)
     app.include_router(payments_router)
     app.include_router(categories_router)

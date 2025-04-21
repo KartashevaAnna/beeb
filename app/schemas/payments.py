@@ -9,6 +9,11 @@ from pydantic import (
     field_validator,
 )
 
+from app.utils.exceptions import (
+    NotIntegerError,
+    NotPositiveValueError,
+    ValueTooLargeError,
+)
 from app.utils.tools.helpers import (
     get_date_from_datetime,
     get_date_from_datetime_without_year,
@@ -53,7 +58,7 @@ class PaymentShowOne(PaymentShow):
 
 
 class PaymentCreate(PaymentBase):
-    price_in_rub: Annotated[int, Field(gt=0, exclude=True)]
+    price_in_rub: Annotated[int, Field(exclude=True)]
     date: Annotated[
         str,
         StringConstraints(
@@ -61,6 +66,19 @@ class PaymentCreate(PaymentBase):
         ),
         Field(exclude=True),
     ]
+
+    @field_validator("price_in_rub", mode="before")
+    @classmethod
+    def validate_price_in_rub(cls, value) -> int:
+        try:
+            value = int(value)
+        except ValueError:
+            raise NotIntegerError(value)
+        if value <= 0:
+            raise NotPositiveValueError(value)
+        if value > 9999999:
+            raise ValueTooLargeError(value)
+        return value
 
     @computed_field
     @property

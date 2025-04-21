@@ -48,4 +48,3 @@ def test_payments_exception(client):
     """
     response = client.get(SETTINGS.urls.payments)
     assert response.status_code != 200
-    assert "exception" in response.text

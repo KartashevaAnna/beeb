@@ -50,4 +50,3 @@ def test_payment_exception(client):
     """Case: any exception is thrown."""
     response = client.get(SETTINGS.urls.payment.format(payment_id=1))
     assert response.status_code != 200
-    assert "exception" in response.text

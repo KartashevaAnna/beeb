@@ -95,4 +95,3 @@ def test_update_payment_exception(client, category):
         data={"name": NAME, "is_active": category.is_active},
     )
     assert response.status_code == 501
-    assert "exception" in response.text
