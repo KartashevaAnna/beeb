@@ -28,11 +28,42 @@
     {% if exception %}
         {% include 'exception.html' %}
     {% else %}
-    {% include 'navbar_horizontal.html' %}
         {% block bodycontent %}
         {% endblock %}
     {% endif %}
 {% endblock %}
 </body>
 
+<nav class="navbar navbar-expand-lg bg-body-tertiary" style="float: right !important; display: block !important;">
+    <div id="navbar" class="container-fluid" style="display: block; float: right !important;">
+      
+        <a class="navbar-brand align-text-right" href="/payments">
+            <img src="/img/logo.png" alt="Logo" width="30" height="30" class="d-inline-block align-text-right">
+            <b>beeb</b>
+        </a>
+ 
+        <ul>
+        <br>
+        {% if not request.path == '/payments' %}
+        <li style="float: right !important; display: block !important;"><a href="/payments">платежи</a></li>
+        {% else %}
+        <li class="active" style="float: right !important; display: block !important;"><a href="/payments">платежи</a></li>
+        {% endif %}
+        <br>
+        {% if not request.path == '/dashboard' %}
+        <li style="float: right !important; display: block !important;"><a href="/dashboard">сводная таблица</a></li>
+        {% else %}
+        <li style="float: right !important; display: block !important;"class="active"><a href="/dashboard">сводная таблица</a></li>
+        {% endif %}
+        <br>
+        {% if not request.path == '/categories' %}
+        <li style="float: right !important; display: block !important;"><a href="/categories">категории</a></li>
+        {% else %}
+        <li style="float: right !important; display: block !important;"class="active"><a href="/categories">категории</a></li>
+        {% endif %}
+        </ul>
+
+
+    </div>
+</nav>
 </html>
