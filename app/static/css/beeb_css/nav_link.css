@@ -1,0 +1,77 @@
+
+ul {
+    list-style-type: none;
+    margin: 0 ! important;
+    padding: 0 ! important;
+    overflow: hidden;
+    display: block;
+  }
+  
+  li {
+    float: left;
+    background-color: #0cca91a5;
+    display: block;
+  }
+  
+  li a {
+    display: block;
+    color: black;
+    text-align: center;
+    padding: 14px 16px;
+    margin-right:10px;
+    text-decoration: none;
+  }
+
+
+ 
+  #navbar ul a:hover { 
+    background-color: #3bf2bb;
+    display: block;
+}
+   
+  /*This rule will highlite an elment with the class active, while the ul is not "active"*/
+  #navbar ul:not(:active) li.active a,
+  /*This rule will highlight the class undergoing class action*/
+  #navbar ul li[id] a:active {
+    background: #20c997;
+    color: black;
+    margin-right:10px;
+    text-align: center;
+    display: block;
+  }
+  
+  
+  /*This rule will highlite an elment with the class active, while the ul is not "active"*/
+  #navbar ul:not(:active) li.active a {
+    color: --bs-emphasis-color;
+    display: block;
+}
+  /*This rule will highlight the class undergoing class action*/
+  #navbar ul li[id] a:active {
+    color: --bs-body-color;
+    display: block;
+    
+  }
+
+
+
+  .vertical-menu {
+    width: 200px; /* Set a width if you like */
+  }
+  
+  .vertical-menu a {
+    background-color: #eee; /* Grey background color */
+    color: black; /* Black text color */
+    display: block; /* Make the links appear below each other */
+    padding: 12px; /* Add some padding */
+    text-decoration: none; /* Remove underline from links */
+  }
+  
+  .vertical-menu a:hover {
+    background-color: #ccc; /* Dark grey background on mouse-over */
+  }
+  
+  .vertical-menu a.active {
+    background-color: #04AA6D; /* Add a green color to the "active/current" link */
+    color: white;
+  }

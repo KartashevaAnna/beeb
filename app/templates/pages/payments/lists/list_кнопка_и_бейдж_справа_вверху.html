@@ -1,9 +1,24 @@
 {% extends "base.html" %}
 
 {% block bodycontent %}
-
-
-
+<div class="container-fluid">
+        <ul class="nav flex-column my-1" style="float: right !important;">
+            <li class="nav-item my-1">
+                <a href="/payments/create" 
+                class="btn beeb-submit-button" 
+                style="color: #191919d6 !important; margin-left:45px !important;width:auto">
+                    внести платёж
+                </a>
+            </li>
+            <li class="nav-item my-1">
+                {% if total %}
+                <h3><span class="badge bg-secondary me-5" style="
+        color: #191919d6 !important; margin-left:45px !important;width:auto"> всего: {{ total if total is not none}}</span></h3>
+                {% endif %}
+            </li>
+        </ul>
+    </div>
+</div>
 
 
 
@@ -57,18 +72,11 @@
     <div class="container-fluid">
         <div class="row my-4 p-2">
             <div class="col-7">
-                {% if total %}
-                <h3><span class="badge bg-secondary" style="
-    color: #191919d6 !important;">всего за всё время: {{ total if total is not none}}</span></h3>
-                {% endif %}
+                
               </div>
           
               <div class="col-3 offset-md-1">
-                <a href="/payments/create" 
-                class="btn beeb-submit-button" 
-                style="color: #191919d6 !important; display:block !important;">
-                    внести платёж
-                </a>
+                
               </div>
 
     </div>

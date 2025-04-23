@@ -5,8 +5,6 @@
 
 
 
-
-
 <div class="container-fluid" id="list_payments">
     <div class="row justify-content-lg-center my-1">
         <div class="col-lg-11">
@@ -51,25 +49,27 @@
 
 
 
+</div>
 
 
 <div class="footer">
     <div class="container-fluid">
-        <div class="row my-4 p-2">
-            <div class="col-7">
-                {% if total %}
-                <h3><span class="badge bg-secondary" style="
-    color: #191919d6 !important;">всего за всё время: {{ total if total is not none}}</span></h3>
-                {% endif %}
-              </div>
-          
-              <div class="col-3 offset-md-1">
+        <ul class="nav flex-column my-1">
+            <li class="nav-item my-1">
                 <a href="/payments/create" 
                 class="btn beeb-submit-button" 
-                style="color: #191919d6 !important; display:block !important;">
+                style="color: #191919d6 !important; margin-left:45px !important;width:auto; float: right !important;">
                     внести платёж
                 </a>
-              </div>
+         
+    
+                {% if total %}
+                <h3><span class="badge bg-secondary me-5" style="
+        color: #191919d6 !important;"> всего: {{ total if total is not none}}</span></h3>
+                {% endif %}
+            </li>
+        </ul>
+    </div>
 
     </div>
 {% endblock %}

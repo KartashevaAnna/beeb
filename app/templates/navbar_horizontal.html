@@ -1,6 +1,6 @@
 <!DOCTYPE html>
 <html lang="en" data-bs-theme="beeb">
-
+    
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -28,11 +28,40 @@
     {% if exception %}
         {% include 'exception.html' %}
     {% else %}
-    {% include 'navbar_horizontal.html' %}
         {% block bodycontent %}
         {% endblock %}
     {% endif %}
 {% endblock %}
 </body>
+<nav class="navbar navbar-expand-lg bg-body-tertiary">
+    <div id="navbar" class="container-fluid">
+      
+        <a class="navbar-brand align-text-middle" href="/payments">
+            <img src="/img/logo.png" alt="Logo" width="30" height="30" class="d-inline-block align-text-middle">
+            <b>beeb</b>
+        </a>
+        <ul>
+        {% if not request.path == '/payments' %}
+            <li><a href="/payments">платежи</a></li>
+        {% else %}
+            <li class="active"><a href="/payments">платежи</a></li>
+        {% endif %}
 
+
+        {% if not request.path == '/dashboard' %}
+            <li><a href="/dashboard">сводная таблица</a></li>
+        {% else %}
+            <li class="active"><a href="/dashboard">сводная таблица</a></li>
+        {% endif %}
+
+        
+        {% if not request.path == '/categories' %}
+            <li><a href="/categories">категории</a></li>
+        {% else %}
+            <li class="active"><a href="/categories">категории</a></li>
+        {% endif %}
+        </ul>
+      </div>
+    </div>
+</nav>
 </html>
