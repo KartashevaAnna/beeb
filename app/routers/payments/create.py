@@ -5,14 +5,14 @@ import fastapi
 from fastapi import Depends, Form, Request, status
 from fastapi.responses import RedirectResponse
 
+from app.exceptions import BeebError
 from app.repositories.categories import CategoryRepo
 from app.repositories.payments import PaymentRepo
 from app.schemas.payments import PaymentCreate
 from app.settings import SETTINGS, TEMPLATES
 from app.utils.dependencies import categories_repo, payments_repo
-from app.utils.exceptions import BeebError
 from app.utils.tools.helpers import (
-    get_date_from_datetime,
+    get_datetime_without_seconds,
 )
 
 create_payments_router = fastapi.APIRouter()
@@ -28,7 +28,7 @@ def serve_create_payment_template(
         context={
             "request": request,
             "options": repo.list_names(),
-            "date": get_date_from_datetime(datetime.now()),
+            "date": get_datetime_without_seconds(datetime.now()),
         },
     )
 

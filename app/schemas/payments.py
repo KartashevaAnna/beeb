@@ -9,15 +9,15 @@ from pydantic import (
     field_validator,
 )
 
-from app.utils.exceptions import (
+from app.exceptions import (
     NotIntegerError,
     NotPositiveValueError,
     ValueTooLargeError,
 )
 from app.utils.tools.helpers import (
-    get_date_from_datetime,
+    get_date_for_database,
     get_date_from_datetime_without_year,
-    get_datetime_from_date,
+    get_datetime_without_seconds,
     get_number_for_db,
     get_readable_price,
 )
@@ -54,7 +54,7 @@ class PaymentShowOne(PaymentShow):
     @computed_field
     @property
     def date(cls) -> str:
-        return get_date_from_datetime(date=cls.created_at)
+        return get_datetime_without_seconds(date=cls.created_at)
 
 
 class PaymentCreate(PaymentBase):
@@ -95,7 +95,7 @@ class PaymentCreate(PaymentBase):
     @computed_field
     @property
     def created_at(cls) -> datetime.datetime:
-        return get_datetime_from_date(cls.date)
+        return get_date_for_database(cls.date)
 
 
 class PaymentUpdate(PaymentBase):
@@ -128,4 +128,4 @@ class PaymentUpdate(PaymentBase):
     @computed_field
     @property
     def date_to_update(cls) -> datetime.datetime:
-        return get_datetime_from_date(cls.date)
+        return get_date_for_database(cls.date)
