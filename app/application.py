@@ -4,12 +4,12 @@ from contextlib import asynccontextmanager
 from fastapi import FastAPI
 from fastapi.staticfiles import StaticFiles
 
+from app.exceptions import beeb_exception_handler
 from app.routers.categories_router import categories_router
 from app.routers.dev_router import dev_router
 from app.routers.payments_router import payments_router
 from app.routers.ping_router import ping_router
 from app.settings import ENGINE
-from app.utils.exceptions import beeb_exception_handler
 
 
 @asynccontextmanager

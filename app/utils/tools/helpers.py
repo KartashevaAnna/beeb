@@ -1,6 +1,7 @@
 import datetime
 import locale
 import random
+import re
 
 from app.models import Payment
 from app.utils.constants import PRODUCTS
@@ -36,9 +37,8 @@ def get_readable_price(price: int) -> str:
 def get_number_for_db(frontend_input: str) -> int:
     """Removes price format as per Russian locale, returns price in kopecks."""
     currency_symbol = locale.localeconv()["currency_symbol"]
-    if frontend_input:
-        removed_currency_symbol = frontend_input.replace(currency_symbol, "")
-        return convert_to_copecks(locale.atoi(removed_currency_symbol))
+    removed_currency_symbol = frontend_input.replace(currency_symbol, "")
+    return convert_to_copecks(locale.atoi(removed_currency_symbol))
 
 
 def get_monthly_payments(all_payments: list[Payment]) -> dict[int, str]:
@@ -76,8 +76,16 @@ def sort_options(
     return sorted_options
 
 
+def has_cyrillic(date: str):
+    return bool(re.search("[а-яА-Я]", date))
+
+
 def get_date_from_datetime(date: datetime.datetime) -> str:
     return f"{date.strftime('%d %B %Y')} года"
+
+
+def get_datetime_without_seconds(date: datetime.datetime) -> str:
+    return f"{date.strftime('%Y-%m-%d %X')}"
 
 
 def get_date_from_datetime_without_year(date: datetime.datetime) -> str:
@@ -89,3 +97,15 @@ def get_datetime_from_date(date: str) -> datetime.datetime:
     date_str = f"{date} 00:00:00.000001"
     date = datetime.datetime.strptime(date_str, "%d %B %Y %H:%M:%S.%f")
     return date.astimezone()
+
+
+def get_datetime_from_time_string(date) -> str:
+    date = f"{date}.000001"
+    res = datetime.datetime.strptime(date, "%Y-%m-%d %H:%M:%S.%f")
+    return res.astimezone()
+
+
+def get_date_for_database(date) -> str:
+    if has_cyrillic(date):
+        return get_datetime_from_date(date)
+    return get_datetime_from_time_string(date)
