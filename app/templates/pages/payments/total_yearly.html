@@ -1,0 +1,29 @@
+{% extends "base.html" %}
+{% block bodycontent %}
+
+<link rel="stylesheet" href="https://unpkg.com/bs-brain@2.0.4/components/charts/chart-2/assets/css/chart-2.css"
+
+
+{% include 'pages/payments/total_chart.html' %}
+
+
+<table class="table table-hover">
+    <tr>
+      <th>месяц</th>
+      <th>сумма</th>
+      <th>просмотр</th>
+    </tr>
+    <tr>
+    {% if total_per_month.items()|length > 0 %}
+      {% for payment in total_per_month.items() %}
+          <td scope="row">{{ payment[0] }}</td>
+          <td>{{ payment[1] }}</td>
+          <td><a href="/"><i class="material-icons">👁️</i></a></td>
+      </tr>
+      {% endfor %}
+      </table>
+      {% endif %}
+
+
+    
+{% endblock %}

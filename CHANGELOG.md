@@ -8,9 +8,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [0.1.0] - 2025-04-23
 ### Added
-- beeb is available from any computer in local network
-- beeb now uses custom exceptions handler
+- payments are broken down by year
 - beeb has a navbar
+- beeb now uses custom exceptions handler
+- beeb is available from any computer in local network
+
+
 
 ### Changed
 
