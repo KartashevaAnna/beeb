@@ -17,7 +17,7 @@ def read_all(
 ):
     try:
         payments = repo.read_all()
-        total = repo.get_total()
+        total = repo.get_total(repo.get_all_payments())
         return TEMPLATES.TemplateResponse(
             SETTINGS.templates.read_payments,
             context={"request": request, "payments": payments, "total": total},

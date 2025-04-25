@@ -68,12 +68,13 @@ class Urls(BaseModel):
     payments: str
     update_payment: str
     delete_payment: str
-    payments_dashboard: str
     total_payments_monthly: str
     create_category: str
     category: str
     categories: str
     update_category: str
+    payments_dashboard: str
+    payments_dashboard_yearly: str
 
 
 class Templates(BaseModel):
@@ -81,7 +82,7 @@ class Templates(BaseModel):
     read_payments: str
     create_payment: str
     delete_payment: str
-    total_payments_monthly: str
+    payments_dashboard_yearly: str
     payments_dashboard: str
     create_category: str
     read_category: str
