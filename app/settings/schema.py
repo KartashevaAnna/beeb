@@ -75,6 +75,7 @@ class Urls(BaseModel):
     update_category: str
     payments_dashboard: str
     payments_dashboard_yearly: str
+    start_page: str
 
 
 class Templates(BaseModel):
