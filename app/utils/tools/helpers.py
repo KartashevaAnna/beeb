@@ -30,6 +30,7 @@ def get_readable_price(price: int) -> str:
     """Formats price as per Russian locale and appends currency symbol."""
     return (
         locale.format_string("%.0f", (convert_to_rub(price)), grouping=True)
+        + " "
         + locale.localeconv()["currency_symbol"]
     )
 
