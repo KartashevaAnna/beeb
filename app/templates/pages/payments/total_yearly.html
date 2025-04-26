@@ -17,8 +17,8 @@
     {% if total_per_month.items()|length > 0 %}
       {% for payment in total_per_month.items() %}
           <td scope="row">{{ payment[0] }}</td>
-          <td>{{ payment[1] }}</td>
-          <td><a href="/"><i class="material-icons">👁️</i></a></td>
+          <td>{{ payment[1][0]}}</td>
+          <td><a href='{{ payment[1][1] }}'><i class="material-icons">👁️</i></a></td>
       </tr>
       {% endfor %}
       </table>

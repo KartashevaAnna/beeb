@@ -45,6 +45,15 @@ class PaymentRepo:
         res = self.session.execute(statement)
         return res.scalars().all()
 
+    def get_payments_per_month(self, year: int, month: int) -> list[Payment]:
+        statement = (
+            select(Payment)
+            .filter(extract("year", Payment.created_at) == year)
+            .filter(extract("month", Payment.created_at) == month)
+        )
+        res = self.session.execute(statement)
+        return res.scalars().all()
+
     def get_payments_per_year_with_category(self, year: int) -> list[Payment]:
         statement = (
             select(Payment)
@@ -120,11 +129,16 @@ class PaymentRepo:
         except TypeError:
             return None
 
-    def get_monthly_payments(self, payments: list[Payment]) -> dict[str, str]:
+    def get_monthly_payments(
+        self, payments: list[Payment], year: int | None = None
+    ) -> dict[str, str]:
         monthly_payments = get_monthly_payments(payments)
         sorted_monthly_payments = dict(sorted(monthly_payments.items()))
         return {
-            MONTHES[calendar.month_name[int(key)]]: get_readable_price(value)
+            MONTHES[calendar.month_name[int(key)]]: (
+                get_readable_price(value),
+                f"/dashboard/{year}/{key}" if year else None,
+            )
             for key, value in sorted_monthly_payments.items()
         }
 
