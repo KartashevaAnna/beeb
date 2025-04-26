@@ -44,7 +44,7 @@ def read_all_payments_per_month(
             else None,
             "total_shares": list(
                 repo.get_total_monthly_payments_shares(
-                    repo.get_payments_per_year_with_category(year)
+                    repo.get_payments_per_month(year=year, month=month)
                 ).items()
             ),
             "header_text": f"За {INT_TO_MONTHES[month]} {year} года: {total}",
