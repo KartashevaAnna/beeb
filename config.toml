@@ -28,6 +28,7 @@ category = "{{ urls.URL_CATEGORY }}"
 
 payments_dashboard = "{{ urls.URL_PAYMENTS_DASHBOARD }}"
 payments_dashboard_yearly = "{{ urls.URL_PAYMENTS_DASHBOARD_YEARLY }}"
+payments_dashboard_monthly = "{{ urls.URL_PAYMENTS_DASHBOARD_MONTHLY }}"
 start_page = "{{  urls.URL_START_PAGE }}"
 
 
@@ -39,6 +40,7 @@ delete_payment = "{{ templates.TEMPLATE_DELETE_PAYMENT }}"
 
 payments_dashboard = "{{ templates.TEMPLATE_PAYMENTS_DASHBOARD }}"
 payments_dashboard_yearly = "{{ templates.TEMPLATE_PAYMENTS_DASHBOARD_YEARLY }}"
+payments_dashboard_monthly = "{{ templates.TEMPLATE_PAYMENTS_DASHBOARD_MONTHLY }}"
 
 
 read_categories = "{{ templates.TEMPLATE_READ_CATEGORIES }}"
