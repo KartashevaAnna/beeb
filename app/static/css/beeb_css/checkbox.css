@@ -1,13 +1,13 @@
 
 input[type=checkbox]:not(:checked){
  content: " ";
- background-color: rgba(222, 226, 230, 0.5);
- border-color: #ffc000;
+ background-color: var(--bs-secondary-color);
+ border-color: var(--bs-secondary-text-emphasis);
  display: inline-block;
  visibility: visible;
 }
 
 input[type=checkbox]:checked{
-    background-color: #37bd74 !important;
-    border-color: #0cca91a5;
+    background-color: var(--bs-success-text-emphasis) !important;
+    border-color: var(--bs-success-text-emphasis);
 }

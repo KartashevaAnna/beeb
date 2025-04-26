@@ -6,7 +6,6 @@ from fastapi.staticfiles import StaticFiles
 
 from app.exceptions import beeb_exception_handler
 from app.routers.categories_router import categories_router
-from app.routers.default_page_router import default_page_router
 from app.routers.dev_router import dev_router
 from app.routers.payments_router import payments_router
 from app.routers.ping_router import ping_router
@@ -22,7 +21,6 @@ async def lifespan(app: FastAPI):
 def build_app():
     app = FastAPI(lifespan=lifespan)
     app.add_exception_handler(Exception, beeb_exception_handler)
-    app.include_router(default_page_router)
     app.include_router(ping_router)
     app.include_router(payments_router)
     app.include_router(categories_router)
