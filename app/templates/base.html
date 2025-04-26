@@ -14,8 +14,11 @@
     <link href="/css/beeb_css/buttons/close_modal.css" rel="stylesheet" crossorigin="anonymous">
     <link href="/css/beeb_css/checkbox.css" rel="stylesheet" crossorigin="anonymous">
     <link href="/css/beeb_css/nav_link.css" rel="stylesheet" crossorigin="anonymous">
+    <link href="/css/beeb_css/navbar.css" rel="stylesheet" crossorigin="anonymous">
+    <link href="/css/beeb_css/table.css" rel="stylesheet" crossorigin="anonymous">
     <link href="https://fonts.googleapis.com/icon?family=Material+Icons"
-    rel="stylesheet">
+    
+
     <link href="/static/css/beeb_css/material_icons.css" rel="stylesheet">
     <script src="/js/htmx.min.js" crossorigin="anonymous"></script>
     <script src="/js/bootstrap/bootstrap.js" crossorigin="anonymous"></script>
@@ -24,6 +27,12 @@
 </head>
 
 <body>
+    <style>
+         * {
+      font-family: garamond;
+    }
+</style>
+
 {% block body %}
     {% if exception %}
         {% include 'exception.html' %}

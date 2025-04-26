@@ -1,15 +1,15 @@
 
 .beeb-input{
-    background-color: rgba(222, 226, 230, 0.75);
+    background-color: var(--bs-secondary-color);
     text-align: center;
   }
   .beeb-input:disabled{
-    color: rgb(34, 33, 33);
+    color: var(--bs-emphasis-color);
     text-align: center;
   }
 
   .select {
-    background-color: rgba(222, 226, 230, 0.75);
+    background-color: var(--bs-secondary-color);
     text-align: center; 
     width: 300px !important; 
     min-width: 300px !important; 
@@ -18,11 +18,11 @@
 
 
   .beeb-input-create{
-    background-color: #a0b7bc;
+    background-color: var(--bs-secondary-color);
     text-align: center;
   }
   .beeb-input-create:disabled{
-    color: rgb(34, 33, 33);
+    color: var (--bs-emphasis-color);
     text-align: center;
   }
   

@@ -1,15 +1,12 @@
 
 .beeb-delete-button {
-    background-color: #ee6695;
-    border-color: #ee6695;
-    color: black;
-    display: block;
+  background-color: var(--bs-body-bg);
+  border-color: var(--bs-body-bg);
   }
 
   .beeb-delete-button:hover {
-    background-color: #e8286b;
-    border-color: #e8286b;
-    color: black;
+    background-color: var(--bs-danger-text-emphasis);
+    border-color: var(--bs-danger-text-emphasis);
   }
 
   

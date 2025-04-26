@@ -1,26 +1,32 @@
 .beeb-submit-button {
-    background-color: #20c997;
-    border-color: #0cca91a5;
-    color: black;
+    background-color: #59B8A0;
+    border-color: #4bb79c;
+    color: bs-emphasis-color;
+    border-radius: 0%;
   }
   .beeb-submit-button:hover {
-    background-color: #37bd74;
-    border-color: #0cca91a5;
-    color: black;
+    background-color: #b4ebc2;
+    border-color: #b9e5c5;
+    color:bs-emphasis-color;
+    border-radius: 0%;
   }
 
 
   .beeb-submit-button-large {
-    background-color: #20c997;
-    border-color: #0cca91a5;
+    background-color: #59B8A0;
+    border-color: #4bb79c;
+    border-radius: 0%;
 
-    color: black;
+    color: var(--bs-emphasis-color);
     display: block;
     width: 100%;
   }
   .beeb-submit-button-large:hover {
-    background-color: #37bd74;
-    border-color: #0cca91a5;
-    color: black;
+    background-color: #6ce0c3;
+    border-color: #6ce0c3;
+    color: bs-emphasis-color;
+    display: block;
+    width: 100%;
+    border-radius: 0%;
   }
   

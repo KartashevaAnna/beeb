@@ -7,26 +7,26 @@
 :root,
 [data-bs-theme=beeb] {
   color-scheme: beeb;
-  --bs-body-color: #ffc000;
+  --bs-body-color: #171818;
   --bs-body-color-rgb: 222, 117, 94;
-  --bs-body-bg: #191919;
+  --bs-body-bg: #F1F6F7 !important;
   --bs-body-bg-rgb: 25, 25, 25;
-  --bs-emphasis-color: #deb15e; /* Цвет теста в таблицах */ 
+  --bs-emphasis-color: #171818; /* Цвет теста в таблицах */ 
   --bs-emphasis-color-rgb: 255, 255, 255;
   --bs-secondary-color: rgba(222, 226, 230, 0.75);
   --bs-secondary-color-rgb: 222, 226, 230;
-  --bs-secondary-bg: #343a40;
+  --bs-secondary-bg: #CCC8BA;
   --bs-secondary-bg-rgb: 52, 58, 64;
-  --bs-tertiary-color: rgba(222, 226, 230, 0.5);
+  --bs-tertiary-color: #E1E3E6;
   --bs-tertiary-color-rgb: 222, 226, 230;
-  --bs-tertiary-bg: #2b3035;
+  --bs-tertiary-bg: #6ce0c3;
   --bs-tertiary-bg-rgb: 43, 48, 53;
   --bs-primary-text-emphasis: #6ea8fe;
-  --bs-secondary-text-emphasis: #a7acb1;
-  --bs-success-text-emphasis: #75b798;
+  --bs-secondary-text-emphasis: #aea993;
+  --bs-success-text-emphasis: #44917d;
   --bs-info-text-emphasis: #6edff6;
   --bs-warning-text-emphasis: #ffda6a;
-  --bs-danger-text-emphasis: #ea868f;
+  --bs-danger-text-emphasis: #F88181;
   --bs-light-text-emphasis: #f8f9fa;
   --bs-dark-text-emphasis: #6ea8fe;
   --bs-primary-bg-subtle: #031633;
@@ -60,6 +60,5 @@
   --bs-form-invalid-color: #e8286b;
   --bs-form-invalid-border-color: #e685b5;
 }
-
 
 

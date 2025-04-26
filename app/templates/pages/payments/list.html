@@ -4,6 +4,22 @@
 
 
 
+    <div class="container-fluid">
+        <div class="row my-2">
+            <div class="col-7">
+                {% if total %}
+                <h3><span class="badge" style="
+    color: var(--bs-emphasis-color); background-color: var(--bs-secondary-bg);">всего за всё время: {{ total if total is not none}}</span></h3>
+                {% endif %}
+              </div>
+          
+              <div class="col-3 offset-md-2">
+                <a href="/payments/create" 
+                class="btn beeb-submit-button-large">
+                    внести платёж
+                </a>
+              </div>
+
 
 
 
@@ -41,9 +57,10 @@
     <td>{{ payment.price_in_rub }}</td>
     <td>{{ payment.category}} </td>
     <td>{{ payment.date }} </td>
-    <td><a href="/payments/update/{{payment.id}}" class="btn beeb-secondary-button"><i class="material-icons" style="color: #191919d6 !important">edit</i></a></td>
+    <td><a href="/payments/update/{{payment.id}}" ><i class="material-icons">✏️</i></a></td>
+
     <form action="/payments/delete/{{payment.id}}" method="post">
-    <td><button class="btn beeb-delete-button"><i class="material-icons" style="color: #191919d6 !important">delete</i></button></td>
+    <td><button class="beeb-delete-button"><i class="material-icons" style="color: var(--bs-body-color);">delete</i></button></td>
     </form>
 </tr>
 {% endfor %}
@@ -53,23 +70,5 @@
 
 
 
-<div class="footer">
-    <div class="container-fluid">
-        <div class="row my-4 p-2">
-            <div class="col-7">
-                {% if total %}
-                <h3><span class="badge bg-secondary" style="
-    color: #191919d6 !important;">всего за всё время: {{ total if total is not none}}</span></h3>
-                {% endif %}
-              </div>
-          
-              <div class="col-3 offset-md-1">
-                <a href="/payments/create" 
-                class="btn beeb-submit-button" 
-                style="color: #191919d6 !important; display:block !important;">
-                    внести платёж
-                </a>
-              </div>
 
-    </div>
 {% endblock %}
