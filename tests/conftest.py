@@ -1,5 +1,6 @@
 import datetime
 import random
+from copy import copy
 from pathlib import Path
 
 import pytest
@@ -12,6 +13,12 @@ from app.application import build_app
 from app.models import AlchemyBaseModel, Category, Payment
 from app.settings import ENGINE
 from app.utils.constants import CATEGORIES, PRODUCTS
+from app.utils.tools.helpers import (
+    get_date_from_datetime,
+)
+from tests.unit.conftest_helpers import change_to_a_defined_category, remove_id
+
+CATEGORY_NAME = "древесина"
 
 
 @pytest.fixture(scope="session")
@@ -134,3 +141,86 @@ def total_payments(session):
     statement = select(functions.sum(Payment.price))
     results = session.execute(statement)
     return results.scalars().first()
+
+
+@pytest.fixture(scope="function")
+def payment_as_dict(payment, session) -> dict:
+    return dict(
+        session.execute(
+            select("*").where(Payment.id == payment.id).select_from(Payment)
+        )
+        .mappings()
+        .all()[0]
+    )
+
+
+def add_category_name(payment_as_dict, session):
+    new_dict = payment_as_dict
+    statement = select(Category).where(
+        Category.id == new_dict.get("category_id")
+    )
+    result = session.execute(statement)
+    category = result.scalars().first()
+    new_dict["category"] = category.name
+    return new_dict
+
+
+def change_created_at_to_date(payment_as_dict):
+    new_dict = copy(payment_as_dict)
+    date = new_dict.pop("created_at", None)
+    new_dict["date"] = get_date_from_datetime(date)
+    return new_dict
+
+
+def payment_create_with_id(payment_as_dict, session, category) -> dict:
+    new_dict = copy(payment_as_dict)
+    new_dict = change_to_a_defined_category(payment_as_dict, category)
+    new_dict = add_category_name(payment_as_dict, session)
+    new_dict = change_created_at_to_date(new_dict)
+    return new_dict
+
+
+@pytest.fixture(scope="function")
+def payment_create(payment_as_dict, session, category) -> dict:
+    return payment_create_with_id(payment_as_dict, session, category)
+
+
+@pytest.fixture(scope="function")
+def payment_create_no_id(payment_create) -> dict:
+    return remove_id(payment_create)
+
+
+@pytest.fixture(scope="function")
+def payment_create_no_category(payment_create_no_id) -> dict:
+    new_dict = copy(payment_create_no_id)
+    payment_create_no_id.pop("category_id", None)
+    return new_dict
+
+
+@pytest.fixture(scope="function")
+def payment_update(payment_as_dict, session, category) -> dict:
+    new_dict = payment_create_with_id(payment_as_dict, session, category)
+    new_dict["form_disabled"] = True
+    return new_dict
+
+
+def get_newly_created_payment(max_id_before: int, session: Session) -> Payment:
+    statement = select(Payment).where(Payment.id == (max_id_before + 1))
+    results = session.execute(statement)
+    return results.scalars().one_or_none()
+
+
+@pytest.fixture(scope="function")
+def category_as_dict(category, session) -> dict:
+    return dict(
+        session.execute(
+            select("*").where(Category.id == category.id).select_from(Category)
+        )
+        .mappings()
+        .all()[0]
+    )
+
+
+@pytest.fixture(scope="function")
+def category_create() -> dict:
+    return {"name": CATEGORY_NAME}

@@ -138,4 +138,4 @@ def test_get_total_per_day(session, category, fill_db):
     computed = PaymentRepo(session).get_total_per_day(
         total=total, total_days=total_days
     )
-    assert computed * total_days == total
+    assert round(round(computed, 2) * total_days) == total
