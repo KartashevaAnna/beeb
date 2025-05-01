@@ -16,6 +16,12 @@ class Category(AlchemyBaseModel):
     payments_list: Mapped[list["Payment"]] = relationship(
         back_populates="payment_category",
     )
+    created_at: Mapped[datetime.datetime] = mapped_column(
+        DateTime(timezone=True), server_default=func.now(), nullable=False
+    )
+    updated_at: Mapped[datetime.datetime] = mapped_column(
+        DateTime(timezone=True), nullable=True
+    )
 
 
 class Payment(AlchemyBaseModel):
@@ -25,6 +31,9 @@ class Payment(AlchemyBaseModel):
     price: Mapped[str] = mapped_column(String(255), nullable=False)
     created_at: Mapped[datetime.datetime] = mapped_column(
         DateTime(timezone=True), server_default=func.now(), nullable=False
+    )
+    updated_at: Mapped[datetime.datetime] = mapped_column(
+        DateTime(timezone=True), nullable=True
     )
     category_id: Mapped[int] = mapped_column(
         Integer, ForeignKey("category.id"), nullable=False
