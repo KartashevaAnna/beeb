@@ -32,3 +32,4 @@ class Payment(AlchemyBaseModel):
     payment_category: Mapped["Category"] = relationship(
         back_populates="payments_list",
     )
+    is_spending: Mapped[bool] = mapped_column(nullable=False, default=True)

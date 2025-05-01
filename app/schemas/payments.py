@@ -31,6 +31,7 @@ class PaymentBase(BaseModel):
         ),
     ]
     category_id: int = Field()
+    is_spending: Annotated[bool, Field()]
 
 
 class PaymentShow(PaymentBase):

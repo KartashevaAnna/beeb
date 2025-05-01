@@ -28,7 +28,7 @@ def test_serve_template_update_payment(client, payment):
     assert payment.payment_category.name in response.text
 
 
-def test_update_payment_standard_mode_name_lowercase_price_int(
+def test_update_payment_standard_mode_name_lowercase_price_int_is_spending_true(
     client, payment, session, payment_update
 ):
     """Case: endpoint updates an payment.
@@ -36,6 +36,24 @@ def test_update_payment_standard_mode_name_lowercase_price_int(
     Name is lowercase, price is integer.
     """
 
+    response = client.post(
+        SETTINGS.urls.update_payment.format(payment_id=payment.id),
+        data=payment_update,
+    )
+    session.expire_all()
+    updated_payment = session.get(Payment, payment.id)
+    check_updated_payment(updated_payment, payment_update, response)
+
+
+def test_update_payment_standard_mode_name_lowercase_price_int_is_speding_false(
+    client, payment, session, payment_update
+):
+    """Case: endpoint updates an payment.
+
+    Name is lowercase, price is integer.
+    """
+    payment_update = copy(payment_update)
+    payment_update["is_spending"] = False
     response = client.post(
         SETTINGS.urls.update_payment.format(payment_id=payment.id),
         data=payment_update,
@@ -193,10 +211,13 @@ def test_update_payment_update_category(
     previous_category = payment.payment_category.name
     categories = get_categories(session)
     categories_names = [x.name for x in categories]
+    categories = {x.name: x.id for x in categories}
     categories_names.remove(previous_category)
+    new_category_name = categories_names[0]
     payment_update = copy(payment_update)
-    payment_update["category"] = categories_names[0]
+    payment_update["category"] = new_category_name
     payment_update.pop("created_at", None)
+    payment_update.pop("categoty_id", None)
 
     response = client.post(
         SETTINGS.urls.update_payment.format(payment_id=payment.id),
@@ -204,9 +225,13 @@ def test_update_payment_update_category(
     )
     session.expire_all()
     updated_payment = session.get(Payment, payment.id)
-    payment_update["category_id"] = categories[0].id
+    payment_update["category_id"] = categories[new_category_name]
 
-    check_updated_payment(updated_payment, payment_update, response)
+    check_updated_payment(
+        updated_payment=updated_payment,
+        payment_update=payment_update,
+        response=response,
+    )
     assert updated_payment.payment_category.name != previous_category
 
 

@@ -46,6 +46,7 @@
         <th>сумма</th>
         <th>категория</th>
         <th>дата</th>
+        <th>расход</th>
         <th> </th>
         <th> </th>
       </tr>
@@ -57,6 +58,15 @@
     <td>{{ payment.price_in_rub }}</td>
     <td>{{ payment.category}} </td>
     <td>{{ payment.date }} </td>
+    <td>
+        {% if not payment.is_spending  %}
+        <input class=form-check-input name="is_spending" id="is_spending" type="checkbox"
+            class="beeb-input">
+        {% else %}
+        <input class=form-check-input name="is_spending" id="is_spending" type="checkbox" checked
+        class="beeb-input">
+        {% endif %}
+    </td>
     <td><a href="/payments/update/{{payment.id}}" ><i class="material-icons">✏️</i></a></td>
 
     <form action="/payments/delete/{{payment.id}}" method="post">
