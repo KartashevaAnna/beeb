@@ -34,7 +34,7 @@ class CustomSettings(BaseSettings):
 class ServerSettings(BaseModel):
     host: str
     port: int
-    debug: bool = False
+    debug: str
     log_level: str = "critical"
 
 
