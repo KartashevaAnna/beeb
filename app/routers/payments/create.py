@@ -42,6 +42,7 @@ def create_payment(
     repo: Annotated[PaymentRepo, Depends(payments_repo)],
     category_repo: Annotated[CategoryRepo, Depends(categories_repo)],
     request: Request,
+    is_spending: bool = Form(False),
 ):
     try:
         options = category_repo.get_dict_names()
@@ -50,6 +51,7 @@ def create_payment(
             price_in_rub=price,
             category_id=options[category],
             date=date,
+            is_spending=is_spending,
         )
         repo.create(new_payment)
         return RedirectResponse(

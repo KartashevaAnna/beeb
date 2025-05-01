@@ -8,7 +8,7 @@
         <div class="container-fluid">
                 <div class="row align-items-center justify-content-lg-center my-4 p-2">
                     <div class="col-lg-4 justify-content-center">
-                            <div class="card" style="border-radius: .80rem; background-color: var(--bs-secondary-bg) !important; border: 2px solid; border-color: var(--bs-secondary-text-emphasis);">
+                        <div class="card" style="border-radius: .80rem; background-color: var(--bs-secondary-bg) !important; border: 2px solid; border-color: var(--bs-secondary-text-emphasis);">
                             <div class="card-body" id="my_card_body"style="background-color: var(--bs-secondary-bg); border-radius: 20px; overflow: hidden;">
                                 <div class="row align-items-center justify-content-sm-center my-1 p-2">
                                     <div class="col-xs-2 justify-content-center align-items-*-center">
@@ -18,32 +18,19 @@
                                     </div>
                                 <div class="row align-items-center justify-content-lg-center my-1 p-2">
                                     <div class="col justify-content-center">
-                                        {% if form_disabled %}
-                                        <input name="name" id="name" type="text" placeholder="name"
-                                        value="{{ payment.name.title() or '' }}" disabled class="beeb-input ">
-                                        {% else %}
                                         <input name="name" id="name" type="text" placeholder="name"
                                         value="{{ payment.name.title() or '' }}" class="beeb-input ">
-                                        {% endif %}
                                     </div>
                                 </div>
                                 <div class="row justify-content-center my-1 p-2">
                                     <div class="col justify-content-center">
-                                        {% if form_disabled %}
-                                        <input name="price" id="price" type="text" placeholder="сумма"
-                                        value="{{ payment.price_in_rub or '' }}" disabled class="beeb-input">
-                                        {% else %}
                                         <input name="price" id="price" type="text" placeholder="сумма"
                                         value="{{ payment.price_in_rub or '' }}" class="beeb-input">
-                                        {% endif %}
+                            
                                     </div> 
                                 </div>
                                 <div class="row justify-content-center my-1 p-2">
                                     <div class="col justify-content-center">
-                                        {% if form_disabled %}
-                                        <input name="category" id="category" type="text" placeholder="категория"
-                                        value="{{ payment.category or '' }}" disabled class="beeb-input">
-                                        {% else %}
                                         <select id="category" name="category" type="text" placeholder="категория"
                                         style="background-color: rgba(222, 226, 230, 0.75);
                                         text-align: center; 
@@ -56,74 +43,40 @@
                                                 >{{ option }}</option>
                                             {% endfor %}
                                         </select>
-                                        {% endif %}
                                     </div> 
                                 </div>
                                 <div class="row align-items-center justify-content-lg-center my-1 p-2">
                                     <div class="col justify-content-center">
-                                        {% if form_disabled %}
-                                        <input name="date" id="date" type="text" placeholder="date"
-                                        value="{{ payment.date or '' }}" disabled class="beeb-input ">
-                                        {% else %}
                                         <input name="date" id="date" type="text" placeholder="date"
                                         value="{{ payment.date or '' }}" class="beeb-input ">
-                                        {% endif %}
                                     </div>
                                 </div>
-                                <div class="row align-items-center justify-content-center my-1 p-2">
-                                    <div class="col-12 justify-content-center align-items-xs-center">
-                                        {% if form_disabled %}
-                                        <a href="/payments/update/{{payment.id}}" class="btn beeb-submit-button" style="display: block;
-            width: 100%;">✏️ отредактировать</a>
+
+                                <div class="row justify-content-center my-1 p-2">
+                                    <div class="col justify-content-center">
+                                        {% if not payment.is_spending  %}
+                                        <input class=form-check-input name="is_spending" id="is_spending" type="checkbox"
+                                            class="beeb-input">
                                         {% else %}
-        
-                                        <button 
-                                        type="submit" 
-                               
-                                        class="btn beeb-submit-button-large"
-                                        >Сохранить
-                                    </button>
+                                        <input class=form-check-input name="is_spending" id="is_spending" type="checkbox" checked
+                                        class="beeb-input">
                                         {% endif %}
-                          
-                                    </div>
-                                </div>
-                                {% if form_disabled %}
-                                <div class="row align-items-center justify-content-center my-1 p-2">
-                                    <div class="col-12 justify-content-center align-items-xs-center">
-                                        <a href="/payments/create" class="btn beeb-add-button" style="display: block;
-            width: 100%;">➕ добавить</a>
+                                        <label class="form-check-label" for="form-check-input">Расход</label>
                                     </div> 
                                 </div>
-</form>
-<form id="delete_payment" action="/payments/delete/{{payment.id}}" method="post">
-    <div class="row align-items-center justify-content-center my-1 p-2">
-        <div class="col-12 justify-content-center align-items-xs-center">
-          <button 
-          hx-get={{ URLS.delete_payment  }} 
-          hx-target="#modals-here" 
-          hx-trigger="click" 
-          hx-push-url="false"
-          data-bs-toggle="modal"
-          data-bs-target="#modals-here" 
-          class="btn beeb-delete-button w-100">➖ удалить</button>
-      </div>
-        </div> 
-    </div>
-    
 
-                                {% endif %}
-                            </div>
-                                </div>
-                            </div>
+                                <div class="row align-items-center justify-content-center my-1 p-2">
+                                    <div class="col-12 justify-content-center align-items-xs-center">
+                                    <button type="submit" class="btn beeb-submit-button-large">Сохранить</button>
+                                    </div>
+                                </div> 
                             </div>
                         </div>
-        </div>
+
+                    </div>
+        </div>       
     </fieldset>
 </form>
-<div id="modals-here" class="modal modal-blur fade" style="display: none" tabindex="-1">
-    <div class="modal-dialog modal-lg modal-dialog-centered" role="document">
-        <div class="modal-content"></div>
-    </div>
-</div>
+
 {% endblock %}
 

@@ -52,6 +52,26 @@ def test_create_payment_valid_data_localized_date(
     )
 
 
+def test_create_payment_valid_data_localized_date_is_spending_false(
+    session, client, payment_create
+):
+    """Case: endpoint creates an payment in db on valid request."""
+    payment_create = copy(payment_create)
+    payment_create["is_spending"] = False
+    max_id_before = session.scalar(select(func.max(Payment.id)))
+    payment_create_check = copy(payment_create)
+    payment_create.pop("category_id", None)
+
+    response = client.post(
+        url=SETTINGS.urls.create_payment, data=payment_create
+    )
+    payment = get_newly_created_payment(max_id_before, session)
+
+    check_created_payment(
+        payment_create=payment_create_check, payment=payment, response=response
+    )
+
+
 def test_create_payment_valid_data_non_localized_date(
     session, client, payment_create
 ):

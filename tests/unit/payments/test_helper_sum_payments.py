@@ -21,13 +21,13 @@ def test_get_monthly_payments(session, category):
         session=session,
         price=400,
         category_id=category.id,
-        created_at=datetime.datetime.now() - datetime.timedelta(weeks=-4),
+        created_at=datetime.datetime.now() - datetime.timedelta(weeks=-8),
     )
     third_payment = add_payment(
         session=session,
         price=200,
         category_id=category.id,
-        created_at=datetime.datetime.now() - datetime.timedelta(weeks=-4),
+        created_at=datetime.datetime.now() - datetime.timedelta(weeks=-8),
     )
     session.commit()
     # get a list of all created payments and pass it to the helper function

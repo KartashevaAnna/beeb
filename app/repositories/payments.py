@@ -185,6 +185,7 @@ class PaymentRepo:
                 price=to_upate.price_in_kopecks,
                 category_id=to_upate.category_id,
                 created_at=to_upate.date_to_update,
+                is_spending=to_upate.is_spending,
             )
         )
         self.session.execute(stmt)

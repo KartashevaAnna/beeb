@@ -23,6 +23,7 @@ def update_payment(
     repo: Annotated[PaymentRepo, Depends(payments_repo)],
     category_repo: Annotated[CategoryRepo, Depends(categories_repo)],
     request: Request,
+    is_spending: bool = Form(False),
 ):
     try:
         options = category_repo.get_dict_names()
@@ -31,6 +32,7 @@ def update_payment(
             price=price,
             category_id=options[category],
             date=date,
+            is_spending=is_spending,
         )
         repo.update(payment_id=payment_id, to_upate=to_update)
         return RedirectResponse(

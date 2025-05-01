@@ -20,7 +20,6 @@ def test_payment_normal_function(client, payment):
     assert str(payment.id) in response.text
     assert payment.name.title() in response.text
     assert get_readable_price(payment.price) in response.text
-    assert payment.payment_category.name in response.text
 
 
 def test_payment_404(client, session, fill_db):

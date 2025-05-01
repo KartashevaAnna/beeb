@@ -27,6 +27,7 @@ def check_created_payment(
     assert payment.name == payment_create["name"]
     assert payment.price == convert_to_copecks(payment_create["price"])
     assert payment.category_id == payment_create["category_id"]
+    assert payment.is_spending == payment_create["is_spending"]
 
 
 def check_updated_payment(
@@ -45,3 +46,4 @@ def check_updated_payment(
         payment_update["price"] = convert_to_copecks(payment_update["price"])
     assert updated_payment.price == payment_update["price"]
     assert updated_payment.payment_category.id == payment_update["category_id"]
+    assert updated_payment.is_spending == payment_update["is_spending"]
