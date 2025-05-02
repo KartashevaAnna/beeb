@@ -17,8 +17,8 @@ from app.exceptions import (
 from app.utils.tools.helpers import (
     get_date_for_database,
     get_date_from_datetime_without_year,
-    get_datetime_without_seconds,
     get_number_for_db,
+    get_pure_date_from_datetime,
     get_readable_price,
 )
 
@@ -55,7 +55,7 @@ class PaymentShowOne(PaymentShow):
     @computed_field
     @property
     def date(cls) -> str:
-        return get_datetime_without_seconds(date=cls.created_at)
+        return get_pure_date_from_datetime(date=cls.created_at)
 
 
 class PaymentCreate(PaymentBase):

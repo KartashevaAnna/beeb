@@ -7,7 +7,6 @@ from app.repositories.payments import PaymentRepo
 from app.settings import SETTINGS
 from app.utils.tools.helpers import (
     get_date_from_datetime,
-    get_readable_price,
 )
 from tests.conftest import get_categories, raise_always
 from tests.unit.conftest_helpers import check_updated_payment
@@ -24,7 +23,7 @@ def test_serve_template_update_payment(client, payment):
     assert response.status_code == 200
     assert payment.name.title() in response.text
     assert str(payment.id) in response.text
-    assert get_readable_price(payment.price) in response.text
+    assert str(payment.price // 100) in response.text
     assert payment.payment_category.name in response.text
 
 
