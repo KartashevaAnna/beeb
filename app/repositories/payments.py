@@ -1,6 +1,7 @@
 import calendar
 import datetime
 
+from fastapi import Request
 from sqlalchemy import delete, extract, func, select, update
 from sqlalchemy.orm import Session
 
@@ -12,7 +13,7 @@ from app.schemas.payments import (
     PaymentShowOne,
     PaymentUpdate,
 )
-from app.utils.constants import MONTHES
+from app.utils.constants import INT_TO_MONTHES, MONTHES
 from app.utils.tools.category_helpers import (
     get_payments_shares,
     get_payments_sums_per_category,
@@ -20,7 +21,6 @@ from app.utils.tools.category_helpers import (
 )
 from app.utils.tools.helpers import (
     get_monthly_payments,
-    get_number_for_db,
     get_readable_price,
 )
 
@@ -37,6 +37,21 @@ class PaymentRepo:
         )
         res = self.session.execute(statement)
         return res.scalars().all()
+
+    def get_spendings(self, payments: list[Payment]) -> list[Payment]:
+        return [payment for payment in payments if payment.is_spending is True]
+
+    def get_all_incomes(self, payments: list[Payment]) -> list[Payment]:
+        return [payment for payment in payments if payment.is_spending is False]
+
+    def get_total_amounts(self, payments: list[Payment]) -> int:
+        amount = self.get_total(payments)
+        return amount if amount is not None else 0
+
+    def get_days_left(
+        self, available_amount: int, total_per_day: int | None = None
+    ):
+        return int(available_amount / total_per_day)
 
     def get_payments_per_year(self, year: int) -> list[Payment]:
         statement = select(Payment).filter(
@@ -73,12 +88,12 @@ class PaymentRepo:
         ]
 
     def get_total(self, payments: list[Payment]) -> int:
-        total_numeric = self.sum_payments_prices(payments)
-        return get_readable_price(total_numeric) if total_numeric else None
+        return self.sum_payments_prices(payments)
 
     def sum_payments_prices(self, payments):
         all_values = [x.price for x in payments]
-        return sum(all_values)
+        result = sum(all_values)
+        return result if result else 0
 
     def get_max_date(self, limit: DateFilter) -> datetime.datetime:
         if not limit.year and not limit.month:
@@ -89,12 +104,11 @@ class PaymentRepo:
                     extract("year", Payment.created_at) == limit.year
                 )
             )
-        if limit.year and limit.month:
-            return self.session.scalar(
-                select(func.max(Payment.created_at))
-                .filter(extract("year", Payment.created_at) == limit.year)
-                .filter(extract("month", Payment.created_at) == limit.month)
-            )
+        return self.session.scalar(
+            select(func.max(Payment.created_at))
+            .filter(extract("year", Payment.created_at) == limit.year)
+            .filter(extract("month", Payment.created_at) == limit.month)
+        )
 
     def get_min_date(self, limit: DateFilter) -> datetime.datetime:
         if not limit.year and not limit.month:
@@ -105,12 +119,11 @@ class PaymentRepo:
                     extract("year", Payment.created_at) == limit.year
                 )
             )
-        if limit.year and limit.month:
-            return self.session.scalar(
-                select(func.min(Payment.created_at))
-                .filter(extract("year", Payment.created_at) == limit.year)
-                .filter(extract("month", Payment.created_at) == limit.month)
-            )
+        return self.session.scalar(
+            select(func.min(Payment.created_at))
+            .filter(extract("year", Payment.created_at) == limit.year)
+            .filter(extract("month", Payment.created_at) == limit.month)
+        )
 
     def get_total_days(
         self, max_date: datetime.datetime, min_date: datetime.datetime
@@ -119,15 +132,13 @@ class PaymentRepo:
             return 0
         else:
             delta = max_date - min_date
-            return delta.days
+            return delta.days + 1
 
-    def get_total_per_day(self, total: int, total_days: int) -> str:
+    def get_total_per_day(self, total: int, total_days: int) -> int:
         try:
             return total / total_days
         except ZeroDivisionError:
-            return None
-        except TypeError:
-            return None
+            return total
 
     def get_monthly_payments(
         self, payments: list[Payment], year: int | None = None
@@ -145,7 +156,7 @@ class PaymentRepo:
     def get_total_monthly_payments_shares(
         self, payments: list[Payment]
     ) -> dict:
-        total = get_number_for_db(self.get_total(payments))
+        total = self.get_total(payments)
         payments_per_categories = get_payments_sums_per_category(payments)
         payment_shares = get_payments_shares(
             payments_per_categories=payments_per_categories, total=total
@@ -176,16 +187,16 @@ class PaymentRepo:
         results = self.session.execute(statement)
         return results.scalars().one_or_none()
 
-    def update(self, payment_id: int, to_upate: PaymentUpdate):
+    def update(self, payment_id: int, to_update: PaymentUpdate):
         stmt = (
             update(Payment)
             .where(Payment.id == payment_id)
             .values(
-                name=to_upate.name,
-                price=to_upate.price_in_kopecks,
-                category_id=to_upate.category_id,
-                created_at=to_upate.date_to_update,
-                is_spending=to_upate.is_spending,
+                name=to_update.name,
+                price=to_update.price_in_kopecks,
+                category_id=to_update.category_id,
+                created_at=to_update.date_to_update,
+                is_spending=to_update.is_spending,
             )
         )
         self.session.execute(stmt)
@@ -201,3 +212,42 @@ class PaymentRepo:
         all_payments = list({x.created_at.year for x in all_payments})
         all_payments.sort(reverse=True)
         return all_payments
+
+    def get_dashboard(
+        self,
+        request: Request,
+        payments: list[Payment],
+        year: int = None,
+        month: int | None = None,
+    ):
+        all_spendings = self.get_spendings(payments)
+        total_spending = self.get_total_amounts(all_spendings)
+        all_incomes = self.get_all_incomes(payments)
+        total_income = self.get_total_amounts(all_incomes)
+        available_amount = total_income - total_spending
+        available_amount_frontend = get_readable_price(available_amount)
+        max_date = self.get_max_date(limit=DateFilter(year=year, month=month))
+        min_date = self.get_min_date(limit=DateFilter(year=year, month=month))
+        total_days = self.get_total_days(max_date, min_date)
+        total_per_day = self.get_total_per_day(
+            total=total_spending, total_days=total_days
+        )
+        days_left = int(available_amount / total_per_day)
+        spending = get_readable_price(total_spending)
+        month = INT_TO_MONTHES.get(month)
+        return {
+            "request": request,
+            "available_amount_frontend": available_amount_frontend,
+            "days_left": days_left,
+            "all_spendings": all_spendings,
+            "total_per_month": self.get_monthly_payments(
+                payments=all_spendings, year=year
+            ),
+            "total_per_day": get_readable_price(total_per_day)
+            if total_per_day
+            else None,
+            "total_shares": list(
+                self.get_total_monthly_payments_shares(all_spendings).items()
+            ),
+            "header_text": f"За {month} {year} года: {spending}",
+        }

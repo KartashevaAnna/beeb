@@ -34,7 +34,7 @@ def update_payment(
             date=date,
             is_spending=is_spending,
         )
-        repo.update(payment_id=payment_id, to_upate=to_update)
+        repo.update(payment_id=payment_id, to_update=to_update)
         return RedirectResponse(
             url=SETTINGS.urls.payments, status_code=status.HTTP_303_SEE_OTHER
         )

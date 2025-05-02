@@ -67,6 +67,7 @@ class PaymentCreate(PaymentBase):
         ),
         Field(exclude=True),
     ]
+    is_spending: Annotated[bool, Field()]
 
     @field_validator("price_in_rub", mode="before")
     @classmethod

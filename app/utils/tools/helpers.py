@@ -23,7 +23,7 @@ def convert_to_copecks(price: int) -> int:
 
 
 def convert_to_rub(price: int) -> int:
-    return price / 100
+    return price // 100
 
 
 def get_readable_price(price: int) -> str:
