@@ -1,0 +1,10 @@
+.card {
+    border-radius: .80rem; 
+    background-color: var(--bs-secondary-bg); 
+    border: 2px solid; 
+    border-color: var(--bs-secondary-text-emphasis)}
+  .card-body {
+    background-color: var(--bs-secondary-bg); 
+    border-radius: 20px; 
+    overflow: hidden;
+  }

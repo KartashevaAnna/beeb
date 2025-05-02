@@ -21,7 +21,7 @@ def test_payments_normal_function(client, fill_db, session):
     assert len(all_payments) > 2
     payment = all_payments[2]
     assert str(payment.id) in response.text
-    assert payment.name.title() in response.text
+    assert payment.name in response.text
     assert get_readable_price(payment.price) in response.text
 
 
