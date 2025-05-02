@@ -85,6 +85,10 @@ def get_date_from_datetime(date: datetime.datetime) -> str:
     return f"{date.strftime('%d %B %Y')} года"
 
 
+def get_pure_date_from_datetime(date: datetime.datetime) -> str:
+    return date.strftime("%d.%m.%Y")
+
+
 def get_datetime_without_seconds(date: datetime.datetime) -> str:
     return f"{date.strftime('%Y-%m-%d %X')}"
 
@@ -101,8 +105,10 @@ def get_datetime_from_date(date: str) -> datetime.datetime:
 
 
 def get_datetime_from_time_string(date) -> str:
-    date = f"{date}.000001"
-    res = datetime.datetime.strptime(date, "%Y-%m-%d %H:%M:%S.%f")
+    now = datetime.datetime.now()
+    now_time = str(now)[10:]
+    date = f"{date}{now_time}"
+    res = datetime.datetime.strptime(date, "%d.%m.%Y %H:%M:%S.%f")
     return res.astimezone()
 
 

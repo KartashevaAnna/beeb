@@ -5,7 +5,6 @@ from sqlalchemy import func, select
 from app.models import Payment
 from app.repositories.payments import PaymentRepo
 from app.settings import SETTINGS
-from app.utils.tools.helpers import get_readable_price
 from tests.conftest import payment, raise_always
 
 
@@ -19,7 +18,7 @@ def test_payment_normal_function(client, payment):
     assert response.status_code == 200
     assert str(payment.id) in response.text
     assert payment.name.title() in response.text
-    assert get_readable_price(payment.price) in response.text
+    assert str(payment.price // 100) in response.text
 
 
 def test_payment_404(client, session, fill_db):

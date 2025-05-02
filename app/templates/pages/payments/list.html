@@ -6,14 +6,9 @@
 
     <div class="container-fluid">
         <div class="row my-2">
-            <div class="col-7">
-                {% if total %}
-                <h3><span class="badge" style="
-    color: var(--bs-emphasis-color); background-color: var(--bs-secondary-bg);">всего за всё время: {{ total if total is not none}}</span></h3>
-                {% endif %}
-              </div>
+
           
-              <div class="col-3 offset-md-2">
+              <div class="col-12">
                 <a href="/payments/create" 
                 class="btn beeb-submit-button-large">
                     добавить

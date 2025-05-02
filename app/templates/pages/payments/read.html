@@ -2,7 +2,6 @@
 
 {% block bodycontent %}
 
-
 <form action="/payments/update/{{payment.id}}" method="post">
     <fieldset>
         <div class="container-fluid">
@@ -25,8 +24,7 @@
                                 <div class="row justify-content-center my-1 p-2">
                                     <div class="col justify-content-center">
                                         <input name="price" id="price" type="text" placeholder="сумма"
-                                        value="{{ payment.price_in_rub or '' }}" class="beeb-input">
-                            
+                                        value="{{ (payment.price|round(2)|string)[:-2] }}" class="beeb-input">
                                     </div> 
                                 </div>
                                 <div class="row justify-content-center my-1 p-2">
@@ -64,6 +62,8 @@
                                         <label class="form-check-label" for="form-check-input">Расход</label>
                                     </div> 
                                 </div>
+                                
+
 
                                 <div class="row align-items-center justify-content-center my-1 p-2">
                                     <div class="col-12 justify-content-center align-items-xs-center">
