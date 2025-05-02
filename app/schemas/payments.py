@@ -60,14 +60,7 @@ class PaymentShowOne(PaymentShow):
 
 class PaymentCreate(PaymentBase):
     price_in_rub: Annotated[int, Field(exclude=True)]
-    date: Annotated[
-        str,
-        StringConstraints(
-            min_length=1, max_length=255, strip_whitespace=True, to_lower=True
-        ),
-        Field(exclude=True),
-    ]
-    is_spending: Annotated[bool, Field()]
+    created_at: datetime.datetime
 
     @field_validator("price_in_rub", mode="before")
     @classmethod
@@ -93,11 +86,6 @@ class PaymentCreate(PaymentBase):
             value = value.replace("  ", " ")
         assert not value.isspace(), "Empty strings are not allowed."
         return value
-
-    @computed_field
-    @property
-    def created_at(cls) -> datetime.datetime:
-        return get_date_for_database(cls.date)
 
 
 class PaymentUpdate(PaymentBase):

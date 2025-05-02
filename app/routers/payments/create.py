@@ -11,9 +11,6 @@ from app.repositories.payments import PaymentRepo
 from app.schemas.payments import PaymentCreate
 from app.settings import SETTINGS, TEMPLATES
 from app.utils.dependencies import categories_repo, payments_repo
-from app.utils.tools.helpers import (
-    get_datetime_without_seconds,
-)
 
 create_payments_router = fastapi.APIRouter()
 
@@ -28,7 +25,6 @@ def serve_create_payment_template(
         context={
             "request": request,
             "options": repo.list_names(),
-            "date": get_datetime_without_seconds(datetime.now()),
         },
     )
 
@@ -38,7 +34,6 @@ def create_payment(
     name: Annotated[str, Form()],
     price: Annotated[str, Form()],
     category: Annotated[str, Form()],
-    date: Annotated[str, Form()],
     repo: Annotated[PaymentRepo, Depends(payments_repo)],
     category_repo: Annotated[CategoryRepo, Depends(categories_repo)],
     request: Request,
@@ -50,7 +45,7 @@ def create_payment(
             name=name,
             price_in_rub=price,
             category_id=options[category],
-            date=date,
+            created_at=datetime.now(),
             is_spending=is_spending,
         )
         repo.create(new_payment)
