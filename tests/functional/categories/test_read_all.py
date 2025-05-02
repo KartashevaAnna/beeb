@@ -19,7 +19,7 @@ def test_categories_normal_function(client, fill_db, session):
     all_categories = session.scalars(select(Category)).all()
     assert len(all_categories) > 2
     category = all_categories[2]
-    assert category.name.title() in response.text
+    assert category.name in response.text
 
 
 def test_categories_empty_db(client):
