@@ -13,12 +13,26 @@
 </div>
 
 
-<table class="table table-hover">
-
+<table class="table table-hover" style="text-align: center; vertical-align: middle;">
+    <tr>
+        <th>название</th>
+        <th>статус</th>
+        <th> </th>
+    </tr>
     {% for category in categories %}
     <tr>
-        <td scope="row">{{ category.name.title() }}</td>
-        <td>{{ category.status }}</td>
+        <td>{{ category.name }}</td>
+        {% if category.is_active == true %}
+            <td>
+            <h4><span class="badge" style="
+        color: var(--bs-emphasis-color); background-color: #59B8A0;">активна</span></h4>
+            </td>
+        {% else %}
+            <td>
+            <h4><span class="badge" style="
+                color: var(--bs-emphasis-color); background-color: var(--bs-secondary-text-emphasis);">устарела</span></h4>
+            </td>
+        {% endif %}
         <td><a href="/categories/update/{{category.id}}"><i class="material-icons">✏️</i></a></td>
     </tr>
     {% endfor %}

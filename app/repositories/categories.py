@@ -11,7 +11,7 @@ class CategoryRepo:
         self.session = session
 
     def read_all(self) -> list[Category]:
-        statement = select(Category)
+        statement = select(Category).order_by(Category.name)
         res = self.session.execute(statement)
         return res.scalars().all()
 

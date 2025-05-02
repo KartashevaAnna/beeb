@@ -1,7 +1,10 @@
+
 .table-hover tbody tr:hover td, .table-hover tbody tr:hover th {
     background-color: var(--bs-tertiary-color);
+    
   }
 
 .table-hover tr th {
     background-color: var(--bs-secondary-color);
+    
 }
