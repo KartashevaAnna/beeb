@@ -1,4 +1,3 @@
-from types import NoneType
 from unittest.mock import patch
 
 from sqlalchemy import select
@@ -10,7 +9,7 @@ from app.utils.tools.helpers import get_readable_price
 from tests.conftest import raise_always
 
 
-def test_payments_normal_function(client, fill_db, session, total_payments):
+def test_payments_normal_function(client, fill_db, session):
     """Case: normal mode.
 
     Checks that the endpoint returns page
@@ -24,11 +23,9 @@ def test_payments_normal_function(client, fill_db, session, total_payments):
     assert str(payment.id) in response.text
     assert payment.name.title() in response.text
     assert get_readable_price(payment.price) in response.text
-    assert isinstance(total_payments, int)
-    assert get_readable_price(total_payments) in response.text
 
 
-def test_payments_empty_db(client, total_payments):
+def test_payments_empty_db(client):
     """Case: the database is empty.
 
     Checks that the endpoint returns page
@@ -37,7 +34,6 @@ def test_payments_empty_db(client, total_payments):
     response = client.get(SETTINGS.urls.payments)
     assert response.status_code == 200
     assert response.context["payments"] == []
-    assert isinstance(total_payments, NoneType)
 
 
 @patch.object(PaymentRepo, "read_all", raise_always)

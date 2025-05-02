@@ -35,9 +35,21 @@
   <div class="col-sm-6">
     <div class="card">
       <div class="card-body">
-          <div class="col-xs-12 text-center">
-            <h6 align="left">расход в день: {{ total_per_day if total_per_day is not none }} </h6>
-          </div>
+
+          <table class="table table-hover">
+            <tr>
+              <th>сумма на счету</th>
+              <th>расход в день</th>
+              <th>осталось дней</th>
+            </tr>
+            <tr>
+              <td>{{ available_amount_frontend if available_amount_frontend is not none }}</td>
+              <td>{{ total_per_day if total_per_day is not none }}</td>
+              <td>{{ days_left if days_left is not none }}</td>
+            </tr>
+          </table>
+
+
           <table class="table table-hover">
             <tr>
               <th>категория</th>

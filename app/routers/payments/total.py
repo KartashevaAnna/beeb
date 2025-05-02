@@ -4,47 +4,27 @@ import fastapi
 from fastapi import Depends, Request
 
 from app.repositories.payments import PaymentRepo
-from app.schemas.dates import DateFilter
 from app.settings import SETTINGS, TEMPLATES
-from app.utils.constants import INT_TO_MONTHES
 from app.utils.dependencies import payments_repo
-from app.utils.tools.helpers import get_number_for_db, get_readable_price
 
 payments_dashboard_router = fastapi.APIRouter()
 
 
 @payments_dashboard_router.get(SETTINGS.urls.payments_dashboard)
-def read_all_payments(
+def dashboard_for_all_years(
     repo: Annotated[PaymentRepo, Depends(payments_repo)],
     request: Request,
 ):
-    total = repo.get_total(repo.get_all_payments())
-    numeric_total = get_number_for_db(total)
-    max_date = repo.get_max_date(limit=DateFilter(year=None, month=None))
-    min_date = repo.get_min_date(limit=DateFilter(year=None, month=None))
-    total_days = repo.get_total_days(max_date, min_date)
-    total_per_day = repo.get_total_per_day(
-        total=numeric_total, total_days=total_days
+    payments = repo.get_all_payments()
+    dashboard = repo.get_dashboard(
+        request=request,
+        payments=payments,
     )
+    dashboard["all_years"] = repo.get_all_years()
+    dashboard["header_text"] = "Расходы за всё время"
+
     return TEMPLATES.TemplateResponse(
-        SETTINGS.templates.payments_dashboard,
-        context={
-            "request": request,
-            "total": total,
-            "total_per_month": repo.get_monthly_payments(
-                repo.get_all_payments()
-            ),
-            "total_per_day": get_readable_price(total_per_day)
-            if total_per_day
-            else None,
-            "all_years": repo.get_all_years(),
-            "total_shares": list(
-                repo.get_total_monthly_payments_shares(
-                    repo.get_all_payments()
-                ).items()
-            ),
-            "header_text": "Расходы за всё время наблюдений",
-        },
+        SETTINGS.templates.payments_dashboard, context=dashboard
     )
 
 
@@ -70,33 +50,14 @@ def read_all_payments_per_year(
     request: Request,
     year: int,
 ):
-    max_date = repo.get_max_date(limit=DateFilter(year=year))
-    min_date = repo.get_min_date(limit=DateFilter(year=year))
-    total_days = repo.get_total_days(max_date=max_date, min_date=min_date)
-    total = repo.get_total(repo.get_payments_per_year(year))
-    numeric_total = get_number_for_db(total)
-    total_per_day = repo.get_total_per_day(
-        total=numeric_total, total_days=total_days
+    payments = repo.get_payments_per_year(year)
+    dashboard = repo.get_dashboard(
+        request=request, payments=payments, year=year
     )
+    dashboard["header_text"] = f"Общие расходы за {year} год"
 
     return TEMPLATES.TemplateResponse(
-        SETTINGS.templates.payments_dashboard_yearly,
-        context={
-            "request": request,
-            "total": total,
-            "total_per_month": repo.get_monthly_payments(
-                payments=repo.get_payments_per_year(year), year=year
-            ),
-            "total_per_day": get_readable_price(total_per_day)
-            if total_per_day
-            else None,
-            "total_shares": list(
-                repo.get_total_monthly_payments_shares(
-                    repo.get_payments_per_year_with_category(year)
-                ).items()
-            ),
-            "header_text": f"Общие расходы за {year} год",
-        },
+        SETTINGS.templates.payments_dashboard_yearly, context=dashboard
     )
 
 
@@ -107,32 +68,11 @@ def read_all_payments_per_month(
     year: int,
     month: int,
 ):
-    max_date = repo.get_max_date(limit=DateFilter(year=year, month=month))
-    min_date = repo.get_min_date(limit=DateFilter(year=year, month=month))
-    total_days = repo.get_total_days(max_date=max_date, min_date=min_date)
-    total = repo.get_total(repo.get_payments_per_month(year=year, month=month))
-    numeric_total = get_number_for_db(total)
-    total_per_day = repo.get_total_per_day(
-        total=numeric_total, total_days=total_days
+    payments = repo.get_payments_per_month(year=year, month=month)
+    dashboard = repo.get_dashboard(
+        request=request, payments=payments, year=year, month=month
     )
 
     return TEMPLATES.TemplateResponse(
-        SETTINGS.templates.payments_dashboard_monthly,
-        context={
-            "request": request,
-            "total": total,
-            "total_per_month": repo.get_monthly_payments(
-                year=year,
-                payments=repo.get_payments_per_month(year=year, month=month),
-            ),
-            "total_per_day": get_readable_price(total_per_day)
-            if total_per_day
-            else None,
-            "total_shares": list(
-                repo.get_total_monthly_payments_shares(
-                    repo.get_payments_per_month(year=year, month=month)
-                ).items()
-            ),
-            "header_text": f"За {INT_TO_MONTHES[month]} {year} года: {total}",
-        },
+        SETTINGS.templates.payments_dashboard_monthly, context=dashboard
     )

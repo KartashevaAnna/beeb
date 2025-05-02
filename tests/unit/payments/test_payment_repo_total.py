@@ -4,7 +4,6 @@ from sqlalchemy import func, select
 
 from app.models import Payment
 from app.repositories.payments import PaymentRepo
-from app.utils.tools.helpers import get_readable_price
 from tests.conftest import add_payment, get_payments
 
 
@@ -16,7 +15,7 @@ def test_payments_total(fill_db, session):
     all_payments = get_payments(session)
     total = sum(payment.price for payment in all_payments)
     repo = PaymentRepo(session)
-    assert repo.get_total(repo.get_all_payments()) == get_readable_price(total)
+    assert repo.get_total(repo.get_all_payments()) == total
 
 
 def test_payments_total_days_no_payments(session):
@@ -59,7 +58,7 @@ def test_payments_total_days_delta_two_days(session, category, fill_db):
     )
     max_date = first_payment.created_at
     min_date = second_payment.created_at
-    assert PaymentRepo(session).get_total_days(max_date, min_date) == 1
+    assert PaymentRepo(session).get_total_days(max_date, min_date) == 2
 
 
 def test_get_payments_per_year(session, fill_db):
@@ -139,3 +138,12 @@ def test_get_total_per_day(session, category, fill_db):
         total=total, total_days=total_days
     )
     assert round(round(computed, 2) * total_days) == total
+
+
+def test_get_total_per_day_zerodivision_error(session):
+    total = 500
+    total_days = 0
+    computed = PaymentRepo(session).get_total_per_day(
+        total=total, total_days=total_days
+    )
+    assert computed == total

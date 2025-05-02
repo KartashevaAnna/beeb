@@ -224,3 +224,81 @@ def category_as_dict(category, session) -> dict:
 @pytest.fixture(scope="function")
 def category_create() -> dict:
     return {"name": CATEGORY_NAME}
+
+
+@pytest.fixture(scope="function")
+def current_payment(category, session: Session):
+    payment = Payment(
+        name=random.choice(PRODUCTS),
+        price=500,
+        category_id=category.id,
+        created_at=datetime.datetime.now(),
+    )
+    session.add(payment)
+    session.flush()
+    return payment
+
+
+@pytest.fixture(scope="function")
+def month_ago_payment(category, session: Session):
+    payment = Payment(
+        name=random.choice(PRODUCTS),
+        price=500,
+        category_id=category.id,
+        created_at=datetime.datetime.now() - datetime.timedelta(weeks=8),
+    )
+    session.add(payment)
+    session.flush()
+    return payment
+
+
+@pytest.fixture(scope="function")
+def month_ago_payment_later(month_ago_payment, category, session: Session):
+    payment = Payment(
+        name=random.choice(PRODUCTS),
+        price=500,
+        category_id=category.id,
+        created_at=month_ago_payment.created_at + datetime.timedelta(days=3),
+    )
+    session.add(payment)
+    session.flush()
+    return payment
+
+
+@pytest.fixture(scope="function")
+def year_ago_payment(category, session: Session):
+    payment = Payment(
+        name=random.choice(PRODUCTS),
+        price=500,
+        category_id=category.id,
+        created_at=datetime.datetime.now() - datetime.timedelta(weeks=53),
+    )
+    session.add(payment)
+    session.flush()
+    return payment
+
+
+@pytest.fixture(scope="function")
+def year_after_payment(category, session: Session):
+    payment = Payment(
+        name=random.choice(PRODUCTS),
+        price=500,
+        category_id=category.id,
+        created_at=datetime.datetime.now() + datetime.timedelta(weeks=53),
+    )
+    session.add(payment)
+    session.flush()
+    return payment
+
+
+@pytest.fixture(scope="function")
+def year_ago_payment_later(year_ago_payment, category, session: Session):
+    payment = Payment(
+        name=random.choice(PRODUCTS),
+        price=500,
+        category_id=category.id,
+        created_at=year_ago_payment.created_at + datetime.timedelta(days=3),
+    )
+    session.add(payment)
+    session.flush()
+    return payment
