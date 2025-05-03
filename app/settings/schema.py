@@ -76,7 +76,7 @@ class Urls(BaseModel):
     payments_dashboard: str
     payments_dashboard_yearly: str
     payments_dashboard_monthly: str
-    start_page: str
+    home_page: str
 
 
 class Templates(BaseModel):
@@ -90,6 +90,7 @@ class Templates(BaseModel):
     create_category: str
     read_category: str
     read_categories: str
+    home_page: str
 
 
 class Settings(CustomSettings):
