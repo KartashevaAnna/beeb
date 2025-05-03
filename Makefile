@@ -6,6 +6,10 @@ ruff:
 local-run:
 	CONFIG_SECRETS_PATH=./local.secrets.toml CONFIG_PATH=config.toml CONFIG_RENDERER=jinja2 python3 run.py
 	
+.PHONY: product-run
+product-run:
+	CONFIG_SECRETS_PATH=./product.secrets.toml CONFIG_PATH=config.toml CONFIG_RENDERER=jinja2 python3 run.py
+
 .PHONY: docker-run
 docker-run:
 	${MAKE} compose-down && ${MAKE} compose-up

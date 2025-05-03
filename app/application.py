@@ -1,7 +1,7 @@
 import locale
 from contextlib import asynccontextmanager
 
-from fastapi import FastAPI
+from fastapi import FastAPI, Request
 from fastapi.staticfiles import StaticFiles
 
 from app.exceptions import beeb_exception_handler
@@ -9,7 +9,7 @@ from app.routers.categories_router import categories_router
 from app.routers.dev_router import dev_router
 from app.routers.payments_router import payments_router
 from app.routers.ping_router import ping_router
-from app.settings import ENGINE
+from app.settings import ENGINE, SETTINGS, TEMPLATES
 
 
 @asynccontextmanager
@@ -31,4 +31,14 @@ def build_app():
     app.mount("/js", StaticFiles(directory="./app/static/js"), name="js")
     app.mount("/img", StaticFiles(directory="./app/static/images"), name="img")
     locale.setlocale(locale.LC_ALL, "ru_RU.utf8")
+
+    @app.get("/")
+    def select_app(request: Request):
+        return TEMPLATES.TemplateResponse(
+            SETTINGS.templates.home_page,
+            context={
+                "request": request,
+            },
+        )
+
     return app
