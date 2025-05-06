@@ -24,6 +24,7 @@ jinja2-fragments = "^1.7.0"
 sqlalchemy = "^2.0.37"
 psycopg2-binary = "^2.9.10"
 python-multipart = "^0.0.20"
+pyexcel-odsr = "^0.6.0"
 
 
 [build-system]
