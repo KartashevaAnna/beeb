@@ -64,7 +64,7 @@ def create_payments_in_db(
 
 
 @dev_router.post("/upload-payments")
-def upload_payments_from_ods_file(
+def upload_payments_from_libreoffice_calc_file(
     session: Annotated[Session, Depends(get_session)],
     category_repo: Annotated[CategoryRepo, Depends(categories_repo)],
     repo: Annotated[PaymentRepo, Depends(payments_repo)],
