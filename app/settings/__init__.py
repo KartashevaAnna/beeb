@@ -19,5 +19,6 @@ ENGINE = create_engine(
 )
 
 TEMPLATES_DIR = Path(__file__).parent.parent / "templates"
+PAYMENTS_TO_UPLOAD_DIR = Path(__file__).parent.parent / "payments_to_upload"
 TEMPLATES = Jinja2Blocks(directory=TEMPLATES_DIR)
 TEMPLATES.env.globals["URLS"] = SETTINGS.urls
