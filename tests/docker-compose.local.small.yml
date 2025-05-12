@@ -15,3 +15,6 @@ services:
       POSTGRES_DB: beeb-test
       POSTGRES_PASSWORD: 1234
       POSTGRES_USER: postgres
+    expose:
+    - 5432
+
