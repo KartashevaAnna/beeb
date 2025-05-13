@@ -40,9 +40,9 @@ def update_payment(
         )
     except Exception as exc:
         return TEMPLATES.TemplateResponse(
+            request,
             SETTINGS.templates.read_payment,
             context={
-                "request": request,
                 "exception": f"There was an error: {str(exc)}",
             },
             status_code=status.HTTP_501_NOT_IMPLEMENTED,
@@ -60,9 +60,9 @@ def serve_update_payment_template(
         if not (payment := repo.read(payment_id)):
             raise HTTPException(status.HTTP_404_NOT_FOUND, "payment not found")
         return TEMPLATES.TemplateResponse(
+            request,
             SETTINGS.templates.read_payment,
             context={
-                "request": request,
                 "payment": payment,
                 "form_disabled": False,
                 "options": category_repo.get_payments_options(
@@ -72,18 +72,18 @@ def serve_update_payment_template(
         )
     except HTTPException as exc:
         return TEMPLATES.TemplateResponse(
+            request,
             SETTINGS.templates.read_payment,
             context={
-                "request": request,
                 "exception": f"There was an error: {str(exc)}",
             },
             status_code=status.HTTP_404_NOT_FOUND,
         )
     except Exception as exc:
         return TEMPLATES.TemplateResponse(
+            request,
             SETTINGS.templates.read_payment,
             context={
-                "request": request,
                 "exception": f"There was an error: {str(exc)}",
             },
             status_code=status.HTTP_501_NOT_IMPLEMENTED,

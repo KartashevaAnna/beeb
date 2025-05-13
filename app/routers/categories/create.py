@@ -18,10 +18,8 @@ def serve_create_category_template(
     request: Request,
 ):
     return TEMPLATES.TemplateResponse(
+        request,
         SETTINGS.templates.create_category,
-        context={
-            "request": request,
-        },
     )
 
 
@@ -45,27 +43,27 @@ def create_category(
         )
     except HTTPException as exc:
         return TEMPLATES.TemplateResponse(
+            request,
             SETTINGS.templates.create_category,
             context={
-                "request": request,
                 "exception": f"Error: {str(exc)}",
             },
             status_code=status.HTTP_406_NOT_ACCEPTABLE,
         )
     except ValidationError as exc:
         return TEMPLATES.TemplateResponse(
+            request,
             SETTINGS.templates.create_category,
             context={
-                "request": request,
                 "exception": f"Error: {str(exc)}",
             },
             status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
         )
     except Exception as exc:
         return TEMPLATES.TemplateResponse(
+            request,
             SETTINGS.templates.create_category,
             context={
-                "request": request,
                 "exception": f"Error: {str(exc)}",
             },
             status_code=status.HTTP_501_NOT_IMPLEMENTED,

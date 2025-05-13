@@ -18,14 +18,15 @@ def read_all(
     try:
         categories = repo.read_all()
         return TEMPLATES.TemplateResponse(
+            request,
             SETTINGS.templates.read_categories,
-            context={"request": request, "categories": categories},
+            context={"categories": categories},
         )
     except Exception as exc:
         return TEMPLATES.TemplateResponse(
+            request,
             SETTINGS.templates.read_categories,
             context={
-                "request": request,
                 "payments": [],
                 "exception": f"There was an error: {str(exc)}",
             },
