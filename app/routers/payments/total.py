@@ -24,7 +24,7 @@ def dashboard_for_all_years(
     dashboard["header_text"] = "Расходы за всё время"
 
     return TEMPLATES.TemplateResponse(
-        SETTINGS.templates.payments_dashboard, context=dashboard
+        request, SETTINGS.templates.payments_dashboard, context=dashboard
     )
 
 
@@ -34,9 +34,9 @@ def read_monthly_payments_breakdown(
     request: Request,
 ):
     return TEMPLATES.TemplateResponse(
+        request,
         SETTINGS.templates.payments_dashboard_yearly,
         context={
-            "request": request,
             "total_per_month": repo.get_monthly_payments(
                 repo.get_all_payments()
             ),
@@ -57,7 +57,7 @@ def read_all_payments_per_year(
     dashboard["header_text"] = f"Общие расходы за {year} год"
 
     return TEMPLATES.TemplateResponse(
-        SETTINGS.templates.payments_dashboard_yearly, context=dashboard
+        request, SETTINGS.templates.payments_dashboard_yearly, context=dashboard
     )
 
 
@@ -74,5 +74,7 @@ def read_all_payments_per_month(
     )
 
     return TEMPLATES.TemplateResponse(
-        SETTINGS.templates.payments_dashboard_monthly, context=dashboard
+        request,
+        SETTINGS.templates.payments_dashboard_monthly,
+        context=dashboard,
     )

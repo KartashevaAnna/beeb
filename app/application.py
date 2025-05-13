@@ -34,11 +34,6 @@ def build_app():
 
     @app.get("/")
     def select_app(request: Request):
-        return TEMPLATES.TemplateResponse(
-            SETTINGS.templates.home_page,
-            context={
-                "request": request,
-            },
-        )
+        return TEMPLATES.TemplateResponse(request, SETTINGS.templates.home_page)
 
     return app

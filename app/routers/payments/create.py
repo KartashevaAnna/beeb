@@ -21,9 +21,9 @@ def serve_create_payment_template(
     repo: Annotated[PaymentRepo, Depends(categories_repo)],
 ):
     return TEMPLATES.TemplateResponse(
+        request,
         SETTINGS.templates.create_payment,
         context={
-            "request": request,
             "options": repo.list_names(),
         },
     )
@@ -55,9 +55,9 @@ def create_payment(
         )
     except BeebError as exc:
         return TEMPLATES.TemplateResponse(
+            request,
             SETTINGS.templates.create_payment,
             context={
-                "request": request,
                 "exception": exc.detail,
                 "status_code": exc.status_code,
             },
@@ -65,9 +65,9 @@ def create_payment(
         )
     except Exception as exc:
         return TEMPLATES.TemplateResponse(
+            request,
             SETTINGS.templates.create_payment,
             context={
-                "request": request,
                 "exception": f"Error: {str(exc)}",
             },
             status_code=status.HTTP_501_NOT_IMPLEMENTED,

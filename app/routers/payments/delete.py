@@ -16,8 +16,8 @@ def delete_template(
     request: Request,
 ):
     return TEMPLATES.TemplateResponse(
+        request,
         SETTINGS.templates.delete_payment,
-        context={"request": request},
     )
 
 
@@ -34,9 +34,9 @@ def delete_payment(
         )
     except Exception as exc:
         return TEMPLATES.TemplateResponse(
+            request,
             SETTINGS.templates.read_payment,
             context={
-                "request": request,
                 "exception": f"There was an error: {str(exc)}",
             },
             status_code=status.HTTP_501_NOT_IMPLEMENTED,

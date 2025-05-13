@@ -20,27 +20,27 @@ def read_category(
         if not (category := repo.read(category_id)):
             raise HTTPException(status.HTTP_404_NOT_FOUND, "Category not found")
         return TEMPLATES.TemplateResponse(
+            request,
             SETTINGS.templates.read_category,
             context={
-                "request": request,
                 "category": category,
                 "form_disabled": True,
             },
         )
     except HTTPException as exc:
         return TEMPLATES.TemplateResponse(
+            request,
             SETTINGS.templates.read_category,
             context={
-                "request": request,
                 "exception": f"There was an error: {str(exc)}",
             },
             status_code=status.HTTP_404_NOT_FOUND,
         )
     except Exception as exc:
         return TEMPLATES.TemplateResponse(
+            request,
             SETTINGS.templates.read_category,
             context={
-                "request": request,
                 "exception": f"There was an error: {str(exc)}",
             },
             status_code=status.HTTP_501_NOT_IMPLEMENTED,
