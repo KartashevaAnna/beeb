@@ -18,7 +18,8 @@ from app.utils.tools.helpers import (
 )
 from tests.unit.conftest_helpers import change_to_a_defined_category, remove_id
 
-CATEGORY_NAME = "древесина"
+TEST_CATEGORY_NAME = "древесина"
+TEST_PASSWORD = "test_password"
 
 
 @pytest.fixture(scope="session")
@@ -223,7 +224,7 @@ def category_as_dict(category, session) -> dict:
 
 @pytest.fixture(scope="function")
 def category_create() -> dict:
-    return {"name": CATEGORY_NAME}
+    return {"name": TEST_CATEGORY_NAME}
 
 
 @pytest.fixture(scope="function")

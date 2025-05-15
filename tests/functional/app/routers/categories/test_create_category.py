@@ -6,7 +6,7 @@ from sqlalchemy import select
 from app.models import Category
 from app.repositories.categories import CategoryRepo
 from app.settings import SETTINGS
-from tests.conftest import CATEGORY_NAME, clean_db, raise_always
+from tests.conftest import TEST_CATEGORY_NAME, clean_db, raise_always
 
 
 def test_create_category_template(client):
@@ -24,7 +24,7 @@ def test_create_category_valid_data(session, client, category_create):
     )
     assert response.status_code == 303
 
-    statement = select(Category).where(Category.name == CATEGORY_NAME)
+    statement = select(Category).where(Category.name == TEST_CATEGORY_NAME)
     results = session.execute(statement)
     category = results.scalars().one_or_none()
     assert category
