@@ -2,8 +2,10 @@ import datetime
 import locale
 import random
 import re
+from hashlib import sha256
 
 from app.models import Payment
+from app.settings import SETTINGS
 from app.utils.constants import PRODUCTS
 
 
@@ -116,3 +118,14 @@ def get_date_for_database(date) -> str:
     if has_cyrillic(date):
         return get_datetime_from_date(date)
     return get_datetime_from_time_string(date)
+
+
+def hash_password(password: str) -> bytes:
+    password_encrypted = sha256(
+        (f"{SETTINGS.secrets.salt}{password}").encode("utf-8")
+    ).hexdigest()
+    return str.encode(password_encrypted)
+
+
+def is_same_password(password: str, password_hash_sum: bytes) -> bool:
+    return hash_password(password) == password_hash_sum

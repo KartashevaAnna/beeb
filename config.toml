@@ -1,17 +1,19 @@
 
 [server]
-host = "{{ parameters.SERVER_HOST }}"
 port = {{ parameters.SERVER_PORT }}
+host = "{{ parameters.SERVER_HOST }}"
 debug = "{{ parameters.DEBUG }}"
 
 [database]
-host = "{{ parameters.DATABASE_HOST }}"
 port = {{ parameters.DATABASE_PORT }}
+host = "{{ parameters.DATABASE_HOST }}"
 database = "{{ parameters.DATABASE_NAME }}"
 
 user = "{{ parameters.DATABASE_USER }}"
 password = "{{ secrets.DATABASE_PASSWORD }}"
 
+[secrets]
+salt = "{{ secrets.SALT }}"
 
 [urls]
 ping = "{{ urls.URL_PING }}"

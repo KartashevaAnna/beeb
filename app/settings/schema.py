@@ -93,8 +93,13 @@ class Templates(BaseModel):
     home_page: str
 
 
+class SecretsSettings(BaseModel):
+    salt: str
+
+
 class Settings(CustomSettings):
     server: ServerSettings
     urls: Urls
     templates: Templates
     database: DatabaseSettings
+    secrets: SecretsSettings
