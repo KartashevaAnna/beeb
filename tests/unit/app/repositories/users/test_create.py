@@ -18,8 +18,6 @@ def test_create_user(session):
     assert created_user.password_hash_sum == hash_password(
         test_user_params.get("password")
     )
-    assert created_user.first_name == test_user_params.get("first_name")
-    assert created_user.last_name == test_user_params.get("last_name")
     clean_db(session)
 
 

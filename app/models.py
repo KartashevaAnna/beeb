@@ -20,8 +20,6 @@ class User(AlchemyBaseModel):
     __tablename__ = "users"
     id: Mapped[int] = mapped_column(Integer, primary_key=True)
     email: Mapped[str] = mapped_column(String(255), nullable=False, unique=True)
-    first_name: Mapped[str] = mapped_column(String(255), nullable=True)
-    last_name: Mapped[str] = mapped_column(String(255), nullable=True)
     password_hash_sum: Mapped[bytes] = mapped_column(
         LargeBinary, nullable=False
     )

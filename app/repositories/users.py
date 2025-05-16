@@ -15,14 +15,10 @@ class UserRepo:
         self,
         email: EmailStr,
         password: str,
-        first_name: str,
-        last_name: str,
     ) -> None:
         if self.get_by_email(email):
             raise DuplicateEmailError(email)
         user = User(
-            first_name=first_name,
-            last_name=last_name,
             email=email,
             password_hash_sum=hash_password(password),
         )

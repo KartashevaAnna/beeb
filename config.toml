@@ -18,6 +18,7 @@ salt = "{{ secrets.SALT }}"
 [urls]
 ping = "{{ urls.URL_PING }}"
 
+
 signup = "{{ urls.URL_SIGNUP }}"
 login = "{{ urls.URL_LOGIN }}"
 
@@ -42,6 +43,7 @@ home_page = "{{  urls.URL_HOME_PAGE }}"
 
 [templates]
 signup = "{{ templates.TEMPLATE_SIGNUP }}"
+
 login = "{{ templates.TEMPLATE_LOGIN }}"
 
 read_payments = "{{ templates.TEMPLATE_READ_PAYMENTS }}"
