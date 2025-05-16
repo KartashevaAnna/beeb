@@ -1,11 +1,30 @@
 import datetime
 
-from sqlalchemy import DateTime, ForeignKey, Integer, MetaData, String, func
+from sqlalchemy import (
+    DateTime,
+    ForeignKey,
+    Integer,
+    LargeBinary,
+    MetaData,
+    String,
+    func,
+)
 from sqlalchemy.orm import DeclarativeBase, Mapped, mapped_column, relationship
 
 
 class AlchemyBaseModel(DeclarativeBase):
     metadata = MetaData(schema="main")
+
+
+class User(AlchemyBaseModel):
+    __tablename__ = "users"
+    id: Mapped[int] = mapped_column(Integer, primary_key=True)
+    email: Mapped[str] = mapped_column(String(255), nullable=False, unique=True)
+    first_name: Mapped[str] = mapped_column(String(255), nullable=True)
+    last_name: Mapped[str] = mapped_column(String(255), nullable=True)
+    password_hash_sum: Mapped[bytes] = mapped_column(
+        LargeBinary, nullable=False
+    )
 
 
 class Category(AlchemyBaseModel):

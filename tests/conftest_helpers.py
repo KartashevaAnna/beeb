@@ -47,3 +47,12 @@ def check_updated_payment(
     assert updated_payment.price == payment_update["price"]
     assert updated_payment.payment_category.id == payment_update["category_id"]
     assert updated_payment.is_spending == payment_update["is_spending"]
+
+
+def get_test_user_dict():
+    return {
+        "first_name": "Blob",
+        "last_name": "Shplock",
+        "email": "testthisemail@mail.ru",
+        "password": "1234",
+    }

@@ -1,7 +1,13 @@
 
+
+
 .beeb-input{
+  
     background-color: var(--bs-secondary-color);
     text-align: center;
+
+
+
   }
   .beeb-input:disabled{
     color: var(--bs-emphasis-color);

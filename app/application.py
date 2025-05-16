@@ -5,10 +5,12 @@ from fastapi import FastAPI, Request
 from fastapi.staticfiles import StaticFiles
 
 from app.exceptions import beeb_exception_handler
+from app.routers.auth_router import auth_router
 from app.routers.categories_router import categories_router
 from app.routers.dev_router import dev_router
 from app.routers.payments_router import payments_router
 from app.routers.ping_router import ping_router
+from app.routers.users_router import users_router
 from app.settings import ENGINE, SETTINGS, TEMPLATES
 
 
@@ -22,6 +24,8 @@ def build_app():
     app = FastAPI(lifespan=lifespan)
     app.add_exception_handler(Exception, beeb_exception_handler)
     app.include_router(ping_router)
+    app.include_router(users_router)
+    app.include_router(auth_router)
     app.include_router(payments_router)
     app.include_router(categories_router)
     app.include_router(dev_router)

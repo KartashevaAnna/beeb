@@ -17,7 +17,7 @@ def test_payment_normal_function(client, payment):
     response = client.get(SETTINGS.urls.payment.format(payment_id=payment.id))
     assert response.status_code == 200
     assert str(payment.id) in response.text
-    assert payment.name.title() in response.text
+    assert payment.name in response.text
     assert str(payment.price // 100) in response.text
 
 

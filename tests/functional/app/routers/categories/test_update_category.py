@@ -17,7 +17,7 @@ def test_serve_template_update_category(client, category):
         SETTINGS.urls.update_category.format(category_id=category_id)
     )
     assert response.status_code == 200
-    assert category.name.title() in response.text
+    assert category.name in response.text
 
 
 def test_update__category_name(client, category, session):

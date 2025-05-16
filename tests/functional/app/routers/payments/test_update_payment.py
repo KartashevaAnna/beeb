@@ -9,7 +9,7 @@ from app.utils.tools.helpers import (
     get_date_from_datetime,
 )
 from tests.conftest import get_categories, raise_always
-from tests.unit.conftest_helpers import check_updated_payment
+from tests.conftest_helpers import check_updated_payment
 
 NAME = "potatoe"
 PRICE = 6500
@@ -21,7 +21,7 @@ def test_serve_template_update_payment(client, payment):
         SETTINGS.urls.update_payment.format(payment_id=payment.id)
     )
     assert response.status_code == 200
-    assert payment.name.title() in response.text
+    assert payment.name in response.text
     assert str(payment.id) in response.text
     assert str(payment.price // 100) in response.text
     assert payment.payment_category.name in response.text

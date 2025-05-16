@@ -38,3 +38,10 @@ class NotIntegerError(BeebError):
         self.value = value
         self.detail = f"Сумма должна быть цифрой. Вы ввели: {value}"
         self.status_code = status.HTTP_422_UNPROCESSABLE_ENTITY
+
+
+class DuplicateEmailError(BeebError):
+    def __init__(self, value: int):
+        self.value = value
+        self.detail = f"Пользователь с email {value} уже существует"
+        self.status_code = status.HTTP_422_UNPROCESSABLE_ENTITY

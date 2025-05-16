@@ -18,7 +18,7 @@ def test_category_normal_function(client, category):
         SETTINGS.urls.category.format(category_id=category.id)
     )
     assert response.status_code == 200
-    assert category.name.title() in response.text
+    assert category.name in response.text
 
 
 def test_category_404(client, session, fill_db):

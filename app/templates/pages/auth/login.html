@@ -1,0 +1,77 @@
+{% extends "base.html"%}
+{% block body %}
+<div class="container">
+    {% if exception %}
+    <div class="alert alert-danger" role="alert">
+        Произошла ошибка! Код ошибки: {{ status_code }}. {{ exception}} 
+    </div>
+    {% endif %}
+    <div class="row justify-content-center pt-5">
+        <div class="col-4">
+            <div class="card">
+                <div class="card-body">
+                    <form hx-post={{ URLS.login }} hx-target="body" hx-push-url="false">
+                        {% if not invalid_email %}
+                        <div class="row justify-content-center" hx-target="this" hx-swap="outerHTML">
+                            <div class="form-group mt-5 mb-3 col-9">
+                                <input type="text" class="beeb-input w-100" id="input-email" name="email"
+                                    placeholder="email" required>
+                            </div>
+                        {% endif %}
+                        {% if invalid_email %}
+                        <div class="row justify-content-center" hx-target="this" hx-swap="outerHTML">
+                            <div class="form-group mt-5 mb-3 col-9">
+                                <input 
+                                type="text" 
+                                class="form-control" 
+                                id="input-email" 
+                                name="email" 
+                                placeholder="Email" 
+                                value={{ invalid_email }}
+                                required>
+                                <div>{{ email_error }}</div>
+                            </div>
+                        {% endif %}
+                        </div>
+                        <div class="row justify-content-center">
+                            <div class="form-group mb-5 col-9">
+                                <input type="emaiil" class="beeb-input w-100" id="input-password" name="password"
+                                    placeholder="пароль" required>
+                            </div>
+                        </div>
+                        <div class="row justify-content-center">
+                            <div class="form-group mt-5 mb-3 col-9">
+                                <button type="submit" class="btn beeb-submit-button w-100" class="btn" id="submit-button">войти</button>
+                            </div>
+                        </div>
+                        <div class="row justify-content-center">
+                        <div class="col-8">
+                            <div class="separator"></div>
+                        </div>
+                        </div>                   
+                        <div class="row justify-content-center">
+                            <div class="form-group mt-3 mb-5 col-9">
+                                <button 
+                                hx-get={{ URLS.signup }} 
+                                hx-target="#modals-here" 
+                                hx-trigger="click" 
+                                hx-push-url="false"
+                                data-bs-toggle="modal"
+                                data-bs-target="#modals-here" 
+                                class="btn beeb-secondary-button w-100">зарегистрироваться</button>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+    </div>
+</div>
+
+<div id="modals-here" class="modal modal-blur fade" style="display: none" tabindex="-1">
+    <div class="modal-dialog modal-lg modal-dialog-centered" role="document">
+        <div class="modal-content"></div>
+    </div>
+</div>
+{% endblock %}

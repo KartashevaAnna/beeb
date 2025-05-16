@@ -19,15 +19,18 @@
                                     <div class="col justify-content-center">
                                         {% if form_disabled %}
                                         <input name="name" id="name" type="text" placeholder="name"
-                                        value="{{ category.name.title() or '' }}" disabled class="beeb-input ">
+                                        value="{{ category.name or '' }}" disabled class="beeb-input w-100">
                                         {% else %}
                                         <input name="name" id="name" type="text" placeholder="название"
-                                        value="{{ category.name.title() or '' }}" class="beeb-input ">
+                                        value="{{ category.name or '' }}" class="beeb-input w-100">
                                         {% endif %}
                                     </div>
                                 </div>
                                 <div class="row align-items-center justify-content-lg-center my-1 p-2">
-                                    <div class="col justify-content-center">
+                                    <div class="col justify-content-center" style="text-align:center !important";>
+                                    <label class="form-check-label" for="form-check-input">
+                                            показывать в меню
+                                          </label>
                                         {% if category.is_active %}
                                             <input class=form-check-input name="is_active" id="is_active" type="checkbox" checked
                                             class="beeb-input">
@@ -35,9 +38,7 @@
                                             <input class=form-check-input name="is_active" id="is_active" type="checkbox" 
                                             class="beeb-input">
                                         {% endif %}
-                                        <label class="form-check-label" for="form-check-input">
-                                            Показывать в меню
-                                          </label>
+
                                     </div>
                                 </div>
                                 
@@ -47,7 +48,7 @@
                                         <button 
                                         type="submit" 
                                         class="btn beeb-submit-button-large"
-                                        >OK
+                                        >сохранить
                                         </button>
                                     </div>
                                 </div>

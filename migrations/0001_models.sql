@@ -18,3 +18,11 @@ CREATE TABLE IF NOT EXISTS "main"."payments" (
     "is_spending" BOOLEAN NOT NULL DEFAULT TRUE,
     "updated_at" TIMESTAMP WITH TIME ZONE
 );
+
+CREATE TABLE IF NOT EXISTS "main"."users"(
+    "id" SERIAL PRIMARY KEY,
+    "email" VARCHAR(255) NOT NULL UNIQUE,
+    "first_name" VARCHAR(255),
+    "last_name" VARCHAR(255),
+    "password_hash_sum" bytea NOT NULL 
+);

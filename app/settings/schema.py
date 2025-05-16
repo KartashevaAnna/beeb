@@ -63,6 +63,8 @@ class DatabaseSettings(BaseModel):
 
 class Urls(BaseModel):
     ping: str
+    signup: str
+    login: str
     create_payment: str
     payment: str
     payments: str
@@ -80,6 +82,8 @@ class Urls(BaseModel):
 
 
 class Templates(BaseModel):
+    signup: str
+    login: str
     read_payment: str
     read_payments: str
     create_payment: str

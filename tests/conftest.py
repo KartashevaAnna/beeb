@@ -10,13 +10,13 @@ from sqlalchemy.orm import Session, sessionmaker
 from sqlalchemy.sql import functions
 
 from app.application import build_app
-from app.models import AlchemyBaseModel, Category, Payment
+from app.models import AlchemyBaseModel, Category, Payment, User
 from app.settings import ENGINE
 from app.utils.constants import CATEGORIES, PRODUCTS
 from app.utils.tools.helpers import (
     get_date_from_datetime,
 )
-from tests.unit.conftest_helpers import change_to_a_defined_category, remove_id
+from tests.conftest_helpers import change_to_a_defined_category, remove_id
 
 TEST_CATEGORY_NAME = "древесина"
 TEST_PASSWORD = "test_password"
@@ -54,6 +54,7 @@ def raise_always(scope="function", *args, **kwargs):
 def clean_db(session):
     session.query(Payment).delete()
     session.query(Category).delete()
+    session.query(User).delete()
     session.commit()
 
 
@@ -65,6 +66,12 @@ def get_categories(session):
 
 def get_payments(session):
     statement = select(Payment)
+    res = session.execute(statement)
+    return res.scalars().all()
+
+
+def get_users(session):
+    statement = select(User)
     res = session.execute(statement)
     return res.scalars().all()
 

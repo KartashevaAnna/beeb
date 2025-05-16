@@ -19,7 +19,7 @@ from tests.conftest import (
     get_newly_created_payment,
     raise_always,
 )
-from tests.unit.conftest_helpers import check_created_payment
+from tests.conftest_helpers import check_created_payment
 
 NAME = "milk"
 PRICE = 350
