@@ -15,8 +15,13 @@ from app.settings import ENGINE
 from app.utils.constants import CATEGORIES, PRODUCTS
 from app.utils.tools.helpers import (
     get_date_from_datetime,
+    hash_password,
 )
-from tests.conftest_helpers import change_to_a_defined_category, remove_id
+from tests.conftest_helpers import (
+    change_to_a_defined_category,
+    get_test_user_dict,
+    remove_id,
+)
 
 TEST_CATEGORY_NAME = "древесина"
 TEST_PASSWORD = "test_password"
@@ -310,3 +315,14 @@ def year_ago_payment_later(year_ago_payment, category, session: Session):
     session.add(payment)
     session.flush()
     return payment
+
+
+@pytest.fixture(scope="function")
+def user(session: Session):
+    user_dict = get_test_user_dict()
+    user_dict["password_hash_sum"] = hash_password(user_dict["password"])
+    del user_dict["password"]
+    user = User(**user_dict)
+    session.add(user)
+    session.flush()
+    return user
