@@ -1,25 +1,31 @@
 {% block body %}
 <div class="modal-dialog modal-dialog-centered">
     <div class="modal-content">
-        <div class="modal-header">
-            <h5 class="modal-title text-center">новый профиль</h5>
-        </div>
         <div class="modal-body">
-            <form id="signup-form" hx-post={{ form_action }} hx-target="body" hx-push-url="false">
-                <div class="row justify-content-center" hx-target="this" hx-swap="outerHTML">
-                    <div class="form-group mt-5 mb-3 col-9">
-                        <input type="text" class="beeb-input w-100" id="input-username-signup" name="username" placeholder="имя" required>
+            <div class="card rounded-0">
+                <div class="card-body">
+                    <div class="col-xs-2 justify-content-center align-items-*-center">
+                        <legend style="text-align: center;">
+                            новый профиль
+                        </legend> 
                     </div>
-                    <div class="form-group mt-5 mb-3 col-9">
-                        <input type="text" class="beeb-input w-100" id="input-password-signup" name="password" placeholder="пароль" required>
-                    </div>
+                    <form id="signup-form" hx-post={{ form_action }} hx-target="body" hx-push-url="false">
+                        <div class="row justify-content-center" hx-target="this" hx-swap="outerHTML">
+                            <div class="form-group mt-5 mb-3 col-9">
+                                <input type="text" class="beeb-input w-100" id="input-username-signup" name="username" placeholder="имя" required>
+                            </div>
+                            <div class="form-group mt-5 mb-3 col-9">
+                                <input type="text" class="beeb-input w-100" id="input-password-signup" name="password" placeholder="пароль" required>
+                            </div>
+                            <div class="form-group mt-5 mb-3 col-9">
+                                <button form="signup-form" type="submit" class="btn beeb-submit-button w-100" class="btn" id="submit-button">создать</button>
+                            </div>
+                        </div>
+
+                    </form>
                 </div>
-            </form>
-        </div>
-        <div class="modal-footer justify-content-center">
-            <div class="form-group mt-5 mb-3 col-10">
-                <button form="signup-form" type="submit" class="btn beeb-submit-button w-100" class="btn" id="submit-button">создать</button>
             </div>
+        </div>
         </div>
     </div>
 </div>
