@@ -99,6 +99,8 @@ class Templates(BaseModel):
 
 class SecretsSettings(BaseModel):
     salt: str
+    jwt_secret: str
+    session_lifetime: int
 
 
 class Settings(CustomSettings):

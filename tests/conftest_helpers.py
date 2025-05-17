@@ -51,6 +51,6 @@ def check_updated_payment(
 
 def get_test_user_dict():
     return {
-        "email": "blob_schplock@mail.ru",
+        "username": "blob_schplock",
         "password": "1234",
     }

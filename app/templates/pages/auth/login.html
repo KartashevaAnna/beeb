@@ -1,37 +1,16 @@
 {% extends "base.html"%}
 {% block body %}
 <div class="container">
-    {% if exception %}
-    <div class="alert alert-danger" role="alert">
-        Произошла ошибка! Код ошибки: {{ status_code }}. {{ exception}} 
-    </div>
-    {% endif %}
     <div class="row justify-content-center pt-5">
         <div class="col-4">
             <div class="card">
                 <div class="card-body">
                     <form hx-post={{ URLS.login }} hx-target="body" hx-push-url="false">
-                        {% if not invalid_email %}
                         <div class="row justify-content-center" hx-target="this" hx-swap="outerHTML">
                             <div class="form-group mt-5 mb-3 col-9">
-                                <input type="text" class="beeb-input w-100" id="input-email" name="email"
-                                    placeholder="email" required>
+                                <input type="text" class="beeb-input w-100" id="input-username" name="username"
+                                    placeholder="имя" required>
                             </div>
-                        {% endif %}
-                        {% if invalid_email %}
-                        <div class="row justify-content-center" hx-target="this" hx-swap="outerHTML">
-                            <div class="form-group mt-5 mb-3 col-9">
-                                <input 
-                                type="text" 
-                                class="form-control" 
-                                id="input-email" 
-                                name="email" 
-                                placeholder="Email" 
-                                value={{ invalid_email }}
-                                required>
-                                <div>{{ email_error }}</div>
-                            </div>
-                        {% endif %}
                         </div>
                         <div class="row justify-content-center">
                             <div class="form-group mb-5 col-9">

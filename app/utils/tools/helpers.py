@@ -4,6 +4,7 @@ import random
 import re
 from hashlib import sha256
 
+from app.exceptions import EmptyStringError
 from app.models import Payment
 from app.settings import SETTINGS
 from app.utils.constants import PRODUCTS
@@ -129,3 +130,11 @@ def hash_password(password: str) -> bytes:
 
 def is_same_password(password: str, password_hash_sum: bytes) -> bool:
     return hash_password(password) == password_hash_sum
+
+
+def prevent_blank_strings(value):
+    for _ in range(len(value)):
+        value = value.replace("  ", " ")
+    if value.isspace():
+        raise EmptyStringError
+    return value

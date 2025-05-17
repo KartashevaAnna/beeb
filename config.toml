@@ -14,6 +14,8 @@ password = "{{ secrets.DATABASE_PASSWORD }}"
 
 [secrets]
 salt = "{{ secrets.SALT }}"
+jwt_secret = "{{ secrets.JWT_SECRET }}"
+session_lifetime = {{ secrets.SESSION_LIFETIME }}
 
 [urls]
 ping = "{{ urls.URL_PING }}"

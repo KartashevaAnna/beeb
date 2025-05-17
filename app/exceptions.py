@@ -40,8 +40,26 @@ class NotIntegerError(BeebError):
         self.status_code = status.HTTP_422_UNPROCESSABLE_ENTITY
 
 
-class DuplicateEmailError(BeebError):
+class DuplicateUsernameError(BeebError):
     def __init__(self, value: int):
         self.value = value
         self.detail = f"Пользователь с email {value} уже существует"
+        self.status_code = status.HTTP_422_UNPROCESSABLE_ENTITY
+
+
+class UserNotFoundError(BeebError):
+    def __init__(self, value: str):
+        self.detail = f"Пользователь с email {value} не найден"
+        self.status_code = status.HTTP_404_NOT_FOUND
+
+
+class WrongPasswordError(BeebError):
+    def __init__(self, username: str, password: str):
+        self.detail = f"Связки пароль {password} и имя {username} не существует"
+        self.status_code = status.HTTP_401_UNAUTHORIZED
+
+
+class EmptyStringError(BeebError):
+    def __init__(self):
+        self.detail = "Значение не может быть пустой строкой"
         self.status_code = status.HTTP_422_UNPROCESSABLE_ENTITY

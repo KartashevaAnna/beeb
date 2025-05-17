@@ -26,6 +26,7 @@ psycopg2-binary = "^2.9.10"
 python-multipart = "^0.0.20"
 pyexcel-odsr = "^0.6.0"
 pydantic = {extras = ["email"], version = "^2.11.4"}
+python-jose = "^3.4.0"
 
 
 [build-system]

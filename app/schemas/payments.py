@@ -20,6 +20,7 @@ from app.utils.tools.helpers import (
     get_number_for_db,
     get_pure_date_from_datetime,
     get_readable_price,
+    prevent_blank_strings,
 )
 
 
@@ -81,11 +82,8 @@ class PaymentCreate(PaymentBase):
         return f"{cls.price_in_rub}00"
 
     @field_validator("name")
-    def prevent_blank_strings(cls, value):
-        for _ in range(len(value)):
-            value = value.replace("  ", " ")
-        assert not value.isspace(), "Empty strings are not allowed."
-        return value
+    def prevent_blank_name(cls, value):
+        return prevent_blank_strings(value)
 
 
 class PaymentUpdate(PaymentBase):
@@ -105,10 +103,7 @@ class PaymentUpdate(PaymentBase):
 
     @field_validator("date")
     def prevent_blank_strings(cls, value):
-        for _ in range(len(value)):
-            value = value.replace("  ", " ")
-        assert not value.isspace(), "Empty strings are not allowed."
-        return value
+        return prevent_blank_strings(value)
 
     @computed_field
     @property

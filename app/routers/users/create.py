@@ -3,10 +3,10 @@ from typing import Annotated
 import fastapi
 from fastapi import Depends, Form, Request, status
 from fastapi.responses import RedirectResponse
-from pydantic import EmailStr
 
-from app.exceptions import DuplicateEmailError
+from app.exceptions import BeebError, DuplicateUsernameError, EmptyStringError
 from app.repositories.users import UserRepo
+from app.schemas.users import UserCreate
 from app.settings import SETTINGS, TEMPLATES
 from app.utils.dependencies import get_block_name, user_repo
 
@@ -31,18 +31,22 @@ def create_user_in_db(
     repo: Annotated[UserRepo, Depends(user_repo)],
     block_name: Annotated[str | None, Depends(get_block_name)],
     request: Request,
-    email: EmailStr = Form(...),
+    username: str = Form(...),
     password: str = Form(...),
 ):
     try:
-        repo.create(
-            email=email,
+        new_user = UserCreate(
+            username=username,
             password=password,
         )
+
+        repo.create(user=new_user)
         return RedirectResponse(
             SETTINGS.urls.login, status_code=status.HTTP_303_SEE_OTHER
         )
-    except DuplicateEmailError as exc:
+    except ValueError as exc:
+        raise EmptyStringError(exc.args[0])
+    except BeebError as exc:
         return TEMPLATES.TemplateResponse(
             request,
             SETTINGS.templates.home_page,

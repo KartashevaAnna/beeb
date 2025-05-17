@@ -7,6 +7,8 @@ from pydantic import (
     field_validator,
 )
 
+from app.utils.tools.helpers import prevent_blank_strings
+
 
 class CategoryCreate(BaseModel):
     name: Annotated[
@@ -19,10 +21,7 @@ class CategoryCreate(BaseModel):
 
     @field_validator("name")
     def prevent_blank_strings(cls, value):
-        for _ in range(len(value)):
-            value = value.replace("  ", " ")
-        assert not value.isspace(), "Empty strings are not allowed."
-        return value
+        return prevent_blank_strings(value)
 
 
 class CategoryShowOne(BaseModel):
