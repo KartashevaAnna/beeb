@@ -32,7 +32,7 @@ def read_payment(
             request,
             SETTINGS.templates.read_payment,
             context={
-                "exception": f"There was an error: {str(exc)}",
+                "exception": f"Ошибка: {str(exc)}",
             },
             status_code=status.HTTP_404_NOT_FOUND,
         )
@@ -41,7 +41,7 @@ def read_payment(
             request,
             SETTINGS.templates.read_payment,
             context={
-                "exception": f"There was an error: {str(exc)}",
+                "exception": f"There was an {str(exc)}",
             },
             status_code=status.HTTP_501_NOT_IMPLEMENTED,
         )

@@ -43,7 +43,7 @@ class NotIntegerError(BeebError):
 class DuplicateUsernameError(BeebError):
     def __init__(self, value: int):
         self.value = value
-        self.detail = f"Пользователь с email {value} уже существует"
+        self.detail = f"Пользователь с именем {value} уже существует"
         self.status_code = status.HTTP_422_UNPROCESSABLE_ENTITY
 
 

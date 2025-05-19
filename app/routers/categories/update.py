@@ -38,7 +38,7 @@ def serve_update_category_template(
             request,
             SETTINGS.templates.read_category,
             context={
-                "exception": f"There was an error: {str(exc)}",
+                "exception": f"Ошибка: {str(exc)}",
             },
             status_code=status.HTTP_404_NOT_FOUND,
         )
@@ -47,7 +47,7 @@ def serve_update_category_template(
             request,
             SETTINGS.templates.read_category,
             context={
-                "exception": f"There was an error: {str(exc)}",
+                "exception": f"Ошибка: {str(exc)}",
             },
             status_code=status.HTTP_501_NOT_IMPLEMENTED,
         )
@@ -88,7 +88,7 @@ def update_category(
             request,
             SETTINGS.templates.read_category,
             context={
-                "exception": f"There was an error: {str(exc)}",
+                "exception": f"Ошибка: {str(exc)}",
             },
             status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
         )
@@ -98,7 +98,7 @@ def update_category(
             request,
             SETTINGS.templates.read_category,
             context={
-                "exception": f"There was an error: {str(exc)}",
+                "exception": f"Ошибка: {str(exc)}",
             },
             status_code=status.HTTP_501_NOT_IMPLEMENTED,
         )

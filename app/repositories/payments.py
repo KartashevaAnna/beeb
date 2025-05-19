@@ -48,6 +48,8 @@ class PaymentRepo:
     def get_days_left(
         self, available_amount: int, total_per_day: int | None = None
     ):
+        if not total_per_day:
+            return None
         return int(available_amount / total_per_day)
 
     def get_payments_per_year(self, year: int) -> list[Payment]:

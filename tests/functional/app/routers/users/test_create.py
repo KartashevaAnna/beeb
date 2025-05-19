@@ -4,8 +4,7 @@ from sqlalchemy import select
 from app.exceptions import DuplicateUsernameError, EmptyStringError
 from app.models import User
 from app.settings import SETTINGS
-from tests.conftest import clean_db, get_users
-from tests.conftest_helpers import get_test_user_dict
+from tests.conftest import clean_db, get_dict_to_create_user, get_users
 
 
 def test_create_user_template(client):
@@ -14,8 +13,8 @@ def test_create_user_template(client):
     assert response.status_code == 200
 
 
-def test_create(session, client):
-    user_params = get_test_user_dict()
+def test_create(session, client, user):
+    user_params = get_dict_to_create_user(session=session, user=user)
     assert not get_users(session)
 
     response = client.post(
@@ -31,8 +30,8 @@ def test_create(session, client):
     clean_db(session)
 
 
-def test_create_duplicate(client, session):
-    user_params = get_test_user_dict()
+def test_create_duplicate(client, session, user):
+    user_params = get_dict_to_create_user(user=user, session=session)
     client.post(
         SETTINGS.urls.signup,
         data={**user_params},
@@ -48,8 +47,8 @@ def test_create_duplicate(client, session):
     clean_db(session)
 
 
-def test_create_no_username(client, session):
-    user_params = get_test_user_dict()
+def test_create_no_username(client, session, user):
+    user_params = get_dict_to_create_user(user=user, session=session)
     del user_params["username"]
     response = client.post(
         SETTINGS.urls.signup,
@@ -59,8 +58,8 @@ def test_create_no_username(client, session):
     assert response.status_code == status.HTTP_422_UNPROCESSABLE_ENTITY
 
 
-def test_create_empty_username(client, session):
-    user_params = get_test_user_dict()
+def test_create_empty_username(client, session, user):
+    user_params = get_dict_to_create_user(user=user, session=session)
     empty_username = "  "
     user_params["username"] = empty_username
     response = client.post(
@@ -72,8 +71,8 @@ def test_create_empty_username(client, session):
     assert EmptyStringError().detail in response.text
 
 
-def test_create_no_password(client, session):
-    user_params = get_test_user_dict()
+def test_create_no_password(client, session, user):
+    user_params = get_dict_to_create_user(user=user, session=session)
     del user_params["password"]
     response = client.post(
         SETTINGS.urls.signup,
@@ -83,8 +82,8 @@ def test_create_no_password(client, session):
     assert response.status_code == status.HTTP_422_UNPROCESSABLE_ENTITY
 
 
-def test_create_empty_password(client, session):
-    user_params = get_test_user_dict()
+def test_create_empty_password(client, session, user):
+    user_params = get_dict_to_create_user(user=user, session=session)
     empty_password = "     "
     user_params["password"] = empty_password
     response = client.post(

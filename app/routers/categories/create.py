@@ -46,7 +46,7 @@ def create_category(
             request,
             SETTINGS.templates.create_category,
             context={
-                "exception": f"Error: {str(exc)}",
+                "exception": f"Ошибка: {str(exc)}",
             },
             status_code=status.HTTP_406_NOT_ACCEPTABLE,
         )
@@ -55,7 +55,7 @@ def create_category(
             request,
             SETTINGS.templates.create_category,
             context={
-                "exception": f"Error: {str(exc)}",
+                "exception": f"Ошибка: {str(exc)}",
             },
             status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
         )
@@ -64,7 +64,7 @@ def create_category(
             request,
             SETTINGS.templates.create_category,
             context={
-                "exception": f"Error: {str(exc)}",
+                "exception": f"Ошибка: {str(exc)}",
             },
             status_code=status.HTTP_501_NOT_IMPLEMENTED,
         )

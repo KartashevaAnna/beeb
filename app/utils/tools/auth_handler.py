@@ -15,6 +15,7 @@ class AuthHandler:
     def encode_token(
         self,
         username: str,
+        id: int,
         expires_delta: timedelta = timedelta(
             seconds=SETTINGS.secrets.session_lifetime
         ),
@@ -23,6 +24,7 @@ class AuthHandler:
 
         payload = {
             "username": username,
+            "id": id,
             "exp": expires_at,
         }
         return jwt.encode(payload, self.secret)
@@ -35,10 +37,10 @@ class AuthHandler:
         except JWTError as exc:
             raise InvalidTokenError from exc
 
-    def set_cookies(self, response: Response, username: str):
+    def set_cookies(self, response: Response, username: str, id: int):
         return response.set_cookie(
             key="token",
-            value=self.encode_token(username=username),
+            value=self.encode_token(username=username, id=id),
             max_age=SETTINGS.secrets.session_lifetime,
             secure=False,
             samesite="lax",

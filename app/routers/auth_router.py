@@ -51,7 +51,7 @@ def login(
             request,
             SETTINGS.templates.login,
             context={
-                "exception": f"Error! {str(exc)}",
+                "exception": f"Ошибка: {str(exc)}",
                 "status_code": status.HTTP_501_NOT_IMPLEMENTED,
             },
             block_name=block_name,
@@ -59,5 +59,7 @@ def login(
     response = RedirectResponse(
         SETTINGS.urls.home_page, status_code=status.HTTP_303_SEE_OTHER
     )
-    AuthHandler().set_cookies(response, user.username)
+    AuthHandler().set_cookies(
+        response=response, username=user.username, id=user.id
+    )
     return response

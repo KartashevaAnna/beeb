@@ -37,7 +37,7 @@ def delete_payment(
             request,
             SETTINGS.templates.read_payment,
             context={
-                "exception": f"There was an error: {str(exc)}",
+                "exception": f"Ошибка: {str(exc)}",
             },
             status_code=status.HTTP_501_NOT_IMPLEMENTED,
         )

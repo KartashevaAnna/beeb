@@ -30,7 +30,7 @@ def read_all(
             SETTINGS.templates.read_payments,
             context={
                 "payments": [],
-                "exception": f"There was an error: {str(exc)}",
+                "exception": f"Ошибка: {str(exc)}",
             },
             status_code=status.HTTP_501_NOT_IMPLEMENTED,
         )

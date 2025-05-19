@@ -15,19 +15,33 @@ from app.settings import ENGINE
 from app.utils.constants import CATEGORIES, PRODUCTS
 from app.utils.tools.auth_handler import AuthHandler
 from app.utils.tools.helpers import get_date_from_datetime, hash_password
-from tests.conftest_helpers import (
-    change_to_a_defined_category,
-    get_test_user_dict,
-    remove_id,
-)
+from tests.conftest_helpers import change_to_a_defined_category, remove_id
 
 TEST_CATEGORY_NAME = "древесина"
 TEST_PASSWORD = "test_password"
+TEST_USER_NAME = "beebo"
+TEST_USER_ID = 1
+TEST_USER_PASSWORD = "sW0rDf!s4"
 
 
-@pytest.fixture(scope="session")
-def client():
-    return TestClient(app=build_app(), follow_redirects=False)
+@pytest.fixture(scope="function")
+def token():
+    username = TEST_USER_NAME
+    return AuthHandler().encode_token(username=username, id=TEST_USER_ID)
+
+
+@pytest.fixture(scope="function")
+def client(token):
+    return TestClient(
+        app=build_app(),
+        follow_redirects=False,
+        cookies={"token": token},
+    )
+
+
+@pytest.fixture(scope="function")
+def auth_handler():
+    return AuthHandler()
 
 
 @pytest.fixture(scope="session")
@@ -48,6 +62,24 @@ def migrate(session):
         with open(file=migration, mode="r") as migration_file:
             with session.begin():
                 session.execute(text(migration_file.read()))
+
+
+def add_user(session) -> User:
+    user = User(
+        username=TEST_USER_NAME,
+        password_hash_sum=hash_password(TEST_USER_PASSWORD),
+    )
+    session.add(user)
+    session.flush()
+    session.commit()
+    return user
+
+
+@pytest.fixture(scope="function", autouse=True)
+def user(session):
+    add_user(session)
+    yield
+    clean_db(session)
 
 
 def raise_always(scope="function", *args, **kwargs):
@@ -77,6 +109,12 @@ def get_users(session):
     statement = select(User)
     res = session.execute(statement)
     return res.scalars().all()
+
+
+def get_user(session):
+    statement = select(User)
+    res = session.execute(statement)
+    return res.scalars().all()[0]
 
 
 def add_categories(session):
@@ -315,24 +353,15 @@ def year_ago_payment_later(year_ago_payment, category, session: Session):
     return payment
 
 
-@pytest.fixture(scope="function")
-def user(session: Session):
-    user_dict = get_test_user_dict()
-    user_dict["password_hash_sum"] = hash_password(user_dict["password"])
-    del user_dict["password"]
-    user = User(**user_dict)
-    session.add(user)
-    session.flush()
-    return user
-
-
-@pytest.fixture(scope="function")
-def auth_handler():
-    return AuthHandler()
-
-
-@pytest.fixture(scope="function")
-def token(auth_handler):
-    username = "test_username"
-    email = "test_email"
-    return auth_handler.encode_token(username, email)
+def get_dict_to_create_user(user, session) -> dict:
+    user = get_user(session)
+    user_dict = dict(
+        session.execute(select("*").where(User.id == user.id).select_from(User))
+        .mappings()
+        .all()[0]
+    )
+    clean_db(session)
+    del user_dict["id"]
+    del user_dict["password_hash_sum"]
+    user_dict["password"] = TEST_USER_PASSWORD
+    return user_dict
