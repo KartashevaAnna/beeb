@@ -1,8 +1,10 @@
-from datetime import datetime, timedelta, timezone
+import datetime
+from datetime import timedelta
 
 from fastapi import Response
-from jose import jwt
+from jose import ExpiredSignatureError, JWTError, jwt
 
+from app.exceptions import ExpiredTokenError, InvalidTokenError
 from app.settings import SETTINGS
 
 
@@ -12,22 +14,31 @@ class AuthHandler:
 
     def encode_token(
         self,
-        email: str,
+        username: str,
         expires_delta: timedelta = timedelta(
             seconds=SETTINGS.secrets.session_lifetime
         ),
     ) -> str:
-        expires_at = datetime.now(timezone.utc).astimezone() + expires_delta
+        expires_at = datetime.datetime.now(datetime.UTC) + expires_delta
+
         payload = {
-            "email": email,
+            "username": username,
             "exp": expires_at,
         }
         return jwt.encode(payload, self.secret)
 
-    def set_cookies(self, response: Response, email: str):
+    def decode_token(self, token: str) -> dict:
+        try:
+            return jwt.decode(token, self.secret)
+        except ExpiredSignatureError as exc:
+            raise ExpiredTokenError from exc
+        except JWTError as exc:
+            raise InvalidTokenError from exc
+
+    def set_cookies(self, response: Response, username: str):
         return response.set_cookie(
             key="token",
-            value=self.encode_token(email=email),
+            value=self.encode_token(username=username),
             max_age=SETTINGS.secrets.session_lifetime,
             secure=False,
             samesite="lax",

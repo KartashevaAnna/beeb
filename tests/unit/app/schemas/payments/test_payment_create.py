@@ -8,9 +8,7 @@ from app.exceptions import (
     ValueTooLargeError,
 )
 from app.schemas.payments import PaymentCreate
-from app.utils.tools.helpers import (
-    get_date_from_datetime,
-)
+from app.utils.tools.helpers import get_date_from_datetime
 
 
 def test_add_payment_schema_negative_price(category):

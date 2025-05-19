@@ -1,4 +1,5 @@
 import pytest
+
 from app.exceptions import EmptyStringError
 from app.utils.tools.helpers import prevent_blank_strings
 

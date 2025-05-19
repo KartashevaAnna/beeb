@@ -12,13 +12,8 @@ from app.exceptions import (
 from app.models import Payment
 from app.repositories.payments import PaymentRepo
 from app.settings import SETTINGS
-from app.utils.tools.helpers import (
-    get_datetime_without_seconds,
-)
-from tests.conftest import (
-    get_newly_created_payment,
-    raise_always,
-)
+from app.utils.tools.helpers import get_datetime_without_seconds
+from tests.conftest import get_newly_created_payment, raise_always
 from tests.conftest_helpers import check_created_payment
 
 NAME = "milk"

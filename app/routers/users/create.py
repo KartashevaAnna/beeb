@@ -4,7 +4,7 @@ import fastapi
 from fastapi import Depends, Form, Request, status
 from fastapi.responses import RedirectResponse
 
-from app.exceptions import BeebError, DuplicateUsernameError, EmptyStringError
+from app.exceptions import BeebError, EmptyStringError
 from app.repositories.users import UserRepo
 from app.schemas.users import UserCreate
 from app.settings import SETTINGS, TEMPLATES

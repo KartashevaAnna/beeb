@@ -27,14 +27,14 @@ def serve_login_template(
     SETTINGS.urls.login,
 )
 def login(
-    email: Annotated[str, Form()],
+    username: Annotated[str, Form()],
     password: Annotated[str, Form()],
     repo: Annotated[UserRepo, Depends(user_repo)],
     block_name: Annotated[str | None, Depends(get_block_name)],
     request: Request,
 ) -> RedirectResponse:
     try:
-        user: User = repo.login(email, password)
+        user: User = repo.login(username, password)
     except BeebError as exc:
         return TEMPLATES.TemplateResponse(
             request,
@@ -59,5 +59,5 @@ def login(
     response = RedirectResponse(
         SETTINGS.urls.home_page, status_code=status.HTTP_303_SEE_OTHER
     )
-    AuthHandler().set_cookies(response, user.email)
+    AuthHandler().set_cookies(response, user.username)
     return response

@@ -5,9 +5,7 @@ from unittest.mock import patch
 from app.models import Payment
 from app.repositories.payments import PaymentRepo
 from app.settings import SETTINGS
-from app.utils.tools.helpers import (
-    get_date_from_datetime,
-)
+from app.utils.tools.helpers import get_date_from_datetime
 from tests.conftest import get_categories, raise_always
 from tests.conftest_helpers import check_updated_payment
 

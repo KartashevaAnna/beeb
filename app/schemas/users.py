@@ -1,13 +1,4 @@
-from typing import Annotated
-
-from pydantic import (
-    BaseModel,
-    ConfigDict,
-    Field,
-    StringConstraints,
-    computed_field,
-    field_validator,
-)
+from pydantic import BaseModel, Field, computed_field, field_validator
 
 from app.utils.tools.helpers import hash_password, prevent_blank_strings
 

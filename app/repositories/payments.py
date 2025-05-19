@@ -19,10 +19,7 @@ from app.utils.tools.category_helpers import (
     get_payments_sums_per_category,
     sort_payment_shares,
 )
-from app.utils.tools.helpers import (
-    get_monthly_payments,
-    get_readable_price,
-)
+from app.utils.tools.helpers import get_monthly_payments, get_readable_price
 
 
 class PaymentRepo:

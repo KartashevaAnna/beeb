@@ -1,11 +1,6 @@
 from typing import Annotated
 
-from pydantic import (
-    BaseModel,
-    Field,
-    StringConstraints,
-    field_validator,
-)
+from pydantic import BaseModel, Field, StringConstraints, field_validator
 
 from app.utils.tools.helpers import prevent_blank_strings
 

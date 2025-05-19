@@ -13,10 +13,8 @@ from app.application import build_app
 from app.models import AlchemyBaseModel, Category, Payment, User
 from app.settings import ENGINE
 from app.utils.constants import CATEGORIES, PRODUCTS
-from app.utils.tools.helpers import (
-    get_date_from_datetime,
-    hash_password,
-)
+from app.utils.tools.auth_handler import AuthHandler
+from app.utils.tools.helpers import get_date_from_datetime, hash_password
 from tests.conftest_helpers import (
     change_to_a_defined_category,
     get_test_user_dict,
@@ -326,3 +324,15 @@ def user(session: Session):
     session.add(user)
     session.flush()
     return user
+
+
+@pytest.fixture(scope="function")
+def auth_handler():
+    return AuthHandler()
+
+
+@pytest.fixture(scope="function")
+def token(auth_handler):
+    username = "test_username"
+    email = "test_email"
+    return auth_handler.encode_token(username, email)

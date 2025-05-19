@@ -49,13 +49,13 @@ class DuplicateUsernameError(BeebError):
 
 class UserNotFoundError(BeebError):
     def __init__(self, value: str):
-        self.detail = f"Пользователь с email {value} не найден"
+        self.detail = f"Пользователь с именем {value} не найден"
         self.status_code = status.HTTP_404_NOT_FOUND
 
 
 class WrongPasswordError(BeebError):
     def __init__(self, username: str, password: str):
-        self.detail = f"Связки пароль {password} и имя {username} не существует"
+        self.detail = f"Пользователя с именем {username} и паролем {password} не существует"
         self.status_code = status.HTTP_401_UNAUTHORIZED
 
 
@@ -63,3 +63,15 @@ class EmptyStringError(BeebError):
     def __init__(self):
         self.detail = "Значение не может быть пустой строкой"
         self.status_code = status.HTTP_422_UNPROCESSABLE_ENTITY
+
+
+class ExpiredTokenError(BeebError):
+    def __init__(self):
+        self.detail = "Срок действия токена истёк"
+        self.status_code = status.HTTP_401_UNAUTHORIZED
+
+
+class InvalidTokenError(BeebError):
+    def __init__(self):
+        self.detail = "Токен не действителен"
+        self.status_code = status.HTTP_401_UNAUTHORIZED
