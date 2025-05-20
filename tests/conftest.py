@@ -365,3 +365,19 @@ def get_dict_to_create_user(user, session) -> dict:
     del user_dict["password_hash_sum"]
     user_dict["password"] = TEST_USER_PASSWORD
     return user_dict
+
+
+@pytest.fixture(scope="function")
+def stale_token(auth_handler):
+    return auth_handler.encode_token(
+        username="test_user",
+        id=TEST_USER_ID,
+        expires_delta=datetime.timedelta(days=-100),
+    )
+
+
+@pytest.fixture(scope="function")
+def wrong_token(auth_handler):
+    username = "Poblebonk"
+    token = auth_handler.encode_token(username=username, id=TEST_USER_ID)
+    return token[10:]

@@ -1,5 +1,5 @@
-from jose import JWTError
 import pytest
+
 from app.exceptions import InvalidTokenError
 from app.utils.tools.auth_handler import AuthHandler
 from tests.conftest import TEST_USER_ID
@@ -16,9 +16,6 @@ def test_decode_token():
     assert "exp" in decoded_token
 
 
-def test_wrong_token():
-    username = "Poblebonk"
-    token = AuthHandler().encode_token(username=username, id=TEST_USER_ID)
-    token = token[10:]
+def test_wrong_token(wrong_token):
     with pytest.raises(InvalidTokenError):
-        AuthHandler().decode_token(token)
+        AuthHandler().decode_token(wrong_token)

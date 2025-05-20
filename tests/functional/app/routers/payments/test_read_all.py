@@ -1,5 +1,6 @@
 from unittest.mock import patch
 
+from fastapi import status
 from sqlalchemy import select
 
 from app.models import Payment
@@ -44,3 +45,28 @@ def test_payments_exception(client):
     """
     response = client.get(SETTINGS.urls.payments)
     assert response.status_code != 200
+
+
+def test_payments_no_cookie(client, fill_db):
+    """Case: normal mode.
+
+    Checks that the endpoint redirects to login if token is missing.
+    """
+    client.cookies = {}
+    response = client.get(SETTINGS.urls.payments)
+    assert response.status_code == status.HTTP_303_SEE_OTHER
+    assert response.headers.get("location") == SETTINGS.urls.login
+
+
+def test_payments_stale_token(client, fill_db, stale_token):
+    client.cookies = {"token": stale_token}
+    response = client.get(SETTINGS.urls.payments)
+    assert response.status_code == status.HTTP_303_SEE_OTHER
+    assert response.headers.get("location") == SETTINGS.urls.login
+
+
+def test_payments_wrong_token(client, fill_db, wrong_token):
+    client.cookies = {"token": wrong_token}
+    response = client.get(SETTINGS.urls.payments)
+    assert response.status_code == status.HTTP_303_SEE_OTHER
+    assert response.headers.get("location") == SETTINGS.urls.login

@@ -4,16 +4,21 @@ import fastapi
 from fastapi import Depends, Request, status
 
 from app.repositories.payments import PaymentRepo
+from app.routers.auth_router import authenticate
 from app.settings import SETTINGS, TEMPLATES
-from app.utils.dependencies import payments_repo
+from app.utils.dependencies import (
+    payments_repo,
+)
 
 read_payments_router = fastapi.APIRouter()
 
 
 @read_payments_router.get(SETTINGS.urls.payments)
+@authenticate
 def read_all(
     repo: Annotated[PaymentRepo, Depends(payments_repo)],
     request: Request,
+    user_id: int | None = None,
 ):
     try:
         payments = repo.read_all()

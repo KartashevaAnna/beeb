@@ -1,3 +1,4 @@
+from functools import wraps
 from typing import Annotated
 
 from fastapi import APIRouter, Depends, Form, Request, status
@@ -7,10 +8,44 @@ from app.exceptions import BeebError
 from app.models import User
 from app.repositories.users import UserRepo
 from app.settings import SETTINGS, TEMPLATES
-from app.utils.dependencies import get_block_name, user_repo
+from app.utils.dependencies import (
+    get_block_name,
+    get_user_id_from_token,
+    user_repo,
+)
 from app.utils.tools.auth_handler import AuthHandler
 
 auth_router = APIRouter(tags=["Auth"])
+
+
+def authenticate(func):
+    @wraps(func)
+    async def wrapper(
+        request: Request,
+        *args,
+        **kwargs,
+    ):
+        if not request.cookies:
+            return RedirectResponse(
+                SETTINGS.urls.login, status_code=status.HTTP_303_SEE_OTHER
+            )
+        try:
+            token = AuthHandler().decode_token(token=request.cookies["token"])
+            kwargs.pop("user_id")
+            user_id = get_user_id_from_token(token)
+        except BeebError:
+            return RedirectResponse(
+                SETTINGS.urls.login, status_code=status.HTTP_303_SEE_OTHER
+            )
+
+        return func(
+            *args,
+            request=request,
+            user_id=user_id,
+            **kwargs,
+        )
+
+    return wrapper
 
 
 @auth_router.get(SETTINGS.urls.login)
