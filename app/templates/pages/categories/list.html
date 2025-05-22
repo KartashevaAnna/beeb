@@ -7,7 +7,7 @@
     <div class="row justify-content-lg-center my-2">
     
         <div class="col-3 offset-md-11">
-            <a href="/categories/create" class="btn beeb-submit-button float-right" >добавить</a>
+            <a href="{{ create }}" class="btn beeb-submit-button float-right" >добавить</a>
         </div>
     </div>
 </div>
@@ -33,7 +33,7 @@
                 color: var(--bs-emphasis-color); background-color: var(--bs-secondary-text-emphasis);">устарела</span></h4>
             </td>
         {% endif %}
-        <td><a href="/categories/update/{{category.id}}"><i class="material-icons">✏️</i></a></td>
+        <td><a href="{{ update }}/{{category.id}}"><i class="material-icons">✏️</i></a></td>
     </tr>
     {% endfor %}
 </table>

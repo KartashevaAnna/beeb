@@ -1,24 +1,34 @@
 
 [server]
-host = "{{ parameters.SERVER_HOST }}"
 port = {{ parameters.SERVER_PORT }}
+host = "{{ parameters.SERVER_HOST }}"
 debug = "{{ parameters.DEBUG }}"
 
 [database]
-host = "{{ parameters.DATABASE_HOST }}"
 port = {{ parameters.DATABASE_PORT }}
+host = "{{ parameters.DATABASE_HOST }}"
 database = "{{ parameters.DATABASE_NAME }}"
 
 user = "{{ parameters.DATABASE_USER }}"
 password = "{{ secrets.DATABASE_PASSWORD }}"
 
+[secrets]
+salt = "{{ secrets.SALT }}"
+jwt_secret = "{{ secrets.JWT_SECRET }}"
+session_lifetime = {{ secrets.SESSION_LIFETIME }}
 
 [urls]
 ping = "{{ urls.URL_PING }}"
 
+
+signup = "{{ urls.URL_SIGNUP }}"
+login = "{{ urls.URL_LOGIN }}"
+
 payments = "{{ urls.URL_PAYMENTS }}"
 create_payment = "{{ urls.URL_CREATE_PAYMENT }}"
+update_payment_core = "{{ urls.URL_UPDATE_PAYMENT_CORE }}"
 update_payment = "{{ urls.URL_UPDATE_PAYMENT }}"
+delete_payment_core = "{{ urls.URL_DELETE_PAYMENT_CORE }}"
 delete_payment = "{{ urls.URL_DELETE_PAYMENT }}"
 payment = "{{ urls.URL_PAYMENT }}"
 
@@ -26,6 +36,7 @@ total_payments_monthly = "{{ urls.URL_PAYMENTS_TOTAL_MONTHLY }}"
 
 categories = "{{ urls.URL_CATEGORIES }}"
 create_category = "{{ urls.URL_CREATE_CATEGORY }}"
+update_category_core = "{{ urls.URL_UPDATE_CATEGORY_CORE }}"
 update_category = "{{ urls.URL_UPDATE_CATEGORY }}"
 category = "{{ urls.URL_CATEGORY }}"
 
@@ -36,6 +47,10 @@ home_page = "{{  urls.URL_HOME_PAGE }}"
 
 
 [templates]
+signup = "{{ templates.TEMPLATE_SIGNUP }}"
+
+login = "{{ templates.TEMPLATE_LOGIN }}"
+
 read_payments = "{{ templates.TEMPLATE_READ_PAYMENTS }}"
 create_payment = "{{ templates.TEMPLATE_CREATE_PAYMENT }}"
 read_payment = "{{ templates.TEMPLATE_READ_PAYMENT }}"

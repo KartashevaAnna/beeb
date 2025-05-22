@@ -9,7 +9,7 @@
 
           
               <div class="col-12">
-                <a href="/payments/create" 
+                <a href="{{ create }}" 
                 class="btn beeb-submit-button-large">
                     добавить
                 </a>
@@ -107,9 +107,9 @@
         class="beeb-input" disabled>
         {% endif %}
     </td>
-    <td><a href="/payments/update/{{payment.id}}" ><i class="material-icons">✏️</i></a></td>
+    <td><a href="{{ update }}/{{payment.id}}" ><i class="material-icons">✏️</i></a></td>
 
-    <form action="/payments/delete/{{payment.id}}" method="post">
+    <form action="{{ delete }}/{{payment.id}}" method="post">
     <td><button class="beeb-delete-button"><i class="material-icons" style="color: var(--bs-body-color);">delete</i></button></td>
     </form>
 </tr>

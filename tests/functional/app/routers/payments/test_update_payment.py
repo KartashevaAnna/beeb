@@ -1,56 +1,77 @@
-import datetime
 from copy import copy
+import datetime
 from unittest.mock import patch
+from fastapi import status
 
+from app.exceptions import NotOwnerError
 from app.models import Payment
 from app.repositories.payments import PaymentRepo
 from app.settings import SETTINGS
-from app.utils.tools.helpers import (
-    get_date_from_datetime,
-)
-from tests.conftest import get_categories, raise_always
-from tests.unit.conftest_helpers import check_updated_payment
+from app.utils.tools.helpers import get_date_from_datetime
+from tests.conftest import clean_db, get_categories, raise_always
+from tests.conftest_helpers import check_updated_payment
 
 NAME = "potatoe"
 PRICE = 6500
 
 
-def test_serve_template_update_payment(client, payment):
-    """Case: endpoint returns form to update an payment."""
+def test_template(client, payment):
     response = client.get(
         SETTINGS.urls.update_payment.format(payment_id=payment.id)
     )
-    assert response.status_code == 200
-    assert payment.name.title() in response.text
+    assert response.status_code == status.HTTP_200_OK
+    assert payment.name in response.text
     assert str(payment.id) in response.text
     assert str(payment.price // 100) in response.text
     assert payment.payment_category.name in response.text
 
 
-def test_update_payment_standard_mode_name_lowercase_price_int_is_spending_true(
-    client, payment, session, payment_update
+def test_template_no_cookie(client, payment):
+    client.cookies = {}
+    response = client.get(
+        SETTINGS.urls.update_payment.format(payment_id=payment.id)
+    )
+    assert response.status_code == status.HTTP_303_SEE_OTHER
+    assert response.headers.get("location") == SETTINGS.urls.login
+
+
+def test_template_stale_token(client, payment, stale_token):
+    client.cookies = {"token": stale_token}
+    response = client.get(
+        SETTINGS.urls.update_payment.format(payment_id=payment.id)
+    )
+    assert response.status_code == status.HTTP_303_SEE_OTHER
+    assert response.headers.get("location") == SETTINGS.urls.login
+
+
+def test_template_wrong_token(client, payment, wrong_token):
+    client.cookies = {"token": wrong_token}
+    response = client.get(
+        SETTINGS.urls.update_payment.format(payment_id=payment.id)
+    )
+    assert response.status_code == status.HTTP_303_SEE_OTHER
+    assert response.headers.get("location") == SETTINGS.urls.login
+
+
+def test_name_lowercase_price_int_is_spending_true(
+    client,
+    payment,
+    session,
+    payment_update,
 ):
-    """Case: endpoint updates an payment.
-
-    Name is lowercase, price is integer.
-    """
-
     response = client.post(
         SETTINGS.urls.update_payment.format(payment_id=payment.id),
         data=payment_update,
     )
+
     session.expire_all()
     updated_payment = session.get(Payment, payment.id)
     check_updated_payment(updated_payment, payment_update, response)
 
 
-def test_update_payment_standard_mode_name_lowercase_price_int_is_speding_false(
+def test_name_lowercase_price_int_is_speding_false(
     client, payment, session, payment_update
 ):
-    """Case: endpoint updates an payment.
-
-    Name is lowercase, price is integer.
-    """
     payment_update = copy(payment_update)
     payment_update["is_spending"] = False
     response = client.post(
@@ -62,13 +83,7 @@ def test_update_payment_standard_mode_name_lowercase_price_int_is_speding_false(
     check_updated_payment(updated_payment, payment_update, response)
 
 
-def test_update_payment_standard_mode_name_title_price_int(
-    client, payment, session, payment_update
-):
-    """Case: endpoint updates an payment.
-
-    Name is a title, price is integer.
-    """
+def test_title_price_int(client, payment, session, payment_update):
     payment_update = copy(payment_update)
     payment_update["name"] = NAME.title()
     response = client.post(
@@ -80,13 +95,7 @@ def test_update_payment_standard_mode_name_title_price_int(
     check_updated_payment(updated_payment, payment_update, response)
 
 
-def test_update_payment_standard_mode_name_upper_price_int(
-    client, payment, session, payment_update
-):
-    """Case: endpoint updates an payment.
-
-    Name is uppercase, price is integer.
-    """
+def test_name_upper_price_int(client, payment, session, payment_update):
     payment_update = copy(payment_update)
     payment_update["name"] = NAME.upper()
     response = client.post(
@@ -98,13 +107,9 @@ def test_update_payment_standard_mode_name_upper_price_int(
     check_updated_payment(updated_payment, payment_update, response)
 
 
-def test_update_payment_standard_mode_name_lowercase_price_frontend(
+def test_name_lowercase_price_frontend(
     client, payment, session, payment_update
 ):
-    """Case: endpoint updates an payment.
-
-    Name is lowercase, price is localized string with currency symbol.
-    """
     payment_update = copy(payment_update)
     payment_update["price"] = "65₽"
     response = client.post(
@@ -116,13 +121,7 @@ def test_update_payment_standard_mode_name_lowercase_price_frontend(
     check_updated_payment(updated_payment, payment_update, response)
 
 
-def test_update_payment_name_lowercase_price_int_zero(
-    client, payment, payment_update
-):
-    """Case: endpoint fails updating an payment.
-
-    Name is lowercase, price is zero (int).
-    """
+def test_name_lowercase_price_int_zero(client, payment, payment_update):
     payment_update = copy(payment_update)
     payment_update["price"] = 0
     response = client.post(
@@ -132,13 +131,7 @@ def test_update_payment_name_lowercase_price_int_zero(
     assert "number must be positive" in response.text
 
 
-def test_update_payment_name_lowercase_price_frontend_zero(
-    client, payment, payment_update
-):
-    """Case: endpoint fails updating an payment.
-
-    Name is lowercase, price is zero (localized string with currency symbol).
-    """
+def test_name_lowercase_price_frontend_zero(client, payment, payment_update):
     payment_update = copy(payment_update)
     payment_update["price"] = "00₽"
     response = client.post(
@@ -148,14 +141,9 @@ def test_update_payment_name_lowercase_price_frontend_zero(
     assert "number must be positive" in response.text
 
 
-def test_update_payment_name_lowercase_price_frontend_negative(
+def test_name_lowercase_price_frontend_negative(
     client, payment, payment_update
 ):
-    """Case: endpoint fails updating an payment.
-
-    Name is lowercase, price is negative
-    (localized string with currency symbol).
-    """
     payment_update = copy(payment_update)
     payment_update["price"] = "-56₽"
     response = client.post(
@@ -165,13 +153,7 @@ def test_update_payment_name_lowercase_price_frontend_negative(
     assert "number must be positive" in response.text
 
 
-def test_update_payment_name_lowercase_price_int_negative(
-    client, payment, payment_update
-):
-    """Case: endpoint fails updating an payment.
-
-    Name is lowercase, price is a negative integer.
-    """
+def test_name_lowercase_price_int_negative(client, payment, payment_update):
     payment_update = copy(payment_update)
     payment_update["price"] = "-56₽"
     response = client.post(
@@ -181,18 +163,13 @@ def test_update_payment_name_lowercase_price_int_negative(
     assert "number must be positive" in response.text
 
 
-def test_update_payment_serve_template_404(client):
-    """Case: user requests update of a nonexistant payment.
-
-    Checks that the endpoint returns a 404 status code.
-    """
+def test_404(client):
     response = client.get(SETTINGS.urls.update_payment.format(payment_id=1))
     assert response.status_code == 404
 
 
 @patch.object(PaymentRepo, "update", raise_always)
-def test_update_payment_exception(client, payment, payment_update):
-    """Case: any exception is thrown."""
+def test_update_payment_any_other_exception(client, payment, payment_update):
     response = client.post(
         SETTINGS.urls.update_payment.format(payment_id=payment.id),
         data=payment_update,
@@ -200,13 +177,7 @@ def test_update_payment_exception(client, payment, payment_update):
     assert response.status_code == 501
 
 
-def test_update_payment_update_category(
-    client, session, fill_db, payment, payment_update
-):
-    """Case: endpoint updates an payment with a new category.
-
-    Name is uppercase, price is integer.
-    """
+def test_update_category(client, session, fill_db, payment, payment_update):
     previous_category = payment.payment_category.name
     categories = get_categories(session)
     categories_names = [x.name for x in categories]
@@ -234,7 +205,7 @@ def test_update_payment_update_category(
     assert updated_payment.payment_category.name != previous_category
 
 
-def test_update_payment_update_date(client, session, payment, payment_update):
+def test_update_date(client, session, payment, payment_update):
     previous_date = payment.created_at
     new_date = payment.created_at - datetime.timedelta(weeks=-4)
     new_date = new_date.astimezone()
@@ -248,3 +219,49 @@ def test_update_payment_update_date(client, session, payment, payment_update):
     check_updated_payment(updated_payment, payment_update, response)
     assert updated_payment.created_at != previous_date
     assert updated_payment.created_at.date() == new_date.date()
+
+
+def test_no_cookie(client, payment, payment_update):
+    client.cookies = {}
+    response = client.post(
+        SETTINGS.urls.update_payment.format(payment_id=payment.id),
+        data=payment_update,
+    )
+    assert response.status_code == status.HTTP_303_SEE_OTHER
+    assert response.headers.get("location") == SETTINGS.urls.login
+
+
+def test_stale_token_post(client, payment, payment_update, stale_token):
+    client.cookies = {"token": stale_token}
+    response = client.post(
+        SETTINGS.urls.update_payment.format(payment_id=payment.id),
+        data=payment_update,
+    )
+    assert response.status_code == status.HTTP_303_SEE_OTHER
+    assert response.headers.get("location") == SETTINGS.urls.login
+
+
+def test_wrong_token_post(
+    client, payment, payment_update, wrong_token, session
+):
+    client.cookies = {"token": wrong_token}
+    response = client.post(
+        SETTINGS.urls.update_payment.format(payment_id=payment.id),
+        data=payment_update,
+    )
+    assert response.status_code == status.HTTP_303_SEE_OTHER
+    assert response.headers.get("location") == SETTINGS.urls.login
+    clean_db(session)
+
+
+def test_wrong_user(client, payment, session, payment_update, wrong_user_token):
+    client.cookies["token"] = wrong_user_token
+    response = client.post(
+        SETTINGS.urls.update_payment.format(payment_id=payment.id),
+        data=payment_update,
+    )
+    assert response.status_code == status.HTTP_501_NOT_IMPLEMENTED
+    assert response.template.name == SETTINGS.templates.read_payment
+    session.expire_all()
+    not_updated_payment = session.get(Payment, payment.id)
+    assert payment == not_updated_payment

@@ -18,13 +18,13 @@
                                 <div class="row align-items-center justify-content-lg-center my-1 p-2">
                                     <div class="col justify-content-center">
                                         <input name="name" id="name" type="text" placeholder="name"
-                                        value="{{ payment.name.title() or '' }}" class="beeb-input ">
+                                        value="{{ payment.name or '' }}" class="beeb-input w-100">
                                     </div>
                                 </div>
                                 <div class="row justify-content-center my-1 p-2">
                                     <div class="col justify-content-center">
                                         <input name="price" id="price" type="text" placeholder="сумма"
-                                        value="{{ (payment.price|round(2)|string)[:-2] }}" class="beeb-input">
+                                        value="{{ (payment.price|round(2)|string)[:-2] }}" class="beeb-input w-100">
                                     </div> 
                                 </div>
                                 <div class="row justify-content-center my-1 p-2">
@@ -32,9 +32,8 @@
                                         <select id="category" name="category" type="text" placeholder="категория"
                                         style="background-color: rgba(222, 226, 230, 0.75);
                                         text-align: center; 
-                                        width: 310px !important; 
-                                        min-width: 310px !important; 
-                                        max-width: 310px !important; ">
+                                        width: 100% !important; 
+                                         ">
                                             {% for option in options %}
                                                 <option value="{{ option }}" 
                                                 {% if value == payment.category %} selected="selected" {% endif %}
@@ -46,12 +45,13 @@
                                 <div class="row align-items-center justify-content-lg-center my-1 p-2">
                                     <div class="col justify-content-center">
                                         <input name="date" id="date" type="text" placeholder="date"
-                                        value="{{ payment.date or '' }}" class="beeb-input ">
+                                        value="{{ payment.date or '' }}" class="beeb-input w-100">
                                     </div>
                                 </div>
 
                                 <div class="row justify-content-center my-1 p-2">
-                                    <div class="col justify-content-center">
+                                    <div class="col justify-content-center" style="text-align:center !important";>
+                                     <label class="form-check-label" for="form-check-input">расход</label>
                                         {% if not payment.is_spending  %}
                                         <input class=form-check-input name="is_spending" id="is_spending" type="checkbox"
                                             class="beeb-input">
@@ -59,7 +59,6 @@
                                         <input class=form-check-input name="is_spending" id="is_spending" type="checkbox" checked
                                         class="beeb-input">
                                         {% endif %}
-                                        <label class="form-check-label" for="form-check-input">Расход</label>
                                     </div> 
                                 </div>
                                 

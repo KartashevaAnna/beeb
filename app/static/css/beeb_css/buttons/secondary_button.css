@@ -1,5 +1,6 @@
 .beeb-secondary-button
 {background-color: var(--bs-body-bg);
+border-radius: 0%;
 }
 
 .beeb-secondary-button:hover {background-color: var(--bs-tertiary-color)}

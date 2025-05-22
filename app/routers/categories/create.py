@@ -1,11 +1,13 @@
 from typing import Annotated
 
 import fastapi
-from fastapi import Depends, Form, HTTPException, Request, status
+from fastapi import Depends, Form, Request, status
 from fastapi.responses import RedirectResponse
 from pydantic import ValidationError
 
+from app.exceptions import BeebError
 from app.repositories.categories import CategoryRepo
+from app.routers.auth_router import authenticate
 from app.schemas.categories import CategoryCreate
 from app.settings import SETTINGS, TEMPLATES
 from app.utils.dependencies import categories_repo
@@ -14,48 +16,49 @@ create_categories_router = fastapi.APIRouter()
 
 
 @create_categories_router.get(SETTINGS.urls.create_category)
+@authenticate
 def serve_create_category_template(
     request: Request,
+    user_id: int | None = None,
 ):
     return TEMPLATES.TemplateResponse(
         request,
         SETTINGS.templates.create_category,
+        context={"form_action": SETTINGS.urls.create_category},
     )
 
 
 @create_categories_router.post(SETTINGS.urls.create_category)
+@authenticate
 def create_category(
     name: Annotated[str, Form()],
     repo: Annotated[CategoryRepo, Depends(categories_repo)],
     request: Request,
+    user_id: int | None = None,
 ):
     try:
-        if new_category := repo.read_name(category_name=name):
-            raise HTTPException(
-                status.HTTP_406_NOT_ACCEPTABLE,
-                "Category with this name already exists",
-            )
-        new_category = CategoryCreate(name=name)
+        new_category = CategoryCreate(name=name, user_id=user_id)
         repo.create(new_category)
         return RedirectResponse(
-            SETTINGS.urls.create_category,
+            SETTINGS.urls.categories,
             status_code=status.HTTP_303_SEE_OTHER,
         )
-    except HTTPException as exc:
+    except BeebError as exc:
         return TEMPLATES.TemplateResponse(
             request,
-            SETTINGS.templates.create_category,
+            SETTINGS.templates.create_payment,
             context={
-                "exception": f"Error: {str(exc)}",
+                "exception": exc.detail,
+                "status_code": exc.status_code,
             },
-            status_code=status.HTTP_406_NOT_ACCEPTABLE,
+            status_code=exc.status_code,
         )
     except ValidationError as exc:
         return TEMPLATES.TemplateResponse(
             request,
             SETTINGS.templates.create_category,
             context={
-                "exception": f"Error: {str(exc)}",
+                "exception": f"Ошибка: {str(exc)}",
             },
             status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
         )
@@ -64,7 +67,7 @@ def create_category(
             request,
             SETTINGS.templates.create_category,
             context={
-                "exception": f"Error: {str(exc)}",
+                "exception": f"Ошибка: {str(exc)}",
             },
             status_code=status.HTTP_501_NOT_IMPLEMENTED,
         )

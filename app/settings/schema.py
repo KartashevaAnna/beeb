@@ -63,15 +63,20 @@ class DatabaseSettings(BaseModel):
 
 class Urls(BaseModel):
     ping: str
+    signup: str
+    login: str
     create_payment: str
     payment: str
     payments: str
+    update_payment_core: str
     update_payment: str
+    delete_payment_core: str
     delete_payment: str
     total_payments_monthly: str
     create_category: str
     category: str
     categories: str
+    update_category_core: str
     update_category: str
     payments_dashboard: str
     payments_dashboard_yearly: str
@@ -80,6 +85,8 @@ class Urls(BaseModel):
 
 
 class Templates(BaseModel):
+    signup: str
+    login: str
     read_payment: str
     read_payments: str
     create_payment: str
@@ -93,8 +100,15 @@ class Templates(BaseModel):
     home_page: str
 
 
+class SecretsSettings(BaseModel):
+    salt: str
+    jwt_secret: str
+    session_lifetime: int
+
+
 class Settings(CustomSettings):
     server: ServerSettings
     urls: Urls
     templates: Templates
     database: DatabaseSettings
+    secrets: SecretsSettings

@@ -1,8 +1,8 @@
 from app.repositories.payments import PaymentRepo
+from tests.conftest import TEST_USER_ID
 
 
 def test_payment_repo_get_payments_per_year(
-    client,
     session,
     year_after_payment,
     year_ago_payment,
@@ -12,7 +12,9 @@ def test_payment_repo_get_payments_per_year(
     current_payment,
 ):
     year = year_ago_payment.created_at.date().year
-    result = PaymentRepo(session).get_payments_per_year(year=year)
+    result = PaymentRepo(session).get_payments_per_year(
+        year=year, user_id=TEST_USER_ID
+    )
     assert year_ago_payment in result
     assert year_ago_payment_later in result
     assert month_ago_payment not in result

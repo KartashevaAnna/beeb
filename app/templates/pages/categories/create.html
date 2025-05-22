@@ -2,7 +2,7 @@
 
 {% block bodycontent %}
 <div class="form-group">
-    <form method="post" enctype="multipart/form-data" action="create">
+    <form method="post" enctype="multipart/form-data" action="{{ form_action }}">
     
             <div class="container-fluid">
                     <div class="row align-items-center justify-content-lg-center my-4 p-2">
@@ -18,7 +18,7 @@
                                     <div class="row align-items-center justify-content-lg-center my-1 p-2">
                                         <div class="col justify-content-center">
                                             <input name="name" id="name" type="text" placeholder="название"
-                                             class="beeb-input ">
+                                             class="beeb-input w-100">
                                         </div>
                                     </div>
                                     <div class="row align-items-center justify-content-center my-1 p-2">

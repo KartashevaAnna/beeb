@@ -1,6 +1,6 @@
 .PHONY: ruff
 ruff:
-	ruff format . && ruff check --fix .
+	ruff format . && ruff check --fix . && isort .
 
 .PHONY: local-run
 local-run:

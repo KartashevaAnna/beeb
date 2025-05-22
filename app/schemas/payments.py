@@ -20,6 +20,7 @@ from app.utils.tools.helpers import (
     get_number_for_db,
     get_pure_date_from_datetime,
     get_readable_price,
+    prevent_blank_strings,
 )
 
 
@@ -52,6 +53,8 @@ class PaymentShow(PaymentBase):
 
 
 class PaymentShowOne(PaymentShow):
+    user_id: Annotated[int, Field(gt=0, exclude=True)]
+
     @computed_field
     @property
     def date(cls) -> str:
@@ -61,6 +64,7 @@ class PaymentShowOne(PaymentShow):
 class PaymentCreate(PaymentBase):
     price_in_rub: Annotated[int, Field(exclude=True)]
     created_at: datetime.datetime
+    user_id: Annotated[int, Field(gt=0)]
 
     @field_validator("price_in_rub", mode="before")
     @classmethod
@@ -81,11 +85,8 @@ class PaymentCreate(PaymentBase):
         return f"{cls.price_in_rub}00"
 
     @field_validator("name")
-    def prevent_blank_strings(cls, value):
-        for _ in range(len(value)):
-            value = value.replace("  ", " ")
-        assert not value.isspace(), "Empty strings are not allowed."
-        return value
+    def prevent_blank_name(cls, value):
+        return prevent_blank_strings(value)
 
 
 class PaymentUpdate(PaymentBase):
@@ -97,6 +98,7 @@ class PaymentUpdate(PaymentBase):
         ),
         Field(exclude=True),
     ]
+    user_id: Annotated[int, Field(gt=0, exclude=True)]
 
     def get_positive_number(self, number) -> int:
         if not number or number <= 0:
@@ -105,10 +107,7 @@ class PaymentUpdate(PaymentBase):
 
     @field_validator("date")
     def prevent_blank_strings(cls, value):
-        for _ in range(len(value)):
-            value = value.replace("  ", " ")
-        assert not value.isspace(), "Empty strings are not allowed."
-        return value
+        return prevent_blank_strings(value)
 
     @computed_field
     @property

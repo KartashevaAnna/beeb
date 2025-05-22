@@ -4,7 +4,7 @@ from app.utils.tools.helpers import get_monthly_payments
 from tests.conftest import add_payment, get_payments
 
 
-def test_get_monthly_payments(session, category):
+def test_get_monthly_payments(session, category, user):
     """Case: normal mode. Verify monthly payments.
 
     Checks that the helper function called by the repo
@@ -12,6 +12,7 @@ def test_get_monthly_payments(session, category):
     """
     # create three payments: 1 for current month and 2 for the previous month
     first_payment = add_payment(
+        user=user,
         session=session,
         price=100,
         category_id=category.id,
@@ -19,11 +20,13 @@ def test_get_monthly_payments(session, category):
     )
     second_payment = add_payment(
         session=session,
+        user=user,
         price=400,
         category_id=category.id,
         created_at=datetime.datetime.now() - datetime.timedelta(weeks=-8),
     )
     third_payment = add_payment(
+        user=user,
         session=session,
         price=200,
         category_id=category.id,

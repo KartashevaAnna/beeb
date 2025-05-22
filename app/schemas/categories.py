@@ -1,14 +1,12 @@
 from typing import Annotated
 
-from pydantic import (
-    BaseModel,
-    Field,
-    StringConstraints,
-    field_validator,
-)
+from pydantic import BaseModel, Field, StringConstraints, field_validator
+
+from app.utils.tools.helpers import prevent_blank_strings
 
 
 class CategoryCreate(BaseModel):
+    user_id: Annotated[int, Field(gt=0)]
     name: Annotated[
         str,
         StringConstraints(
@@ -19,13 +17,11 @@ class CategoryCreate(BaseModel):
 
     @field_validator("name")
     def prevent_blank_strings(cls, value):
-        for _ in range(len(value)):
-            value = value.replace("  ", " ")
-        assert not value.isspace(), "Empty strings are not allowed."
-        return value
+        return prevent_blank_strings(value)
 
 
 class CategoryShowOne(BaseModel):
     id: Annotated[int, Field()]
     name: Annotated[str, Field()]
     is_active: Annotated[bool, Field()]
+    user_id: Annotated[int, Field(gt=0, exclude=True)]
