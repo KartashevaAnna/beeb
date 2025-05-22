@@ -1,11 +1,51 @@
 from unittest.mock import patch
 
+from fastapi import status
 from sqlalchemy import select
 
+from app.exceptions import NotOwnerError
 from app.models import Payment
 from app.repositories.payments import PaymentRepo
 from app.settings import SETTINGS
 from tests.conftest import fill_db, raise_always
+
+
+def test_delete_payment_template(client, payment):
+    payment_id = payment.id
+    response = client.get(
+        url=SETTINGS.urls.delete_payment.format(payment_id=payment_id),
+    )
+    assert response.status_code == 200
+
+
+def test_template_no_cookie(client, payment):
+    payment_id = payment.id
+    client.cookies = {}
+    response = client.get(
+        url=SETTINGS.urls.delete_payment.format(payment_id=payment_id),
+    )
+    assert response.status_code == status.HTTP_303_SEE_OTHER
+    assert response.headers.get("location") == SETTINGS.urls.login
+
+
+def test_template_stale_token(client, payment, stale_token):
+    payment_id = payment.id
+    client.cookies = {"token": stale_token}
+    response = client.get(
+        url=SETTINGS.urls.delete_payment.format(payment_id=payment_id),
+    )
+    assert response.status_code == status.HTTP_303_SEE_OTHER
+    assert response.headers.get("location") == SETTINGS.urls.login
+
+
+def test_template_wrong_token(client, payment, wrong_token):
+    payment_id = payment.id
+    client.cookies = {"token": wrong_token}
+    response = client.get(
+        url=SETTINGS.urls.delete_payment.format(payment_id=payment_id),
+    )
+    assert response.status_code == status.HTTP_303_SEE_OTHER
+    assert response.headers.get("location") == SETTINGS.urls.login
 
 
 def test_delete_payment(client, payment, session):
@@ -28,8 +68,47 @@ def test_delete_payment_that_does_not_exist(client):
     """Case: any exception is thrown."""
     response = client.post(SETTINGS.urls.delete_payment.format(payment_id=1))
     assert response.status_code == 501
+    assert response.template.name == SETTINGS.templates.read_payment
 
 
-def test_delete_payment_template(client):
-    response = client.get(SETTINGS.urls.delete_payment)
-    assert response.status_code == 200
+def test_no_cookie(client, payment):
+    payment_id = payment.id
+    client.cookies = {}
+    response = client.post(
+        url=SETTINGS.urls.delete_payment.format(payment_id=payment_id),
+    )
+    assert response.status_code == status.HTTP_303_SEE_OTHER
+    assert response.headers.get("location") == SETTINGS.urls.login
+
+
+def test_stale_token(client, payment, stale_token):
+    payment_id = payment.id
+    client.cookies = {"token": stale_token}
+    response = client.post(
+        url=SETTINGS.urls.delete_payment.format(payment_id=payment_id)
+    )
+    assert response.status_code == status.HTTP_303_SEE_OTHER
+    assert response.headers.get("location") == SETTINGS.urls.login
+
+
+def test_wrong_token(client, payment, wrong_token):
+    payment_id = payment.id
+    client.cookies = {"token": wrong_token}
+    response = client.post(
+        url=SETTINGS.urls.delete_payment.format(payment_id=payment_id),
+    )
+    assert response.status_code == status.HTTP_303_SEE_OTHER
+    assert response.headers.get("location") == SETTINGS.urls.login
+
+
+def test_wrong_user(client, payment, session, payment_update, wrong_user_token):
+    client.cookies["token"] = wrong_user_token
+    response = client.post(
+        SETTINGS.urls.delete_payment.format(payment_id=payment.id),
+        data=payment_update,
+    )
+    assert response.status_code == NotOwnerError(payment.name).status_code
+    assert response.template.name == SETTINGS.templates.delete_payment
+    session.expire_all()
+    not_deleted_payment = session.get(Payment, payment.id)
+    assert not_deleted_payment

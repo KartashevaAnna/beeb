@@ -40,11 +40,18 @@ class NotIntegerError(BeebError):
         self.status_code = status.HTTP_422_UNPROCESSABLE_ENTITY
 
 
-class DuplicateUsernameError(BeebError):
-    def __init__(self, value: int):
+class DuplicateNameCreateError(BeebError):
+    def __init__(self, value: str):
         self.value = value
-        self.detail = f"Пользователь с именем {value} уже существует"
-        self.status_code = status.HTTP_422_UNPROCESSABLE_ENTITY
+        self.detail = f"Запись {value} уже существует"
+        self.status_code = status.HTTP_406_NOT_ACCEPTABLE
+
+
+class DuplicateNameEditError(BeebError):
+    def __init__(self, value: str):
+        self.value = value
+        self.detail = f"Запись {value} уже существует"
+        self.status_code = status.HTTP_304_NOT_MODIFIED
 
 
 class UserNotFoundError(BeebError):
@@ -55,7 +62,9 @@ class UserNotFoundError(BeebError):
 
 class WrongPasswordError(BeebError):
     def __init__(self, username: str, password: str):
-        self.detail = f"Пользователя с именем {username} и паролем {password} не существует"
+        first_part_message = f"Пользователя с именем {username} "
+        second_part_message = f"и паролем {password} не существует"
+        self.detail = first_part_message + second_part_message
         self.status_code = status.HTTP_401_UNAUTHORIZED
 
 
@@ -74,4 +83,10 @@ class ExpiredTokenError(BeebError):
 class InvalidTokenError(BeebError):
     def __init__(self):
         self.detail = "Токен не действителен"
+        self.status_code = status.HTTP_401_UNAUTHORIZED
+
+
+class NotOwnerError(BeebError):
+    def __init__(self, value):
+        self.detail = f"Не вы завели запись {value}"
         self.status_code = status.HTTP_401_UNAUTHORIZED

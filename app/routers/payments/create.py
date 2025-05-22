@@ -8,28 +8,35 @@ from fastapi.responses import RedirectResponse
 from app.exceptions import BeebError
 from app.repositories.categories import CategoryRepo
 from app.repositories.payments import PaymentRepo
+from app.routers.auth_router import authenticate
 from app.schemas.payments import PaymentCreate
 from app.settings import SETTINGS, TEMPLATES
-from app.utils.dependencies import categories_repo, payments_repo
+from app.utils.dependencies import (
+    categories_repo,
+    payments_repo,
+)
 
 create_payments_router = fastapi.APIRouter()
 
 
 @create_payments_router.get(SETTINGS.urls.create_payment)
+@authenticate
 def serve_create_payment_template(
     request: Request,
     repo: Annotated[PaymentRepo, Depends(categories_repo)],
+    user_id: int | None = None,
 ):
     return TEMPLATES.TemplateResponse(
         request,
         SETTINGS.templates.create_payment,
         context={
-            "options": repo.list_names(),
+            "options": repo.list_names(user_id=user_id),
         },
     )
 
 
 @create_payments_router.post(SETTINGS.urls.create_payment)
+@authenticate
 def create_payment(
     name: Annotated[str, Form()],
     price: Annotated[str, Form()],
@@ -38,10 +45,12 @@ def create_payment(
     category_repo: Annotated[CategoryRepo, Depends(categories_repo)],
     request: Request,
     is_spending: bool = Form(False),
+    user_id: int | None = None,
 ):
     try:
-        options = category_repo.get_dict_names()
+        options = category_repo.get_dict_names(user_id=user_id)
         new_payment = PaymentCreate(
+            user_id=user_id,
             name=name,
             price_in_rub=price,
             category_id=options[category],

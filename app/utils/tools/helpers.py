@@ -10,8 +10,9 @@ from app.settings import SETTINGS
 from app.utils.constants import PRODUCTS
 
 
-def add_payments_to_db(session, category_id: int) -> Payment:
+def add_payments_to_db(session, category_id: int, user_id: int) -> Payment:
     payment = Payment(
+        user_id=user_id,
         name=random.choice(PRODUCTS),
         price=random.randrange(100, 5000, 100),
         category_id=category_id,

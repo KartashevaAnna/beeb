@@ -1,7 +1,7 @@
 from fastapi import status
 from sqlalchemy import select
 
-from app.exceptions import DuplicateUsernameError, EmptyStringError
+from app.exceptions import DuplicateNameCreateError, EmptyStringError
 from app.models import User
 from app.settings import SETTINGS
 from tests.conftest import clean_db, get_dict_to_create_user, get_users
@@ -41,9 +41,10 @@ def test_create_duplicate(client, session, user):
         SETTINGS.urls.signup,
         data={**user_params},
     )
-    assert response.status_code == status.HTTP_422_UNPROCESSABLE_ENTITY
-    error_text = DuplicateUsernameError(user_params.get("username")).detail
-    assert error_text in response.text
+
+    error = DuplicateNameCreateError(user_params.get("username"))
+    assert response.status_code == error.status_code
+    assert error.detail in response.text
     clean_db(session)
 
 

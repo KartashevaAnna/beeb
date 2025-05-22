@@ -2,8 +2,9 @@ SET TIME ZONE "Europe/Moscow";
 
 CREATE TABLE IF NOT EXISTS "main"."category" (
     "id" SERIAL PRIMARY KEY,
-    "name" VARCHAR (255) NOT NULL UNIQUE,
+    "name" VARCHAR (255) NOT NULL,
     "is_active" BOOLEAN NOT NULL DEFAULT TRUE,
+    "user_id" INT NOT NULL,
     "created_at" TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
     "updated_at" TIMESTAMP WITH TIME ZONE
 );
@@ -14,6 +15,7 @@ CREATE TABLE IF NOT EXISTS "main"."payments" (
     "name" VARCHAR (255) NOT NULL,
     "price" INT NOT NULL,
     "category_id" INT NOT NULL,
+    "user_id" INT NOT NULL,
     "created_at" TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
     "is_spending" BOOLEAN NOT NULL DEFAULT TRUE,
     "updated_at" TIMESTAMP WITH TIME ZONE

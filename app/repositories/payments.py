@@ -5,6 +5,7 @@ from fastapi import Request
 from sqlalchemy import delete, extract, func, select, update
 from sqlalchemy.orm import Session
 
+from app.exceptions import NotOwnerError
 from app.models import Category, Payment
 from app.schemas.dates import DateFilter
 from app.schemas.payments import (
@@ -26,9 +27,10 @@ class PaymentRepo:
     def __init__(self, session: Session) -> None:
         self.session = session
 
-    def get_all_payments(self) -> list[Payment]:
+    def get_all_payments(self, user_id: int) -> list[Payment]:
         statement = (
             select(Payment, Category.name)
+            .where(Payment.user_id == user_id)
             .join(Payment.payment_category)
             .order_by(Payment.created_at.desc())
         )
@@ -52,33 +54,41 @@ class PaymentRepo:
             return None
         return int(available_amount / total_per_day)
 
-    def get_payments_per_year(self, year: int) -> list[Payment]:
-        statement = select(Payment).filter(
-            extract("year", Payment.created_at) == year
+    def get_payments_per_year(self, year: int, user_id: int) -> list[Payment]:
+        statement = (
+            select(Payment)
+            .where(Payment.user_id == user_id)
+            .filter(extract("year", Payment.created_at) == year)
         )
         res = self.session.execute(statement)
         return res.scalars().all()
 
-    def get_payments_per_month(self, year: int, month: int) -> list[Payment]:
+    def get_payments_per_month(
+        self, year: int, month: int, user_id: int
+    ) -> list[Payment]:
         statement = (
             select(Payment)
+            .where(Payment.user_id == user_id)
             .filter(extract("year", Payment.created_at) == year)
             .filter(extract("month", Payment.created_at) == month)
         )
         res = self.session.execute(statement)
         return res.scalars().all()
 
-    def get_payments_per_year_with_category(self, year: int) -> list[Payment]:
+    def get_payments_per_year_with_category(
+        self, year: int, user_id: int
+    ) -> list[Payment]:
         statement = (
             select(Payment)
+            .where(Payment.user_id == user_id)
             .join(Payment.payment_category)
             .filter(extract("year", Payment.created_at) == year)
         )
         res = self.session.execute(statement)
         return res.scalars().all()
 
-    def read_all(self) -> list[Payment]:
-        results = self.get_all_payments()
+    def read_all(self, user_id: int) -> list[Payment]:
+        results = self.get_all_payments(user_id)
         return [
             PaymentShow(
                 **payment.__dict__, category=payment.payment_category.name
@@ -94,32 +104,46 @@ class PaymentRepo:
         result = sum(all_values)
         return result if result else 0
 
-    def get_max_date(self, limit: DateFilter) -> datetime.datetime:
+    def get_max_date(
+        self, limit: DateFilter, user_id: int
+    ) -> datetime.datetime:
         if not limit.year and not limit.month:
-            return self.session.scalar(select(func.max(Payment.created_at)))
+            return self.session.scalar(
+                select(func.max(Payment.created_at)).where(
+                    Payment.user_id == user_id
+                )
+            )
         if limit.year and not limit.month:
             return self.session.scalar(
-                select(func.max(Payment.created_at)).filter(
-                    extract("year", Payment.created_at) == limit.year
-                )
+                select(func.max(Payment.created_at))
+                .where(Payment.user_id == user_id)
+                .filter(extract("year", Payment.created_at) == limit.year)
             )
         return self.session.scalar(
             select(func.max(Payment.created_at))
+            .where(Payment.user_id == user_id)
             .filter(extract("year", Payment.created_at) == limit.year)
             .filter(extract("month", Payment.created_at) == limit.month)
         )
 
-    def get_min_date(self, limit: DateFilter) -> datetime.datetime:
+    def get_min_date(
+        self, limit: DateFilter, user_id: int
+    ) -> datetime.datetime:
         if not limit.year and not limit.month:
-            return self.session.scalar(select(func.min(Payment.created_at)))
+            return self.session.scalar(
+                select(func.min(Payment.created_at)).where(
+                    Payment.user_id == user_id
+                )
+            )
         if limit.year and not limit.month:
             return self.session.scalar(
-                select(func.min(Payment.created_at)).filter(
-                    extract("year", Payment.created_at) == limit.year
-                )
+                select(func.min(Payment.created_at))
+                .where(Payment.user_id == user_id)
+                .filter(extract("year", Payment.created_at) == limit.year)
             )
         return self.session.scalar(
             select(func.min(Payment.created_at))
+            .where(Payment.user_id == user_id)
             .filter(extract("year", Payment.created_at) == limit.year)
             .filter(extract("month", Payment.created_at) == limit.month)
         )
@@ -187,10 +211,14 @@ class PaymentRepo:
         return results.scalars().one_or_none()
 
     def update(self, payment_id: int, to_update: PaymentUpdate):
+        old_payment = self.read(payment_id)
+        if old_payment.user_id != to_update.user_id:
+            raise NotOwnerError(old_payment.name)
         stmt = (
             update(Payment)
             .where(Payment.id == payment_id)
             .values(
+                user_id=to_update.user_id,
                 name=to_update.name,
                 price=to_update.price_in_kopecks,
                 category_id=to_update.category_id,
@@ -201,19 +229,23 @@ class PaymentRepo:
         self.session.execute(stmt)
         self.session.commit()
 
-    def delete(self, payment_id: int):
+    def delete(self, payment_id: int, user_id: int):
+        old_payment = self.read(payment_id)
+        if old_payment.user_id != user_id:
+            raise NotOwnerError(old_payment.name)
         stmt = delete(Payment).where(Payment.id == payment_id)
         self.session.execute(stmt)
         self.session.commit()
 
-    def get_all_years(self):
-        all_payments = self.get_all_payments()
+    def get_all_years(self, user_id: int):
+        all_payments = self.get_all_payments(user_id)
         all_payments = list({x.created_at.year for x in all_payments})
         all_payments.sort(reverse=True)
         return all_payments
 
     def get_dashboard(
         self,
+        user_id: int,
         request: Request,
         payments: list[Payment],
         year: int = None,
@@ -225,8 +257,16 @@ class PaymentRepo:
         total_income = self.get_total_amounts(all_incomes)
         available_amount = total_income - total_spending
         available_amount_frontend = get_readable_price(available_amount)
-        max_date = self.get_max_date(limit=DateFilter(year=year, month=month))
-        min_date = self.get_min_date(limit=DateFilter(year=year, month=month))
+        max_date = self.get_max_date(
+            user_id=user_id, limit=DateFilter(year=year, month=month)
+        )
+        min_date = self.get_min_date(
+            user_id=user_id,
+            limit=DateFilter(
+                year=year,
+                month=month,
+            ),
+        )
         total_days = self.get_total_days(max_date, min_date)
         total_per_day = self.get_total_per_day(
             total=total_spending, total_days=total_days

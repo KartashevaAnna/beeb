@@ -6,6 +6,7 @@ from app.utils.tools.helpers import prevent_blank_strings
 
 
 class CategoryCreate(BaseModel):
+    user_id: Annotated[int, Field(gt=0)]
     name: Annotated[
         str,
         StringConstraints(

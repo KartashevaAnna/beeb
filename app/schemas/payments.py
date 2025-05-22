@@ -53,6 +53,8 @@ class PaymentShow(PaymentBase):
 
 
 class PaymentShowOne(PaymentShow):
+    user_id: Annotated[int, Field(gt=0, exclude=True)]
+
     @computed_field
     @property
     def date(cls) -> str:
@@ -62,6 +64,7 @@ class PaymentShowOne(PaymentShow):
 class PaymentCreate(PaymentBase):
     price_in_rub: Annotated[int, Field(exclude=True)]
     created_at: datetime.datetime
+    user_id: Annotated[int, Field(gt=0)]
 
     @field_validator("price_in_rub", mode="before")
     @classmethod
@@ -95,6 +98,7 @@ class PaymentUpdate(PaymentBase):
         ),
         Field(exclude=True),
     ]
+    user_id: Annotated[int, Field(gt=0, exclude=True)]
 
     def get_positive_number(self, number) -> int:
         if not number or number <= 0:

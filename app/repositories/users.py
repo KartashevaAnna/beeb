@@ -2,7 +2,7 @@ from sqlalchemy import select
 from sqlalchemy.orm import Session
 
 from app.exceptions import (
-    DuplicateUsernameError,
+    DuplicateNameCreateError,
     UserNotFoundError,
     WrongPasswordError,
 )
@@ -17,7 +17,7 @@ class UserRepo:
 
     def create(self, user: UserCreate) -> None:
         if self.get_by_username(user.username):
-            raise DuplicateUsernameError(user.username)
+            raise DuplicateNameCreateError(user.username)
         user = User(**user.model_dump())
         self.session.add(user)
         self.session.commit()

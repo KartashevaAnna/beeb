@@ -93,8 +93,19 @@ def clean_db(session):
     session.commit()
 
 
+def delete_category(session):
+    session.query(Category).delete()
+    session.commit()
+
+
 def get_categories(session):
     statement = select(Category)
+    res = session.execute(statement)
+    return res.scalars().all()
+
+
+def get_category_by_id(session, category_id: int):
+    statement = select(Category).where(Category.id == category_id)
     res = session.execute(statement)
     return res.scalars().all()
 
@@ -121,23 +132,27 @@ def add_categories(session):
     categories = get_categories(session)
     if not categories:
         for i in range(len(CATEGORIES)):
-            category = Category(name=CATEGORIES[i], is_active=True)
-            session.add(category)
+            category = Category(
+                name=CATEGORIES[i], is_active=True, user_id=TEST_USER_ID
+            )
             session.flush()
+            session.add(category)
         session.commit()
 
 
-def add_payments(session):
+def add_payments(session, user):
     categories = get_categories(session)
     category_ids = [x.id for x in categories]
     for _ in range(10):
         payment = Payment(
+            user_id=TEST_USER_ID,
             name=random.choice(PRODUCTS),
             price=random.randrange(100, 5000, 100),
             category_id=random.choice(category_ids),
         )
-        session.add(payment)
         session.flush()
+        session.add(payment)
+
     session.commit()
 
 
@@ -146,22 +161,24 @@ def add_payment(
     category_id: int,
     created_at: datetime.datetime,
     price: int,
+    user,
 ) -> Payment:
     payment = Payment(
+        user_id=TEST_USER_ID,
         name=random.choice(PRODUCTS),
         price=price,
         category_id=category_id,
         created_at=created_at,
     )
-    session.add(payment)
     session.flush()
+    session.add(payment)
     return payment
 
 
 @pytest.fixture(scope="function")
 def fill_db(session):
     add_categories(session)
-    add_payments(session)
+    add_payments(session, user)
     yield
     clean_db(session)
 
@@ -234,9 +251,23 @@ def payment_create(payment_as_dict, session, category) -> dict:
     return payment_create_with_id(payment_as_dict, session, category)
 
 
+def payment_create_function(payment_as_dict, session, category) -> dict:
+    return payment_create_with_id(payment_as_dict, session, category)
+
+
 @pytest.fixture(scope="function")
 def payment_create_no_id(payment_create) -> dict:
     return remove_id(payment_create)
+
+
+@pytest.fixture(scope="function")
+def dict_for_new_payment(payment_create):
+    new_dict = copy(payment_create)
+    new_dict.pop("id", None)
+    new_dict.pop("created_at", None)
+    new_dict.pop("updated_at", None)
+    new_dict.pop("user_id", None)
+    return new_dict
 
 
 @pytest.fixture(scope="function")
@@ -250,6 +281,7 @@ def payment_create_no_category(payment_create_no_id) -> dict:
 def payment_update(payment_as_dict, session, category) -> dict:
     new_dict = payment_create_with_id(payment_as_dict, session, category)
     new_dict["form_disabled"] = True
+    new_dict["user_id"] = TEST_USER_ID
     return new_dict
 
 
@@ -271,13 +303,23 @@ def category_as_dict(category, session) -> dict:
 
 
 @pytest.fixture(scope="function")
-def category_create() -> dict:
-    return {"name": TEST_CATEGORY_NAME}
+def category_create(category_as_dict, session) -> dict:
+    category = copy(category_as_dict)
+    del category["id"]
+    del category["created_at"]
+    del category["updated_at"]
+    del category["is_active"]
+    return category
 
 
 @pytest.fixture(scope="function")
-def current_payment(category, session: Session):
+def current_payment(
+    category,
+    user,
+    session: Session,
+):
     payment = Payment(
+        user_id=TEST_USER_ID,
         name=random.choice(PRODUCTS),
         price=500,
         category_id=category.id,
@@ -289,8 +331,9 @@ def current_payment(category, session: Session):
 
 
 @pytest.fixture(scope="function")
-def month_ago_payment(category, session: Session):
+def month_ago_payment(category, user, session: Session):
     payment = Payment(
+        user_id=TEST_USER_ID,
         name=random.choice(PRODUCTS),
         price=500,
         category_id=category.id,
@@ -302,8 +345,11 @@ def month_ago_payment(category, session: Session):
 
 
 @pytest.fixture(scope="function")
-def month_ago_payment_later(month_ago_payment, category, session: Session):
+def month_ago_payment_later(
+    month_ago_payment, category, user, session: Session
+):
     payment = Payment(
+        user_id=TEST_USER_ID,
         name=random.choice(PRODUCTS),
         price=500,
         category_id=category.id,
@@ -315,8 +361,9 @@ def month_ago_payment_later(month_ago_payment, category, session: Session):
 
 
 @pytest.fixture(scope="function")
-def year_ago_payment(category, session: Session):
+def year_ago_payment(category, user, session: Session):
     payment = Payment(
+        user_id=TEST_USER_ID,
         name=random.choice(PRODUCTS),
         price=500,
         category_id=category.id,
@@ -328,8 +375,9 @@ def year_ago_payment(category, session: Session):
 
 
 @pytest.fixture(scope="function")
-def year_after_payment(category, session: Session):
+def year_after_payment(category, user, session: Session):
     payment = Payment(
+        user_id=TEST_USER_ID,
         name=random.choice(PRODUCTS),
         price=500,
         category_id=category.id,
@@ -341,8 +389,9 @@ def year_after_payment(category, session: Session):
 
 
 @pytest.fixture(scope="function")
-def year_ago_payment_later(year_ago_payment, category, session: Session):
+def year_ago_payment_later(user, year_ago_payment, category, session: Session):
     payment = Payment(
+        user_id=TEST_USER_ID,
         name=random.choice(PRODUCTS),
         price=500,
         category_id=category.id,
@@ -381,3 +430,15 @@ def wrong_token(auth_handler):
     username = "Poblebonk"
     token = auth_handler.encode_token(username=username, id=TEST_USER_ID)
     return token[10:]
+
+
+@pytest.fixture(scope="function")
+def wrong_user_token(auth_handler):
+    username = "Wrong User"
+    return auth_handler.encode_token(username=username, id=500)
+
+
+def check_that_payments_belong_to_test_user(payments: list[Payment]):
+    user_ids = set([x.user_id for x in payments])
+    assert len(user_ids) == 1
+    assert list(user_ids)[0] == TEST_USER_ID

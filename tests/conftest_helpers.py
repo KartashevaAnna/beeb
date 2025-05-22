@@ -47,3 +47,4 @@ def check_updated_payment(
     assert updated_payment.price == payment_update["price"]
     assert updated_payment.payment_category.id == payment_update["category_id"]
     assert updated_payment.is_spending == payment_update["is_spending"]
+    assert updated_payment.user_id == payment_update["user_id"]

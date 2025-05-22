@@ -45,8 +45,8 @@ def sort_payment_shares(payments_per_categories: dict) -> dict:
     )
 
 
-def add_category_to_db(session, name: str) -> Category:
-    category = Category(**CategoryCreate(name=name).__dict__)
+def add_category_to_db(session, name: str, user_id: int) -> Category:
+    category = Category(**CategoryCreate(name=name, user_id=user_id).__dict__)
     session.add(category)
     session.commit()
     return category

@@ -1,14 +1,10 @@
 import pytest
 
-from app.exceptions import DuplicateUsernameError, EmptyStringError
+from app.exceptions import DuplicateNameCreateError, EmptyStringError
 from app.repositories.users import UserRepo
 from app.schemas.users import UserCreate
 from app.utils.tools.helpers import hash_password
-from tests.conftest import (
-    clean_db,
-    get_dict_to_create_user,
-    get_users,
-)
+from tests.conftest import clean_db, get_dict_to_create_user, get_users
 
 
 def test_create_user(session, user):
@@ -30,7 +26,7 @@ def test_create_user_duplicate(session, user):
     assert not get_users(session)
     UserRepo(session).create(UserCreate(**user_params))
     session.expire_all()
-    with pytest.raises(DuplicateUsernameError):
+    with pytest.raises(DuplicateNameCreateError):
         UserRepo(session).create(UserCreate(**user_params))
     clean_db(session)
 
