@@ -41,6 +41,7 @@ def create_user_in_db(
         )
 
         repo.create(user=new_user)
+
         return RedirectResponse(
             SETTINGS.urls.login, status_code=status.HTTP_303_SEE_OTHER
         )

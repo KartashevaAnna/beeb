@@ -25,6 +25,9 @@ def read_all(
             SETTINGS.templates.read_payments,
             context={
                 "payments": payments,
+                "create": SETTINGS.urls.create_payment,
+                "update": SETTINGS.urls.update_payment_core,
+                "delete": SETTINGS.urls.delete_payment_core,
             },
         )
     except Exception as exc:

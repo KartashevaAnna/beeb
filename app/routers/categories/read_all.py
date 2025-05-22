@@ -23,7 +23,11 @@ def read_all(
         return TEMPLATES.TemplateResponse(
             request,
             SETTINGS.templates.read_categories,
-            context={"categories": categories},
+            context={
+                "categories": categories,
+                "create": SETTINGS.urls.create_category,
+                "update": SETTINGS.urls.update_category_core,
+            },
         )
     except Exception as exc:
         return TEMPLATES.TemplateResponse(

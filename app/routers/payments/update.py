@@ -85,6 +85,7 @@ def serve_update_payment_template(
                 "options": category_repo.get_payments_options(
                     user_id=user_id, current_option=payment.category
                 ),
+                "form_action": SETTINGS.urls.update_payment_core,
             },
         )
     except HTTPException as exc:

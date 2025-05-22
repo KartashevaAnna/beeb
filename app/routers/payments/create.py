@@ -31,6 +31,7 @@ def serve_create_payment_template(
         SETTINGS.templates.create_payment,
         context={
             "options": repo.list_names(user_id=user_id),
+            "form_action": SETTINGS.urls.create_payment,
         },
     )
 

@@ -26,7 +26,9 @@ login = "{{ urls.URL_LOGIN }}"
 
 payments = "{{ urls.URL_PAYMENTS }}"
 create_payment = "{{ urls.URL_CREATE_PAYMENT }}"
+update_payment_core = "{{ urls.URL_UPDATE_PAYMENT_CORE }}"
 update_payment = "{{ urls.URL_UPDATE_PAYMENT }}"
+delete_payment_core = "{{ urls.URL_DELETE_PAYMENT_CORE }}"
 delete_payment = "{{ urls.URL_DELETE_PAYMENT }}"
 payment = "{{ urls.URL_PAYMENT }}"
 
@@ -34,6 +36,7 @@ total_payments_monthly = "{{ urls.URL_PAYMENTS_TOTAL_MONTHLY }}"
 
 categories = "{{ urls.URL_CATEGORIES }}"
 create_category = "{{ urls.URL_CREATE_CATEGORY }}"
+update_category_core = "{{ urls.URL_UPDATE_CATEGORY_CORE }}"
 update_category = "{{ urls.URL_UPDATE_CATEGORY }}"
 category = "{{ urls.URL_CATEGORY }}"
 

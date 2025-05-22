@@ -24,6 +24,7 @@ def serve_create_category_template(
     return TEMPLATES.TemplateResponse(
         request,
         SETTINGS.templates.create_category,
+        context={"form_action": SETTINGS.urls.create_category},
     )
 
 

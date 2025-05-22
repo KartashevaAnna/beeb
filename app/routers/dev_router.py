@@ -98,7 +98,8 @@ def upload_payments_from_libreoffice_calc_file(
             ) or category_repo.create(
                 CategoryCreate(
                     user_id=user_id, name=category_name, is_active=True
-                )
+                ),
+                user_id=user_id,
             )
             name = entry[0]
             price = convert_to_copecks(locale.atoi(entry[2][:3]))

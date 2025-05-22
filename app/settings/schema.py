@@ -68,12 +68,15 @@ class Urls(BaseModel):
     create_payment: str
     payment: str
     payments: str
+    update_payment_core: str
     update_payment: str
+    delete_payment_core: str
     delete_payment: str
     total_payments_monthly: str
     create_category: str
     category: str
     categories: str
+    update_category_core: str
     update_category: str
     payments_dashboard: str
     payments_dashboard_yearly: str

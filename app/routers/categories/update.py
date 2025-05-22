@@ -35,6 +35,7 @@ def serve_update_category_template(
                 "options": repo.get_status_options(
                     current_option=category.is_active
                 ),
+                "update": SETTINGS.urls.update_category_core,
             },
         )
     except HTTPException as exc:
