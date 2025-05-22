@@ -15,7 +15,6 @@ NAME = "exotic_category"
 
 
 def test_template(client, category, session):
-    """Case: endpoint returns form to update a category."""
     category_id = category.id
     response = client.get(
         SETTINGS.urls.update_category.format(category_id=category_id)
@@ -58,7 +57,6 @@ def test_template_wrong_token(client, category, session, wrong_token):
 
 
 def test_update_name(client, category, category_create, session):
-    """Case: endpoint updates a category."""
     category_id = category.id
     category_create["name"] = NAME
     response = client.post(
@@ -79,7 +77,6 @@ def test_update_name(client, category, category_create, session):
 
 
 def test_change_status(client, category, category_create, session):
-    """Case: endpoint updates a category."""
     category_id = category.id
 
     response = client.post(
@@ -91,8 +88,7 @@ def test_change_status(client, category, category_create, session):
     clean_db(session)
 
 
-def test_uplicate_name(client, categories, category_create, session):
-    """Case: endpoint refuses updating a category."""
+def test_duplicate_name(client, categories, category_create, session):
     categories = get_categories(session)
     category_id = categories[0].id
     category_create["name"] = categories[1].name
@@ -106,7 +102,6 @@ def test_uplicate_name(client, categories, category_create, session):
 
 
 def test_name_is_None(client, category, category_create, session):
-    """Case: endpoint refuses updating a category."""
     category_id = category.id
     category_create["name"] = None
     response = client.post(

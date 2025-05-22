@@ -24,3 +24,4 @@ class CategoryShowOne(BaseModel):
     id: Annotated[int, Field()]
     name: Annotated[str, Field()]
     is_active: Annotated[bool, Field()]
+    user_id: Annotated[int, Field(gt=0, exclude=True)]

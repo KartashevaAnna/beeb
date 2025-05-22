@@ -1,7 +1,11 @@
 from sqlalchemy import select, update
 from sqlalchemy.orm import Session
 
-from app.exceptions import DuplicateNameCreateError
+from app.exceptions import (
+    DuplicateNameCreateError,
+    DuplicateNameEditError,
+    NotOwnerError,
+)
 from app.models import Category
 from app.schemas.categories import CategoryCreate, CategoryShowOne
 from app.utils.tools.helpers import sort_options
@@ -86,9 +90,12 @@ class CategoryRepo:
             else None
         )
 
-    def create(self, category: CategoryCreate, user_id: int) -> Category:
+    def create(
+        self,
+        category: CategoryCreate,
+    ) -> Category:
         if new_category := self.read_name(
-            category_name=category.name, user_id=user_id
+            category_name=category.name, user_id=category.user_id
         ):
             raise DuplicateNameCreateError(category.name)
         new_category = Category(**category.model_dump())
@@ -99,6 +106,15 @@ class CategoryRepo:
         return results.scalars().one_or_none()
 
     def update(self, category_id: int, to_update: CategoryCreate):
+        previous_state = self.read(category_id)
+        if previous_state.user_id != to_update.user_id:
+            raise NotOwnerError(previous_state.name)
+        category_with_the_same_name = self.read_name(
+            to_update.name, user_id=to_update.user_id
+        )
+        if category_with_the_same_name:
+            if category_with_the_same_name.id != category_id:
+                raise DuplicateNameEditError(category_with_the_same_name.name)
         stmt = (
             update(Category)
             .where(Category.id == category_id)

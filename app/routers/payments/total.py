@@ -1,8 +1,9 @@
 from typing import Annotated
 
 import fastapi
-from fastapi import Depends, Request
+from fastapi import Depends, Request, status
 
+from app.exceptions import BeebError
 from app.repositories.payments import PaymentRepo
 from app.routers.auth_router import authenticate
 from app.settings import SETTINGS, TEMPLATES
@@ -18,18 +19,38 @@ def dashboard_for_all_years(
     request: Request,
     user_id: int | None = None,
 ):
-    payments = repo.get_all_payments(user_id)
-    dashboard = repo.get_dashboard(
-        request=request,
-        payments=payments,
-        user_id=user_id,
-    )
-    dashboard["all_years"] = repo.get_all_years(user_id)
-    dashboard["header_text"] = "Расходы за всё время"
+    try:
+        payments = repo.get_all_payments(user_id)
+        dashboard = repo.get_dashboard(
+            request=request,
+            payments=payments,
+            user_id=user_id,
+        )
+        dashboard["all_years"] = repo.get_all_years(user_id)
+        dashboard["header_text"] = "Расходы за всё время"
 
-    return TEMPLATES.TemplateResponse(
-        request, SETTINGS.templates.payments_dashboard, context=dashboard
-    )
+        return TEMPLATES.TemplateResponse(
+            request, SETTINGS.templates.payments_dashboard, context=dashboard
+        )
+    except BeebError as exc:
+        return TEMPLATES.TemplateResponse(
+            request,
+            SETTINGS.templates.payments_dashboard_monthly,
+            context={
+                "exception": exc.detail,
+                "status_code": exc.status_code,
+            },
+            status_code=exc.status_code,
+        )
+    except Exception as exc:
+        return TEMPLATES.TemplateResponse(
+            request,
+            SETTINGS.templates.payments_dashboard_monthly,
+            context={
+                "exception": f"Ошибка: {str(exc)}",
+                "status_code": status.HTTP_501_NOT_IMPLEMENTED,
+            },
+        )
 
 
 @payments_dashboard_router.get(SETTINGS.urls.total_payments_monthly)
@@ -58,15 +79,37 @@ def read_all_payments_per_year(
     year: int,
     user_id: int | None = None,
 ):
-    payments = repo.get_payments_per_year(year=year, user_id=user_id)
-    dashboard = repo.get_dashboard(
-        request=request, payments=payments, year=year, user_id=user_id
-    )
-    dashboard["header_text"] = f"Общие расходы за {year} год"
+    try:
+        payments = repo.get_payments_per_year(year=year, user_id=user_id)
+        dashboard = repo.get_dashboard(
+            request=request, payments=payments, year=year, user_id=user_id
+        )
+        dashboard["header_text"] = f"Общие расходы за {year} год"
 
-    return TEMPLATES.TemplateResponse(
-        request, SETTINGS.templates.payments_dashboard_yearly, context=dashboard
-    )
+        return TEMPLATES.TemplateResponse(
+            request,
+            SETTINGS.templates.payments_dashboard_yearly,
+            context=dashboard,
+        )
+    except BeebError as exc:
+        return TEMPLATES.TemplateResponse(
+            request,
+            SETTINGS.templates.payments_dashboard_yearly,
+            context={
+                "exception": exc.detail,
+                "status_code": exc.status_code,
+            },
+            status_code=exc.status_code,
+        )
+    except Exception as exc:
+        return TEMPLATES.TemplateResponse(
+            request,
+            SETTINGS.templates.payments_dashboard_yearly,
+            context={
+                "exception": f"Ошибка: {str(exc)}",
+                "status_code": status.HTTP_501_NOT_IMPLEMENTED,
+            },
+        )
 
 
 @payments_dashboard_router.get(SETTINGS.urls.payments_dashboard_monthly)
@@ -78,19 +121,39 @@ def read_all_payments_per_month(
     month: int,
     user_id: int | None = None,
 ):
-    payments = repo.get_payments_per_month(
-        year=year, month=month, user_id=user_id
-    )
-    dashboard = repo.get_dashboard(
-        request=request,
-        payments=payments,
-        year=year,
-        month=month,
-        user_id=user_id,
-    )
+    try:
+        payments = repo.get_payments_per_month(
+            year=year, month=month, user_id=user_id
+        )
+        dashboard = repo.get_dashboard(
+            request=request,
+            payments=payments,
+            year=year,
+            month=month,
+            user_id=user_id,
+        )
 
-    return TEMPLATES.TemplateResponse(
-        request,
-        SETTINGS.templates.payments_dashboard_monthly,
-        context=dashboard,
-    )
+        return TEMPLATES.TemplateResponse(
+            request,
+            SETTINGS.templates.payments_dashboard_monthly,
+            context=dashboard,
+        )
+    except BeebError as exc:
+        return TEMPLATES.TemplateResponse(
+            request,
+            SETTINGS.templates.payments_dashboard_monthly,
+            context={
+                "exception": exc.detail,
+                "status_code": exc.status_code,
+            },
+            status_code=exc.status_code,
+        )
+    except Exception as exc:
+        return TEMPLATES.TemplateResponse(
+            request,
+            SETTINGS.templates.payments_dashboard_monthly,
+            context={
+                "exception": f"Ошибка: {str(exc)}",
+                "status_code": status.HTTP_501_NOT_IMPLEMENTED,
+            },
+        )

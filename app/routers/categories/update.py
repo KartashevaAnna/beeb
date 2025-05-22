@@ -72,14 +72,12 @@ def update_category(
         to_update = CategoryCreate(
             name=name, is_active=is_active, user_id=user_id
         )
-        category_with_the_same_name = repo.read_name(name, user_id=user_id)
-        if category_with_the_same_name:
-            if category_with_the_same_name.id != category_id:
-                raise DuplicateNameEditError(category_with_the_same_name.name)
+
         repo.update(category_id=category_id, to_update=to_update)
         return RedirectResponse(
             url=SETTINGS.urls.categories, status_code=status.HTTP_303_SEE_OTHER
         )
+
     except BeebError as exc:
         return TEMPLATES.TemplateResponse(
             request,

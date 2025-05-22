@@ -38,7 +38,7 @@ def create_category(
 ):
     try:
         new_category = CategoryCreate(name=name, user_id=user_id)
-        repo.create(category=new_category, user_id=user_id)
+        repo.create(new_category)
         return RedirectResponse(
             SETTINGS.urls.categories,
             status_code=status.HTTP_303_SEE_OTHER,

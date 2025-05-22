@@ -5,7 +5,7 @@ from fastapi import Request
 from sqlalchemy import delete, extract, func, select, update
 from sqlalchemy.orm import Session
 
-from app.exceptions import NotOwnerError
+from app.exceptions import NotOwnerError, NothingToComputeError
 from app.models import Category, Payment
 from app.schemas.dates import DateFilter
 from app.schemas.payments import (
@@ -271,7 +271,10 @@ class PaymentRepo:
         total_per_day = self.get_total_per_day(
             total=total_spending, total_days=total_days
         )
-        days_left = int(available_amount / total_per_day)
+        try:
+            days_left = int(available_amount / total_per_day)
+        except ZeroDivisionError:
+            raise NothingToComputeError
         spending = get_readable_price(total_spending)
         month = INT_TO_MONTHES.get(month)
         return {

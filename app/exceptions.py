@@ -90,3 +90,9 @@ class NotOwnerError(BeebError):
     def __init__(self, value):
         self.detail = f"Не вы завели запись {value}"
         self.status_code = status.HTTP_401_UNAUTHORIZED
+
+
+class NothingToComputeError(BeebError):
+    def __init__(self):
+        self.detail = "Недостаточно данных для расчётов"
+        self.status_code = status.HTTP_422_UNPROCESSABLE_ENTITY
