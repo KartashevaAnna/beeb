@@ -6,7 +6,7 @@ def test_dev_router_populating_the_database_with_payments(client, session):
     #  check that there are no payments in the database
     all_payments = get_payments(session)
     assert not all_payments
-    response = client.post("/populate-payments")
+    response = client.post("/populate-payments", data={"user_id": 1})
     assert response.status_code == 200
     # verify that payments appered in the database
     all_payments = get_payments(session)
@@ -19,7 +19,7 @@ def test_dev_router_populating_the_database_with_categories(client, session):
     #  check that there are no categories in the database
     all_categories = get_categories(session)
     assert not all_categories
-    response = client.post("/populate-categories")
+    response = client.post("/populate-categories", data={"user_id": 1})
     assert response.status_code == 200
     # verify that categories appered in the database
     all_categories = get_categories(session)
@@ -29,7 +29,7 @@ def test_dev_router_populating_the_database_with_categories(client, session):
 def test_upload_payments_from_ods_file_non_clean_db(client, session, fill_db):
     all_categories_before = get_categories(session)
     all_payments_before = get_payments(session)
-    response = client.post("/upload-payments")
+    response = client.post("/upload-payments", data={"user_id": 1})
     assert response.status_code == 200
     session.expire_all()
     all_categories_after = get_categories(session)

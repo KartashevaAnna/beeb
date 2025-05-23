@@ -100,7 +100,7 @@ class PaymentRepo:
         return self.sum_payments_prices(payments)
 
     def sum_payments_prices(self, payments):
-        all_values = [x.price for x in payments]
+        all_values = [int(x.price) for x in payments]
         result = sum(all_values)
         return result if result else 0
 
@@ -243,6 +243,14 @@ class PaymentRepo:
         all_payments.sort(reverse=True)
         return all_payments
 
+    def get_balance(self, payments: list[Payment]) -> int:
+        all_spendings = self.get_spendings(payments)
+        all_spendings = self.get_spendings(payments)
+        total_spending = self.get_total_amounts(all_spendings)
+        all_incomes = self.get_all_incomes(payments)
+        total_income = self.get_total_amounts(all_incomes)
+        return total_income - total_spending
+
     def get_dashboard(
         self,
         user_id: int,
@@ -253,9 +261,7 @@ class PaymentRepo:
     ):
         all_spendings = self.get_spendings(payments)
         total_spending = self.get_total_amounts(all_spendings)
-        all_incomes = self.get_all_incomes(payments)
-        total_income = self.get_total_amounts(all_incomes)
-        available_amount = total_income - total_spending
+        available_amount = self.get_balance(all_spendings)
         available_amount_frontend = get_readable_price(available_amount)
         max_date = self.get_max_date(
             user_id=user_id, limit=DateFilter(year=year, month=month)
@@ -293,3 +299,10 @@ class PaymentRepo:
             ),
             "header_text": f"За {month} {year} года: {spending}",
         }
+
+    def get_current_user_balance(
+        self,
+        user_id: int,
+    ):
+        payments = self.get_all_payments(user_id)
+        return self.get_balance(payments)

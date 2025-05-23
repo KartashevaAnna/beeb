@@ -28,12 +28,10 @@ dev_router = fastapi.APIRouter(tags=["Dev"], include_in_schema=True)
 
 
 @dev_router.post("/populate-categories")
-@authenticate
 def create_category_in_db(
-    request: Request,
     session: Annotated[Session, Depends(get_session)],
     repo: Annotated[CategoryRepo, Depends(categories_repo)],
-    user_id: int | None = None,
+    user_id: int | None = 1,
 ):
     current_categories = repo.read_all(user_id)
 
@@ -51,12 +49,10 @@ def create_category_in_db(
 
 
 @dev_router.post("/populate-payments")
-@authenticate
 def create_payments_in_db(
-    request: Request,
     session: Annotated[Session, Depends(get_session)],
     repo: Annotated[CategoryRepo, Depends(categories_repo)],
-    user_id: int | None = None,
+    user_id: int | None = 1,
 ):
     categories = repo.read_all(user_id)
     if not categories:
@@ -73,13 +69,11 @@ def create_payments_in_db(
 
 
 @dev_router.post("/upload-payments")
-@authenticate
 def upload_payments_from_libreoffice_calc_file(
-    request: Request,
     session: Annotated[Session, Depends(get_session)],
     category_repo: Annotated[CategoryRepo, Depends(categories_repo)],
     repo: Annotated[PaymentRepo, Depends(payments_repo)],
-    user_id: int | None = None,
+    user_id: int | None = 1,
 ):
     filenames = os.listdir(PAYMENTS_TO_UPLOAD_DIR)
     for file in filenames:
