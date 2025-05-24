@@ -96,3 +96,10 @@ class NothingToComputeError(BeebError):
     def __init__(self):
         self.detail = "Недостаточно данных для расчётов"
         self.status_code = status.HTTP_422_UNPROCESSABLE_ENTITY
+
+
+class SpendingOverBalanceError(BeebError):
+    def __init__(self, value):
+        self.value = value
+        self.detail = f"Расход {value} превышает сумму, которая есть на счету."
+        self.status_code = status.HTTP_406_NOT_ACCEPTABLE

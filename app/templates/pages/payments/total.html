@@ -1,24 +1,36 @@
 {% extends "base.html" %}
+{% include 'navbar_horizontal.html' %}
+{% include 'pages/payments/total_header.html' %}
 <link rel="stylesheet" href="https://unpkg.com/bs-brain@2.0.4/components/charts/chart-2/assets/css/chart-2.css"
 
 {% block bodycontent %}
 
-{% include 'pages/payments/total_chart.html' %}
 
-<table class="table table-hover">
-    <tr>
-      <th>год</th>
-      <th> </th>
-    </tr>
-    <tr>
-    {% if all_years|length > 0 %}
-      {% for year in all_years %}
-          <td scope="row">{{ year }}</td>
-          <td><a href="/dashboard/{{ year }}"><i class="material-icons">👁️</i></a></td>
-      </tr>
-      {% endfor %}
-      </table>
-      {% endif %}
+
+{% include 'pages/payments/total_chart.html' %}
+<div class="row">
+  <div class="col my-2">
+    <div class="card">
+      <div class="card-body">
+        <table class="table table-hover">
+            <tr>
+              <th>год</th>
+              <th> </th>
+            </tr>
+            <tr>
+            {% if all_years|length > 0 %}
+              {% for year in all_years %}
+                  <td scope="row">{{ year }}</td>
+                  <td><a href="/dashboard/{{ year }}"><i class="material-icons">👁️</i></a></td>
+              </tr>
+              {% endfor %}
+              </table>
+              {% endif %}
+      </div>
+    </div>
+  </div>
+</div>
+
 
 
 {% endblock %}

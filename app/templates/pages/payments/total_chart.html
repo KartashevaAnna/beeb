@@ -1,8 +1,3 @@
-<header class="d-flex flex-wrap justify-content-center py-3 mb-4 border-bottom">
-  <h1>{{ header_text }}</h1>
-  </a>
-
-</header>
 
 
 
@@ -30,52 +25,85 @@
 
 
 
+<div class="container-fluid">
+  <div class="row">
+    {% if current_month %}
+      <div class="col">
+        <div class="card rounded-0">
+          <div class="card-body">
+            <div class="row">
+              <table class="table table-hover">
+                  <tr>
+                    <th>приход</th>
+                    <th>расход</th>
+                    <th>сумма на счету</th>
+                    <th>расход в день</th>
+                    <th>осталось до</th>
+                  </tr>
+                  <tr>
+                    <td>{{ total_income }}</td>
+                    <td>{{ total_spending }}</td>
+                    <td>{{ available_amount_frontend if available_amount_frontend is not none }}</td>
+                    <td>{{ rate_per_day if rate_per_day is not none }}</td>
+                    <td>{{ days_left if days_left is not none }}</td> 
+                  </tr>
+              </table>
+          </div>
+        </div>
+      </div>
+    {% else %}
+    <div class="col-sm-4 mt-2">
+        <div class="card rounded-0">
+          <div class="card-body">
+            <div class="row">
+              <table class="table table-hover">
+                  <tr>
+                    <th>приход</th>
+                    <th>расход</th>
+                    <th>расход в день</th>
+                  </tr>
+                  <tr>
+                    <td>{{ total_income }}</td>
+                    <td>{{ total_spending }}</td>
+                    <td>{{ rate_per_day if rate_per_day is not none }}</td>
+                  </tr>
+              </table>
+          </div>
+        </div>
+      </div>
+    {% endif %} 
+  </div> 
 
-<div class="row">
-  <div class="col-sm-6">
-    <div class="card">
-      <div class="card-body">
-
-          <table class="table table-hover">
-            <tr>
-              <th>сумма на счету</th>
-              <th>расход в день</th>
-              <th>осталось дней</th>
-            </tr>
-            <tr>
-              <td>{{ available_amount_frontend if available_amount_frontend is not none }}</td>
-              <td>{{ total_per_day if total_per_day is not none }}</td>
-              <td>{{ days_left if days_left is not none }}</td>
-            </tr>
-          </table>
-
-
-          <table class="table table-hover">
-            <tr>
-              <th>категория</th>
-              <th>процент</th>
-              <th>сумма</th>
-            </tr>
-            {% for record in total_shares %}
-            <tr>
-                <td scope="row">{{ record[1][0] }}</td>
-                  <td>{{ record[0] }}</td>
-                  <td>{{ record[1][1] }}</td>
-            </tr>
-            {% endfor %}
-          </table>
+  <div class="row">
+    <div class="col-sm-6 mt-2">
+      <div class="card rounded-0">
+        <div class="card-body">
+            <table class="table table-hover">
+              <tr>
+                <th>категория</th>
+                <th>процент</th>
+                <th>сумма</th>
+              </tr>
+              {% for record in total_shares %}
+              <tr>
+                  <td scope="row">{{ record[1][0] }}</td>
+                    <td>{{ record[0] }}</td>
+                    <td>{{ record[1][1] }}</td>
+              </tr>
+              {% endfor %}
+            </table>
+        </div>
       </div>
     </div>
-  </div>
-  <div class="col-sm-6">
-    <div class="card">
-      <div class="card-body">
-        <h6 class="card-title" align="center">по категориям</h6>
-        <div class="card-text" id="donut-chart"></div>
+    <div class="col-sm-6 mt-2">
+      <div class="card rounded-0">
+        <div class="card-body">
+          <div class="card-text" id="donut-chart"></div>
+        </div>
       </div>
     </div>
-  </div>
-</div>
+
+
 
 
 
@@ -105,3 +133,4 @@
           bindto: "#donut-chart",
       });
   </script>
+</div>

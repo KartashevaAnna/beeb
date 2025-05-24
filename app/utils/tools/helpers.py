@@ -7,7 +7,7 @@ from hashlib import sha256
 from app.exceptions import EmptyStringError
 from app.models import Payment
 from app.settings import SETTINGS
-from app.utils.constants import PRODUCTS
+from app.utils.constants import INT_TO_MONTHES, PRODUCTS
 
 
 def add_payments_to_db(session, category_id: int, user_id: int) -> Payment:
@@ -139,3 +139,13 @@ def prevent_blank_strings(value):
     if value.isspace():
         raise EmptyStringError
     return value
+
+
+def get_current_year_and_month() -> list:
+    now = datetime.datetime.now()
+    return [now.year, now.month]
+
+
+def check_current_year_and_month(year: int, month: int) -> list:
+    current_year, current_month = get_current_year_and_month()
+    return current_year == year and INT_TO_MONTHES[current_month] == month

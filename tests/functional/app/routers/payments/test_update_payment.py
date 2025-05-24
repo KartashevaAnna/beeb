@@ -1,9 +1,9 @@
-from copy import copy
 import datetime
+from copy import copy
 from unittest.mock import patch
+
 from fastapi import status
 
-from app.exceptions import NotOwnerError
 from app.models import Payment
 from app.repositories.payments import PaymentRepo
 from app.settings import SETTINGS

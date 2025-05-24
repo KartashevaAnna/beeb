@@ -7,13 +7,8 @@ from app.exceptions import UserNotFoundError, WrongPasswordError
 from app.repositories.users import UserRepo
 from app.settings import SETTINGS
 from app.utils.tools.auth_handler import AuthHandler
-from tests.conftest import (
-    TEST_USER_NAME,
-    TEST_USER_PASSWORD,
-    clean_db,
-    get_user,
-    raise_always,
-)
+from tests.conftest import (TEST_USER_NAME, TEST_USER_PASSWORD, clean_db,
+                            get_user, raise_always)
 
 TEST_LOGIN_DATA = {"username": TEST_USER_NAME, "password": TEST_USER_PASSWORD}
 

@@ -5,7 +5,7 @@ from fastapi import Depends, Form, HTTPException, Request, status
 from fastapi.responses import RedirectResponse
 from pydantic import ValidationError
 
-from app.exceptions import BeebError, DuplicateNameEditError
+from app.exceptions import BeebError
 from app.repositories.categories import CategoryRepo
 from app.routers.auth_router import authenticate
 from app.schemas.categories import CategoryCreate

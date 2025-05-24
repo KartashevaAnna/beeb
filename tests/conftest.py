@@ -320,7 +320,7 @@ def current_payment(
 ):
     payment = Payment(
         user_id=TEST_USER_ID,
-        name=random.choice(PRODUCTS),
+        name="текущий платёж",
         price=500,
         category_id=category.id,
         created_at=datetime.datetime.now(),
@@ -334,13 +334,29 @@ def current_payment(
 def month_ago_payment(category, user, session: Session):
     payment = Payment(
         user_id=TEST_USER_ID,
-        name=random.choice(PRODUCTS),
+        name="платёж прошлого месяца",
         price=500,
         category_id=category.id,
         created_at=datetime.datetime.now() - datetime.timedelta(weeks=8),
     )
     session.add(payment)
     session.flush()
+    return payment
+
+
+@pytest.fixture(scope="function")
+def positive_balance(category, user, session: Session):
+    payment = Payment(
+        user_id=TEST_USER_ID,
+        name="зарплата",
+        price=500000000,
+        category_id=category.id,
+        created_at=datetime.datetime.now(),
+        is_spending=False,
+    )
+    session.add(payment)
+    session.flush()
+    session.commit()
     return payment
 
 
@@ -353,7 +369,7 @@ def month_ago_payment_later(
         name=random.choice(PRODUCTS),
         price=500,
         category_id=category.id,
-        created_at=month_ago_payment.created_at + datetime.timedelta(days=3),
+        created_at=month_ago_payment.created_at + datetime.timedelta(minutes=3),
     )
     session.add(payment)
     session.flush()
@@ -364,7 +380,7 @@ def month_ago_payment_later(
 def year_ago_payment(category, user, session: Session):
     payment = Payment(
         user_id=TEST_USER_ID,
-        name=random.choice(PRODUCTS),
+        name="платёж прошлого года",
         price=500,
         category_id=category.id,
         created_at=datetime.datetime.now() - datetime.timedelta(weeks=53),

@@ -1,9 +1,7 @@
 from app.utils.tools.helpers import add_payments_to_db
-from tests.conftest import (
-    TEST_USER_ID,
-    check_that_payments_belong_to_test_user,
-    get_payments,
-)
+from tests.conftest import (TEST_USER_ID,
+                            check_that_payments_belong_to_test_user,
+                            get_payments)
 
 
 def test_add_payments_to_db(session, category):

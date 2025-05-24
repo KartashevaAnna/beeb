@@ -25,12 +25,8 @@
 
 <body>
 {% block body %}
-    {% if exception %}
-        {% include 'exception.html' %}
-    {% else %}
         {% block bodycontent %}
         {% endblock %}
-    {% endif %}
 {% endblock %}
 </body>
 <nav class="navbar navbar-expand-lg" style="background-color: #DCDDDF !important;">
@@ -49,9 +45,9 @@
 
 
         {% if not request.path == '/dashboard' %}
-            <li><a href="/dashboard">сводная таблица</a></li>
+            <li><a href="/dashboard">статистика</a></li>
         {% else %}
-            <li class="active"><a href="/dashboard">сводная таблица</a></li>
+            <li class="active"><a href="/dashboard">статистика</a></li>
         {% endif %}
 
         

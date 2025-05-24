@@ -3,7 +3,7 @@ from app.repositories.payments import PaymentRepo
 
 def test_get_days_left(session):
     result = PaymentRepo(session).get_days_left(
-        available_amount=50, total_per_day=10
+        available_amount=50, rate_per_day=10
     )
     assert result == 5
 

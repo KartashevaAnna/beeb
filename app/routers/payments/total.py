@@ -8,6 +8,7 @@ from app.repositories.payments import PaymentRepo
 from app.routers.auth_router import authenticate
 from app.settings import SETTINGS, TEMPLATES
 from app.utils.dependencies import payments_repo
+from app.utils.tools.helpers import get_current_year_and_month
 
 payments_dashboard_router = fastapi.APIRouter()
 
@@ -20,11 +21,15 @@ def dashboard_for_all_years(
     user_id: int | None = None,
 ):
     try:
+        current_year, current_month = get_current_year_and_month()
+
         payments = repo.get_all_payments(user_id)
         dashboard = repo.get_dashboard(
             request=request,
             payments=payments,
             user_id=user_id,
+            year=current_year,
+            month=current_month,
         )
         dashboard["all_years"] = repo.get_all_years(user_id)
         dashboard["header_text"] = "Расходы за всё время"
@@ -84,7 +89,7 @@ def read_all_payments_per_year(
         dashboard = repo.get_dashboard(
             request=request, payments=payments, year=year, user_id=user_id
         )
-        dashboard["header_text"] = f"Общие расходы за {year} год"
+        dashboard["header_text"] = f"Расходы за {year} год"
 
         return TEMPLATES.TemplateResponse(
             request,

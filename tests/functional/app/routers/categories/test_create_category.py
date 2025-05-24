@@ -7,11 +7,7 @@ from sqlalchemy import select
 from app.models import Category
 from app.repositories.categories import CategoryRepo
 from app.settings import SETTINGS
-from tests.conftest import (
-    clean_db,
-    delete_category,
-    raise_always,
-)
+from tests.conftest import clean_db, delete_category, raise_always
 
 
 def test_template(client):
