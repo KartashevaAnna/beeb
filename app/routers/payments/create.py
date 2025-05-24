@@ -11,10 +11,7 @@ from app.repositories.payments import PaymentRepo
 from app.routers.auth_router import authenticate
 from app.schemas.payments import PaymentCreate
 from app.settings import SETTINGS, TEMPLATES
-from app.utils.dependencies import (
-    categories_repo,
-    payments_repo,
-)
+from app.utils.dependencies import categories_repo, payments_repo
 
 create_payments_router = fastapi.APIRouter()
 
@@ -58,7 +55,7 @@ def create_payment(
             created_at=datetime.now(),
             is_spending=is_spending,
         )
-        repo.create(new_payment)
+        repo.create(payment=new_payment, user_id=user_id)
         return RedirectResponse(
             SETTINGS.urls.create_payment,
             status_code=status.HTTP_303_SEE_OTHER,

@@ -5,24 +5,20 @@ import random
 from typing import Annotated
 
 import fastapi
-from fastapi import Depends, Request
+from fastapi import Depends
 from pyexcel_odsr import get_data
 from sqlalchemy.orm import Session
 
 from app.models import Payment
 from app.repositories.categories import CategoryRepo
 from app.repositories.payments import PaymentRepo
-from app.routers.auth_router import authenticate
 from app.schemas.categories import CategoryCreate
 from app.settings import PAYMENTS_TO_UPLOAD_DIR
 from app.utils.constants import CATEGORIES, PRODUCTS
 from app.utils.dependencies import categories_repo, get_session, payments_repo
 from app.utils.tools.category_helpers import add_category_to_db
-from app.utils.tools.helpers import (
-    add_payments_to_db,
-    convert_to_copecks,
-    get_date_for_database,
-)
+from app.utils.tools.helpers import (add_payments_to_db, convert_to_copecks,
+                                     get_date_for_database)
 
 dev_router = fastapi.APIRouter(tags=["Dev"], include_in_schema=True)
 

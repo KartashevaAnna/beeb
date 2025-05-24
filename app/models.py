@@ -1,14 +1,7 @@
 import datetime
 
-from sqlalchemy import (
-    DateTime,
-    ForeignKey,
-    Integer,
-    LargeBinary,
-    MetaData,
-    String,
-    func,
-)
+from sqlalchemy import (DateTime, ForeignKey, Integer, LargeBinary, MetaData,
+                        String, func)
 from sqlalchemy.orm import DeclarativeBase, Mapped, mapped_column, relationship
 
 

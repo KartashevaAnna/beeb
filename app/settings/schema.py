@@ -1,11 +1,8 @@
 from typing import Tuple, Type
 
 from pydantic import BaseModel, ConfigDict, computed_field
-from pydantic_settings import (
-    BaseSettings,
-    PydanticBaseSettingsSource,
-    SettingsConfigDict,
-)
+from pydantic_settings import (BaseSettings, PydanticBaseSettingsSource,
+                               SettingsConfigDict)
 from sqlalchemy import URL
 
 from app.utils.tools.config_loader import load_custom_config_source

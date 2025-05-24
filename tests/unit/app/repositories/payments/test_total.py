@@ -134,7 +134,7 @@ def test_get_payments_per_year_with_category_one_in_previous_year(
     assert payments[0].created_at.year == year
 
 
-def test_get_total_per_day(session, category, fill_db, user):
+def test_get_rate_per_day(session, category, fill_db, user):
     category_id = category.id
     created_at = datetime.datetime.now() - datetime.timedelta(weeks=2)
     add_payment(
@@ -151,16 +151,16 @@ def test_get_total_per_day(session, category, fill_db, user):
     statement = select(func.sum(Payment.price))
     results = session.execute(statement)
     total = results.fetchall()[0][0]
-    computed = PaymentRepo(session).get_total_per_day(
-        total=total, total_days=total_days
+    computed = PaymentRepo(session).get_rate_per_day(
+        expenses=total, elapsed_days=total_days
     )
     assert round(round(computed, 2) * total_days) == total
 
 
-def test_get_total_per_day_zerodivision_error(session):
+def test_get_rate_per_day_zerodivision_error(session):
     total = 500
     total_days = 0
-    computed = PaymentRepo(session).get_total_per_day(
-        total=total, total_days=total_days
+    computed = PaymentRepo(session).get_rate_per_day(
+        expenses=total, elapsed_days=total_days
     )
     assert computed == total

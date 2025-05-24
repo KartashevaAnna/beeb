@@ -2,11 +2,8 @@ from copy import copy
 
 import pytest
 
-from app.exceptions import (
-    NotIntegerError,
-    NotPositiveValueError,
-    ValueTooLargeError,
-)
+from app.exceptions import (NotIntegerError, NotPositiveValueError,
+                            ValueTooLargeError)
 from app.schemas.payments import PaymentCreate
 
 

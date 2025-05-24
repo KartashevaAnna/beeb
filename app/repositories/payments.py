@@ -5,22 +5,20 @@ from fastapi import Request
 from sqlalchemy import delete, extract, func, select, update
 from sqlalchemy.orm import Session
 
-from app.exceptions import NotOwnerError, NothingToComputeError
+from app.exceptions import (NothingToComputeError, NotOwnerError,
+                            SpendingOverBalanceError)
 from app.models import Category, Payment
 from app.schemas.dates import DateFilter
-from app.schemas.payments import (
-    PaymentCreate,
-    PaymentShow,
-    PaymentShowOne,
-    PaymentUpdate,
-)
+from app.schemas.payments import (PaymentCreate, PaymentShow, PaymentShowOne,
+                                  PaymentUpdate)
 from app.utils.constants import INT_TO_MONTHES, MONTHES
-from app.utils.tools.category_helpers import (
-    get_payments_shares,
-    get_payments_sums_per_category,
-    sort_payment_shares,
-)
-from app.utils.tools.helpers import get_monthly_payments, get_readable_price
+from app.utils.tools.category_helpers import (get_payments_shares,
+                                              get_payments_sums_per_category,
+                                              sort_payment_shares)
+from app.utils.tools.helpers import (check_current_year_and_month,
+                                     get_current_year_and_month,
+                                     get_date_from_datetime_without_year,
+                                     get_monthly_payments, get_readable_price)
 
 
 class PaymentRepo:
@@ -48,11 +46,11 @@ class PaymentRepo:
         return amount if amount is not None else 0
 
     def get_days_left(
-        self, available_amount: int, total_per_day: int | None = None
+        self, available_amount: int, rate_per_day: int | None = None
     ):
-        if not total_per_day:
+        if not rate_per_day:
             return None
-        return int(available_amount / total_per_day)
+        return int(available_amount / rate_per_day)
 
     def get_payments_per_year(self, year: int, user_id: int) -> list[Payment]:
         statement = (
@@ -157,11 +155,11 @@ class PaymentRepo:
             delta = max_date - min_date
             return delta.days + 1
 
-    def get_total_per_day(self, total: int, total_days: int) -> int:
+    def get_rate_per_day(self, expenses: int, elapsed_days: int) -> int:
         try:
-            return total / total_days
+            return expenses / elapsed_days
         except ZeroDivisionError:
-            return total
+            return expenses
 
     def get_monthly_payments(
         self, payments: list[Payment], year: int | None = None
@@ -202,7 +200,15 @@ class PaymentRepo:
             else None
         )
 
-    def create(self, payment: PaymentCreate) -> Payment:
+    def create(self, payment: PaymentCreate, user_id: int) -> Payment:
+        if payment.is_spending:
+            year, month = get_current_year_and_month()
+            balance = self.get_user_balance(
+                user_id=user_id, year=year, month=month
+            )["balance"]
+            balance -= int(payment.price)
+            if balance <= 0:
+                raise SpendingOverBalanceError(int(payment.price) // 100)
         new_payment = Payment(**payment.model_dump())
         self.session.add(new_payment)
         self.session.commit()
@@ -243,13 +249,20 @@ class PaymentRepo:
         all_payments.sort(reverse=True)
         return all_payments
 
-    def get_balance(self, payments: list[Payment]) -> int:
-        all_spendings = self.get_spendings(payments)
+    def get_balance(self, payments: list[Payment]) -> dict:
         all_spendings = self.get_spendings(payments)
         total_spending = self.get_total_amounts(all_spendings)
         all_incomes = self.get_all_incomes(payments)
         total_income = self.get_total_amounts(all_incomes)
-        return total_income - total_spending
+        return {
+            "balance": total_income - total_spending,
+            "income": total_income,
+            "spending": total_spending,
+        }
+
+    def get_expenses(self, payments: list[Payment]) -> int:
+        all_spendings = self.get_spendings(payments)
+        return self.get_total_amounts(all_spendings)
 
     def get_dashboard(
         self,
@@ -261,8 +274,45 @@ class PaymentRepo:
     ):
         all_spendings = self.get_spendings(payments)
         total_spending = self.get_total_amounts(all_spendings)
-        available_amount = self.get_balance(all_spendings)
+        balance_income_spending = self.get_balance(all_spendings)
+        available_amount = balance_income_spending["balance"]
         available_amount_frontend = get_readable_price(available_amount)
+        total_days = self.calculate_total_days(user_id, year, month)
+        rate_per_day = self.get_rate_per_day(
+            expenses=total_spending, elapsed_days=total_days
+        )
+        try:
+            remaining_days = int(available_amount / rate_per_day)
+            left_until = get_date_from_datetime_without_year(
+                self.get_next_date(remaining_days)
+            )
+        except ZeroDivisionError:
+            raise NothingToComputeError
+        spending = get_readable_price(total_spending)
+        month = INT_TO_MONTHES.get(month)
+        return {
+            "request": request,
+            "current_month": check_current_year_and_month(
+                year=year, month=month
+            ),
+            "available_amount_frontend": available_amount_frontend,
+            "days_left": left_until,
+            "total_income": get_readable_price(
+                balance_income_spending["income"]
+            ),
+            "total_spending": get_readable_price(total_spending),
+            "all_spendings": all_spendings,
+            "total_per_month": self.get_monthly_payments(
+                payments=all_spendings, year=year
+            ),
+            "rate_per_day": get_readable_price(rate_per_day),
+            "total_shares": list(
+                self.get_total_monthly_payments_shares(all_spendings).items()
+            ),
+            "header_text": f"За {month} {year} года: {spending}",
+        }
+
+    def calculate_total_days(self, user_id, year, month):
         max_date = self.get_max_date(
             user_id=user_id, limit=DateFilter(year=year, month=month)
         )
@@ -274,35 +324,39 @@ class PaymentRepo:
             ),
         )
         total_days = self.get_total_days(max_date, min_date)
-        total_per_day = self.get_total_per_day(
-            total=total_spending, total_days=total_days
-        )
-        try:
-            days_left = int(available_amount / total_per_day)
-        except ZeroDivisionError:
-            raise NothingToComputeError
-        spending = get_readable_price(total_spending)
-        month = INT_TO_MONTHES.get(month)
-        return {
-            "request": request,
-            "available_amount_frontend": available_amount_frontend,
-            "days_left": days_left,
-            "all_spendings": all_spendings,
-            "total_per_month": self.get_monthly_payments(
-                payments=all_spendings, year=year
-            ),
-            "total_per_day": get_readable_price(total_per_day)
-            if total_per_day
-            else None,
-            "total_shares": list(
-                self.get_total_monthly_payments_shares(all_spendings).items()
-            ),
-            "header_text": f"За {month} {year} года: {spending}",
-        }
+        return total_days
 
-    def get_current_user_balance(
+    def get_payments_by_requested_month(
+        self, year: int, month: int, user_id: int
+    ) -> list[Payment]:
+        max_date = datetime.datetime(year, month, 1)
+        statement = select(Payment).where(
+            (Payment.user_id == user_id) & (Payment.created_at < max_date)
+        )
+        res = self.session.execute(statement)
+        return res.scalars().all()
+
+    def get_user_balance(
         self,
         user_id: int,
+        year: int,
+        month: int,
     ):
-        payments = self.get_all_payments(user_id)
+        payments = self.get_payments_by_requested_month(
+            year=year, month=month + 1, user_id=user_id
+        )
         return self.get_balance(payments)
+
+    def get_user_expenses(
+        self,
+        user_id: int,
+        year: int,
+        month: int,
+    ):
+        payments = self.get_payments_by_requested_month(
+            year=year, month=month + 1, user_id=user_id
+        )
+        return self.get_expenses(payments)
+
+    def get_next_date(self, remaining_days: int) -> datetime.datetime:
+        return datetime.datetime.now() + datetime.timedelta(days=remaining_days)

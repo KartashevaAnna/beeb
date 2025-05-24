@@ -21,7 +21,7 @@ def test_get_balance(
     )
     expected_result = salary.price - spendings
     payments = [salary, current_payment, month_ago_payment, year_ago_payment]
-    obtained_result = PaymentRepo(session).get_balance(payments)
+    obtained_result = PaymentRepo(session).get_balance(payments)["balance"]
     assert expected_result == obtained_result
     clean_db(session)
 
@@ -34,7 +34,7 @@ def test_get_balance_no_salary(
     )
     expected_result = -spendings
     payments = [current_payment, month_ago_payment, year_ago_payment]
-    obtained_result = PaymentRepo(session).get_balance(payments)
+    obtained_result = PaymentRepo(session).get_balance(payments)["balance"]
     assert expected_result == obtained_result
     clean_db(session)
 
@@ -53,7 +53,7 @@ def test_get_balance_only_salary(session, category):
 
     expected_result = salary.price
     payments = [salary]
-    obtained_result = PaymentRepo(session).get_balance(payments)
+    obtained_result = PaymentRepo(session).get_balance(payments)["balance"]
     assert expected_result == obtained_result
     clean_db(session)
 
@@ -100,6 +100,6 @@ def test_get_balance_two_salaries(
         month_ago_payment,
         year_ago_payment,
     ]
-    obtained_result = PaymentRepo(session).get_balance(payments)
+    obtained_result = PaymentRepo(session).get_balance(payments)["balance"]
     assert expected_result == obtained_result
     clean_db(session)

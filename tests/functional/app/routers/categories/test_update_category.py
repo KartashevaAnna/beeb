@@ -5,11 +5,7 @@ from fastapi import status
 from app.models import Category
 from app.repositories.categories import CategoryRepo
 from app.settings import SETTINGS
-from tests.conftest import (
-    clean_db,
-    get_categories,
-    raise_always,
-)
+from tests.conftest import clean_db, get_categories, raise_always
 
 NAME = "exotic_category"
 

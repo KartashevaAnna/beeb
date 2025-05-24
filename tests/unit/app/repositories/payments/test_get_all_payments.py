@@ -3,11 +3,8 @@ import datetime
 from app.models import Payment
 from app.repositories.payments import PaymentRepo
 from app.schemas.payments import PaymentCreate
-from tests.conftest import (
-    TEST_USER_ID,
-    check_that_payments_belong_to_test_user,
-    clean_db,
-)
+from tests.conftest import (TEST_USER_ID,
+                            check_that_payments_belong_to_test_user, clean_db)
 
 
 def test_payment_repo_get_all_payments_for_the_user(

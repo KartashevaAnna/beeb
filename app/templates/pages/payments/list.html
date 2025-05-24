@@ -1,4 +1,5 @@
 {% extends "base.html" %}
+{% include 'navbar_horizontal.html' %}
 
 {% block bodycontent %}
 
@@ -7,34 +8,17 @@
     <div class="container-fluid">
         <div class="row my-2">
 
-          
               <div class="col-12">
                 <a href="{{ create }}" 
                 class="btn beeb-submit-button-large">
-                    добавить
+                    Добавить
                 </a>
               </div>
 
 
 
 
-<div class="container-fluid" id="list_payments">
-    <div class="row justify-content-lg-center my-1">
-        <div class="col-lg-11">
-
-        
-        
-        </div>
-
-
-        <div class="col-lg-1">
-            
-        </div>
-    </div>
-</div>
-
-
-
+<div class="container-fluid my-2">
 <table class="table table-hover" style="text-align: center; vertical-align: middle;">
     <tr>
         <th>имя</th>
@@ -116,7 +100,7 @@
 {% endfor %}
 </table>
 
-
+</div>
 
 
 
