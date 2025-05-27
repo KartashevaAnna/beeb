@@ -14,7 +14,7 @@ def test_template(client):
     """Case: endpoint returns form to create a category."""
     response = client.get(url=SETTINGS.urls.create_category)
     assert response.status_code == status.HTTP_200_OK
-    assert "название" in response.text
+    assert "имя" in response.text
 
 
 def test_template_no_cookie(client, fill_db):

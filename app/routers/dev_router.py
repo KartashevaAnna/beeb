@@ -1,6 +1,8 @@
 import copy
+import datetime
 import locale
 import os
+import csv
 import random
 from typing import Annotated
 
@@ -17,8 +19,12 @@ from app.settings import PAYMENTS_TO_UPLOAD_DIR
 from app.utils.constants import CATEGORIES, PRODUCTS
 from app.utils.dependencies import categories_repo, get_session, payments_repo
 from app.utils.tools.category_helpers import add_category_to_db
-from app.utils.tools.helpers import (add_payments_to_db, convert_to_copecks,
-                                     get_date_for_database)
+from app.utils.tools.helpers import (
+    add_payments_to_db,
+    convert_to_copecks,
+    get_date_for_database,
+    get_number_for_db,
+)
 
 dev_router = fastapi.APIRouter(tags=["Dev"], include_in_schema=True)
 
@@ -100,6 +106,46 @@ def upload_payments_from_libreoffice_calc_file(
                 created_at=date,
             )
             session.add(payment)
+    session.commit()
+
+    return repo.read_all(user_id)
+
+
+@dev_router.post("/upload-csv")
+def upload_payments_from_csv(
+    session: Annotated[Session, Depends(get_session)],
+    category_repo: Annotated[CategoryRepo, Depends(categories_repo)],
+    repo: Annotated[PaymentRepo, Depends(payments_repo)],
+    user_id: int | None = 1,
+):
+    filenames = os.listdir(PAYMENTS_TO_UPLOAD_DIR)
+    for file in filenames:
+        with open(f"{PAYMENTS_TO_UPLOAD_DIR}/{file}", newline="") as f:
+            reader = csv.reader(f)
+            filename = file[:-4]
+            date = get_date_for_database(filename)
+            for row in reader:
+                category_name = row[1].lower()
+                if category_name == "еда":
+                    category_name = "продукты"
+                if len(category_name) != 0:
+                    category = CategoryRepo(session).read_name(
+                        user_id=user_id, category_name=category_name
+                    ) or category_repo.create(
+                        CategoryCreate(
+                            user_id=user_id, name=category_name, is_active=True
+                        ),
+                    )
+                    name = row[0]
+                    price = get_number_for_db(row[2].replace(",", ""))
+                    payment = Payment(
+                        user_id=user_id,
+                        name=name,
+                        price=price,
+                        category_id=category.id,
+                        created_at=date,
+                    )
+                    session.add(payment)
     session.commit()
 
     return repo.read_all(user_id)

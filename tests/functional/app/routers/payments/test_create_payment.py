@@ -5,8 +5,12 @@ from unittest.mock import patch
 from fastapi import status
 from sqlalchemy import func, select
 
-from app.exceptions import (NotIntegerError, NotPositiveValueError,
-                            SpendingOverBalanceError, ValueTooLargeError)
+from app.exceptions import (
+    NotIntegerError,
+    NotPositiveValueError,
+    SpendingOverBalanceError,
+    ValueTooLargeError,
+)
 from app.models import Payment
 from app.repositories.payments import PaymentRepo
 from app.settings import SETTINGS
@@ -22,7 +26,7 @@ def test_template(client):
     """Case: endpoint returns form to create an payment."""
     response = client.get(url=SETTINGS.urls.create_payment)
     assert response.status_code == 200
-    assert "название" in response.text
+    assert "имя" in response.text
     assert "сумма" in response.text
     assert "категория" in response.text
 

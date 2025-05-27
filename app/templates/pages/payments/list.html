@@ -3,8 +3,6 @@
 
 {% block bodycontent %}
 
-
-
     <div class="container-fluid">
         <div class="row my-2">
 
@@ -25,7 +23,7 @@
         <th>сумма</th>
         <th>категория</th>
         <th>дата</th>
-        <th>расход</th>
+        <th>тип</th>
         <th> </th>
         <th> </th>
       </tr>
@@ -84,11 +82,11 @@
     <td>{{ payment.date }} </td>
     <td>
         {% if not payment.is_spending  %}
-        <input class=form-check-input name="is_spending" id="is_spending" type="checkbox"
-            class="beeb-input" disabled>
+        <h5><span class="badge" style="color: var(--bs-emphasis-color); background-color: var(--bs-secondary-bg);">доход</span></h5> 
+
         {% else %}
-        <input class=form-check-input name="is_spending" id="is_spending" type="checkbox" checked
-        class="beeb-input" disabled>
+        <h5><span class="badge" style="color: var(--bs-emphasis-color); background-color: var(--bs-tertiary-color);">расход</span></h5> 
+
         {% endif %}
     </td>
     <td><a href="{{ update }}/{{payment.id}}" ><i class="material-icons">✏️</i></a></td>

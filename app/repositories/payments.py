@@ -5,20 +5,32 @@ from fastapi import Request
 from sqlalchemy import delete, extract, func, select, update
 from sqlalchemy.orm import Session
 
-from app.exceptions import (NothingToComputeError, NotOwnerError,
-                            SpendingOverBalanceError)
+from app.exceptions import (
+    NothingToComputeError,
+    NotOwnerError,
+    SpendingOverBalanceError,
+)
 from app.models import Category, Payment
 from app.schemas.dates import DateFilter
-from app.schemas.payments import (PaymentCreate, PaymentShow, PaymentShowOne,
-                                  PaymentUpdate)
+from app.schemas.payments import (
+    PaymentCreate,
+    PaymentShow,
+    PaymentShowOne,
+    PaymentUpdate,
+)
 from app.utils.constants import INT_TO_MONTHES, MONTHES
-from app.utils.tools.category_helpers import (get_payments_shares,
-                                              get_payments_sums_per_category,
-                                              sort_payment_shares)
-from app.utils.tools.helpers import (check_current_year_and_month,
-                                     get_current_year_and_month,
-                                     get_date_from_datetime_without_year,
-                                     get_monthly_payments, get_readable_price)
+from app.utils.tools.category_helpers import (
+    get_payments_shares,
+    get_payments_sums_per_category,
+    sort_payment_shares,
+)
+from app.utils.tools.helpers import (
+    check_current_year_and_month,
+    get_current_year_and_month,
+    get_date_from_datetime_without_year,
+    get_monthly_payments,
+    get_readable_price,
+)
 
 
 class PaymentRepo:
@@ -288,8 +300,8 @@ class PaymentRepo:
             )
         except ZeroDivisionError:
             raise NothingToComputeError
-        spending = get_readable_price(total_spending)
         month = INT_TO_MONTHES.get(month)
+        capitalized_month = month.title() if month is not None else None
         return {
             "request": request,
             "current_month": check_current_year_and_month(
@@ -309,7 +321,7 @@ class PaymentRepo:
             "total_shares": list(
                 self.get_total_monthly_payments_shares(all_spendings).items()
             ),
-            "header_text": f"За {month} {year} года: {spending}",
+            "header_text": f"{capitalized_month} {year} года",
         }
 
     def calculate_total_days(self, user_id, year, month):
