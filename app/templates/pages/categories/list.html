@@ -16,32 +16,39 @@
     </div>
 </div>
 
-<div class="container-fluid my-2">
-    <table class="table table-hover" style="text-align: center; vertical-align: middle;">
-        <tr>
-            <th>имя</th>
-            <th>статус</th>
-            <th> </th>
-        </tr>
-        {% for category in categories %}
-        <tr>
-            <td>{{ category.name }}</td>
-            {% if category.is_active == true %}
-                <td>
-                <h4><span class="badge" style="
-            color: var(--bs-emphasis-color); background-color: #59B8A0;">активна</span></h4>
-                </td>
-            {% else %}
-                <td>
-                <h4><span class="badge" style="
-                    color: var(--bs-emphasis-color); background-color: var(--bs-secondary-text-emphasis);">устарела</span></h4>
-                </td>
-            {% endif %}
-            <td><a href="{{ update }}/{{category.id}}"><i class="material-icons">✏️</i></a></td>
-        </tr>
-        {% endfor %}
-    </table>
-</div>
+<div class="container-fluid my-4">
+    <div class="row justify-content-center">
+    <div class="col-6 align-self-center" >
+
+    <div class="card rounded-0">
+          <div class="card-body">
+            <div class="row justify-content-center my-4">
+                <div class="col-9 align-self-center" >
+                    <table class="table table-hover" style="text-align: center; vertical-align: middle;">
+                        <tr>
+                            <th style="text-align: left; vertical-align: middle; padding-left:12%;">имя</th>
+                            <th>состояние</th>
+                            <th> </th>
+                        </tr>
+                        {% for category in categories %}
+                        <tr>
+                            <td style="text-align: left; vertical-align: middle; padding-left:12%;">{{ category.name }}</td>
+                            {% if category.is_active == true %}
+                                <td>
+                                <h4><span class="badge" style="
+                            color: var(--bs-emphasis-color); background-color: #59B8A0;">вкл</span></h4>
+                                </td>
+                            {% else %}
+                                <td>
+                                <h4><span class="badge" style="
+                                    color: var(--bs-emphasis-color); background-color: var(--bs-tertiary-color);">выкл</span></h4>
+                                </td>
+                            {% endif %}
+                            <td><a href="{{ update }}/{{category.id}}"><i class="material-icons">✏️</i></a></td>
+                        </tr>
+                        {% endfor %}
+                    </table>
+                </div>
 
 {% endblock %}
 
