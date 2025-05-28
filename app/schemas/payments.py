@@ -20,6 +20,7 @@ from app.utils.tools.helpers import (
     get_number_for_db,
     get_pure_date_from_datetime,
     get_readable_amount,
+    get_readable_number,
     prevent_blank_strings,
     validate_positive_number_for_db,
 )
@@ -42,6 +43,16 @@ class PaymentShow(PaymentBase):
     amount: Annotated[int, Field()]
     created_at: Annotated[datetime.datetime, Field(exclude=True)]
     category: Annotated[str, Field()]
+
+    @computed_field
+    @property
+    def readable_grams(cls) -> str:
+        return get_readable_number(cls.grams)
+
+    @computed_field
+    @property
+    def readable_quantity(cls) -> str:
+        return get_readable_number(cls.quantity)
 
     @computed_field
     @property

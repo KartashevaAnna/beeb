@@ -44,8 +44,8 @@
 <tr>
     <td scope="row">{{ payment.name }}</td>
     <td>{{ payment.amount_in_rub }}</td>
-    <td>{{ payment.quantity if payment.quantity is not none else "—"}}</td>
-    <td>{{ payment.grams if payment.grams is not none else "—"}}</td>
+    <td>{{ payment.readable_quantity if payment.quantity is not none else "—"}}</td>
+    <td>{{ payment.readable_grams if payment.grams is not none else "—"}}</td>
     {% if payment.category == 'продукты' %}
         <td>
             <h5><span class="badge" style="

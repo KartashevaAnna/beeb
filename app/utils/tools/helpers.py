@@ -35,10 +35,17 @@ def convert_to_rub(amount: int) -> int:
     return amount // 100
 
 
+def get_readable_number(amount: int) -> str:
+    """Formats amount as per Russian locale"""
+    return locale.format_string("%.0f", amount, grouping=True)
+
+
 def get_readable_amount(amount: int) -> str:
     """Formats amount as per Russian locale and appends currency symbol."""
     return (
-        locale.format_string("%.0f", (convert_to_rub(amount)), grouping=True)
+        locale.format_string(
+            "%.0f", (convert_to_rub(amount)), grouping=True, monetary=True
+        )
         + " "
         + locale.localeconv()["currency_symbol"]
     )
