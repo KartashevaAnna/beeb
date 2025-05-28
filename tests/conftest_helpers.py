@@ -26,12 +26,12 @@ def check_created_payment(
     if payment_create.get("grams"):
         assert (
             response.headers.get("location")
-            == SETTINGS.templates.create_payment_food
+            == SETTINGS.urls.create_payment_food
         )
     else:
         assert (
             response.headers.get("location")
-            == SETTINGS.templates.create_payment_non_food
+            == SETTINGS.urls.create_payment_non_food
         )
     assert payment.name == payment_create["name"]
     assert payment.amount == convert_to_copecks(payment_create["amount"])

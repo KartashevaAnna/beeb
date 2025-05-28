@@ -5,16 +5,25 @@
 
     <div class="container-fluid">
         <div class="row my-2">
+            <div class="col-12">
+                <button 
+                    hx-get={{ create }} 
+                    hx-target="#modals-here" 
+                    hx-trigger="click" 
+                    hx-push-url="false"
+                    data-bs-toggle="modal"
+                    data-bs-target="#modals-here" 
+                    class="btn beeb-submit-button-large">Добавить</button>
+                </div>
+            </div>
 
-              <div class="col-12">
-                <a href="{{ create }}" 
-                class="btn beeb-submit-button-large">
-                    Добавить
-                </a>
-              </div>
 
-
-
+<div id="modals-here" class="modal modal-blur fade" style="display: none" tabindex="-1">
+    <div class="modal-dialog modal-lg modal-dialog-centered" role="document" >
+                <div class="modal-content"></div>
+            </div>
+    </div>
+</div>
 
 <div class="container-fluid my-2">
 <table class="table table-hover" style="text-align: center; vertical-align: middle;">

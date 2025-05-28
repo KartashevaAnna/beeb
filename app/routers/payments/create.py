@@ -96,11 +96,16 @@ def create_payment(
             quantity=quantity,
         )
         repo.create(payment=new_payment, user_id=user_id)
-
-        return RedirectResponse(
-            url,
-            status_code=status.HTTP_303_SEE_OTHER,
-        )
+        if grams:
+            return RedirectResponse(
+                SETTINGS.urls.create_payment_food,
+                status_code=status.HTTP_303_SEE_OTHER,
+            )
+        else:
+            return RedirectResponse(
+                SETTINGS.urls.create_payment_non_food,
+                status_code=status.HTTP_303_SEE_OTHER,
+            )
     except BeebError as exc:
         return TEMPLATES.TemplateResponse(
             request,
