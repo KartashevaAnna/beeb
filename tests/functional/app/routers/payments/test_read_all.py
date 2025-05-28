@@ -6,7 +6,7 @@ from sqlalchemy import select
 from app.models import Payment
 from app.repositories.payments import PaymentRepo
 from app.settings import SETTINGS
-from app.utils.tools.helpers import get_readable_price
+from app.utils.tools.helpers import get_readable_amount
 from tests.conftest import TEST_USER_ID, raise_always
 
 
@@ -18,7 +18,7 @@ def test_normal_function(client, fill_db, session):
     payment = all_payments[2]
     assert str(payment.id) in response.text
     assert payment.name in response.text
-    assert get_readable_price(payment.price) in response.text
+    assert get_readable_amount(payment.amount) in response.text
     assert payment.user_id == TEST_USER_ID
 
 

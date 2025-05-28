@@ -25,7 +25,7 @@ def read_all(
             SETTINGS.templates.read_payments,
             context={
                 "payments": payments,
-                "create": SETTINGS.urls.create_payment,
+                "create": SETTINGS.urls.select_food_non_food,
                 "update": SETTINGS.urls.update_payment_core,
                 "delete": SETTINGS.urls.delete_payment_core,
             },

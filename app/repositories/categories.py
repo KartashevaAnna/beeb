@@ -1,8 +1,11 @@
 from sqlalchemy import select, update
 from sqlalchemy.orm import Session
 
-from app.exceptions import (DuplicateNameCreateError, DuplicateNameEditError,
-                            NotOwnerError)
+from app.exceptions import (
+    DuplicateNameCreateError,
+    DuplicateNameEditError,
+    NotOwnerError,
+)
 from app.models import Category
 from app.schemas.categories import CategoryCreate, CategoryShowOne
 from app.utils.tools.helpers import sort_options

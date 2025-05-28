@@ -8,18 +8,19 @@ def test_get_balance(
 ):
     salary = Payment(
         name="зарплата",
-        price="20000",
+        amount="20000",
         user_id=TEST_USER_ID,
         category_id=category.id,
-        is_spending=False,
     )
     session.add(salary)
     session.flush()
     session.commit()
     spendings = (
-        current_payment.price + month_ago_payment.price + year_ago_payment.price
+        current_payment.amount
+        + month_ago_payment.amount
+        + year_ago_payment.amount
     )
-    expected_result = salary.price - spendings
+    expected_result = salary.amount - spendings
     payments = [salary, current_payment, month_ago_payment, year_ago_payment]
     obtained_result = PaymentRepo(session).get_balance(payments)["balance"]
     assert expected_result == obtained_result
@@ -30,7 +31,9 @@ def test_get_balance_no_salary(
     session, current_payment, month_ago_payment, year_ago_payment, category
 ):
     spendings = (
-        current_payment.price + month_ago_payment.price + year_ago_payment.price
+        current_payment.amount
+        + month_ago_payment.amount
+        + year_ago_payment.amount
     )
     expected_result = -spendings
     payments = [current_payment, month_ago_payment, year_ago_payment]
@@ -42,16 +45,15 @@ def test_get_balance_no_salary(
 def test_get_balance_only_salary(session, category):
     salary = Payment(
         name="зарплата",
-        price="20000",
+        amount="20000",
         user_id=TEST_USER_ID,
         category_id=category.id,
-        is_spending=False,
     )
     session.add(salary)
     session.flush()
     session.commit()
 
-    expected_result = salary.price
+    expected_result = salary.amount
     payments = [salary]
     obtained_result = PaymentRepo(session).get_balance(payments)["balance"]
     assert expected_result == obtained_result
@@ -67,10 +69,9 @@ def test_get_balance_two_salaries(
 ):
     salary = Payment(
         name="зарплата",
-        price="20000",
+        amount="20000",
         user_id=TEST_USER_ID,
         category_id=category.id,
-        is_spending=False,
     )
     session.add(salary)
     session.flush()
@@ -78,18 +79,19 @@ def test_get_balance_two_salaries(
 
     second_salary = Payment(
         name="зарплата",
-        price="5000",
+        amount="5000",
         user_id=TEST_USER_ID,
         category_id=category.id,
-        is_spending=False,
     )
     session.add(salary)
     session.flush()
     session.commit()
 
-    income = int(salary.price) + int(second_salary.price)
+    income = int(salary.amount) + int(second_salary.amount)
     spendings = (
-        current_payment.price + month_ago_payment.price + year_ago_payment.price
+        current_payment.amount
+        + month_ago_payment.amount
+        + year_ago_payment.amount
     )
     expected_result = income - spendings
 

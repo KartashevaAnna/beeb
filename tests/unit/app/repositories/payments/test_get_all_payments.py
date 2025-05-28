@@ -3,8 +3,11 @@ import datetime
 from app.models import Payment
 from app.repositories.payments import PaymentRepo
 from app.schemas.payments import PaymentCreate
-from tests.conftest import (TEST_USER_ID,
-                            check_that_payments_belong_to_test_user, clean_db)
+from tests.conftest import (
+    TEST_USER_ID,
+    check_that_payments_belong_to_test_user,
+    clean_db,
+)
 
 
 def test_payment_repo_get_all_payments_for_the_user(
@@ -18,9 +21,9 @@ def test_payment_repo_get_all_payments_for_the_user(
     dict_for_new_payment,
 ):
     dict_for_new_payment["user_id"] = 600
-    del dict_for_new_payment["price"]
+    del dict_for_new_payment["amount"]
     del dict_for_new_payment["date"]
-    dict_for_new_payment["price_in_rub"] = 400
+    dict_for_new_payment["amount_in_rub"] = 400
     dict_for_new_payment["created_at"] = datetime.datetime.now()
 
     payment = PaymentCreate(**dict_for_new_payment)

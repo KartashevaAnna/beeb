@@ -14,92 +14,106 @@ def beeb_exception_handler(request: Request, exc: HTTPException):
 class BeebError(Exception):
     def __init__(self, value: int):
         self.value = value
-        self.detail = ""
+        self.message = ""
         self.status_code = None
+        self.detail = f"Код ошибки: {self.status_code}. " + self.message
 
 
 class ValueTooLargeError(BeebError):
     def __init__(self, value: int):
         self.limit = 999999900
         self.value = value
-        self.detail = f"Сумма не может превышать 9999999. Вы ввели: {value}"
+        self.message = f"Сумма не может превышать 9999999. Вы ввели: {value}"
         self.status_code = status.HTTP_422_UNPROCESSABLE_ENTITY
+        self.detail = f"Код ошибки: {self.status_code}. " + self.message
 
 
 class NotPositiveValueError(BeebError):
     def __init__(self, value: int):
         self.value = value
-        self.detail = f"Сумма должна быть больше нуля. Вы ввели: {value}"
+        self.message = f"Сумма должна быть больше нуля. Вы ввели: {value}"
         self.status_code = status.HTTP_422_UNPROCESSABLE_ENTITY
+        self.detail = f"Код ошибки: {self.status_code}. " + self.message
 
 
 class NotIntegerError(BeebError):
     def __init__(self, value):
         self.value = value
-        self.detail = f"Сумма должна быть цифрой. Вы ввели: {value}"
+        self.message = f"Сумма должна быть цифрой. Вы ввели: {value}"
         self.status_code = status.HTTP_422_UNPROCESSABLE_ENTITY
+        self.detail = f"Код ошибки: {self.status_code}. " + self.message
 
 
 class DuplicateNameCreateError(BeebError):
     def __init__(self, value: str):
         self.value = value
-        self.detail = f"Запись {value} уже существует"
+        self.message = f"Запись {value} уже существует"
         self.status_code = status.HTTP_406_NOT_ACCEPTABLE
+        self.detail = f"Код ошибки: {self.status_code}. " + self.message
 
 
 class DuplicateNameEditError(BeebError):
     def __init__(self, value: str):
         self.value = value
-        self.detail = f"Запись {value} уже существует"
+        self.message = f"Запись {value} уже существует"
         self.status_code = status.HTTP_304_NOT_MODIFIED
+        self.detail = f"Код ошибки: {self.status_code}. " + self.message
 
 
 class UserNotFoundError(BeebError):
     def __init__(self, value: str):
-        self.detail = f"Пользователь с именем {value} не найден"
+        self.message = f"Пользователь с именем {value} не найден"
         self.status_code = status.HTTP_404_NOT_FOUND
+        self.detail = f"Код ошибки: {self.status_code}. " + self.message
 
 
 class WrongPasswordError(BeebError):
     def __init__(self, username: str, password: str):
         first_part_message = f"Пользователя с именем {username} "
         second_part_message = f"и паролем {password} не существует"
-        self.detail = first_part_message + second_part_message
+        self.message = first_part_message + second_part_message
         self.status_code = status.HTTP_401_UNAUTHORIZED
+        self.detail = f"Код ошибки: {self.status_code}. " + self.message
 
 
 class EmptyStringError(BeebError):
     def __init__(self):
-        self.detail = "Значение не может быть пустой строкой"
+        self.message = "Значение не может быть пустой строкой"
         self.status_code = status.HTTP_422_UNPROCESSABLE_ENTITY
+        self.detail = f"Код ошибки: {self.status_code}. " + self.message
 
 
 class ExpiredTokenError(BeebError):
     def __init__(self):
-        self.detail = "Срок действия токена истёк"
+        self.message = "Срок действия токена истёк"
         self.status_code = status.HTTP_401_UNAUTHORIZED
+        self.detail = f"Код ошибки: {self.status_code}. " + self.message
 
 
 class InvalidTokenError(BeebError):
     def __init__(self):
-        self.detail = "Токен не действителен"
+        self.message = "Токен не действителен"
         self.status_code = status.HTTP_401_UNAUTHORIZED
+        self.detail = f"Код ошибки: {self.status_code}. " + self.message
 
 
 class NotOwnerError(BeebError):
     def __init__(self, value):
-        self.detail = f"Не вы завели запись {value}"
+        self.message = f"Не вы завели запись {value}"
         self.status_code = status.HTTP_401_UNAUTHORIZED
+        self.detail = f"Код ошибки: {self.status_code}. " + self.message
 
 
 class NothingToComputeError(BeebError):
     def __init__(self):
-        self.detail = "Недостаточно данных для расчётов"
+        self.message = "Недостаточно данных для расчётов"
         self.status_code = status.HTTP_422_UNPROCESSABLE_ENTITY
+        self.detail = f"Код ошибки: {self.status_code}. " + self.message
 
 
 class SpendingOverBalanceError(BeebError):
     def __init__(self, value):
         self.value = value
-        self.detail = f"Расход {value} превышает сумму, которая есть на счету."
+        self.message = f"Расход {value} превышает сумму, которая есть на счету."
         self.status_code = status.HTTP_406_NOT_ACCEPTABLE
+        self.detail = f"Код ошибки: {self.status_code}. " + self.message

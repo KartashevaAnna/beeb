@@ -43,7 +43,6 @@ def dashboard_for_all_years(
             SETTINGS.templates.payments_dashboard_monthly,
             context={
                 "exception": exc.detail,
-                "status_code": exc.status_code,
             },
             status_code=exc.status_code,
         )
@@ -102,7 +101,6 @@ def read_all_payments_per_year(
             SETTINGS.templates.payments_dashboard_yearly,
             context={
                 "exception": exc.detail,
-                "status_code": exc.status_code,
             },
             status_code=exc.status_code,
         )
@@ -149,7 +147,6 @@ def read_all_payments_per_month(
             SETTINGS.templates.payments_dashboard_monthly,
             context={
                 "exception": exc.detail,
-                "status_code": exc.status_code,
             },
             status_code=exc.status_code,
         )

@@ -23,11 +23,19 @@ def check_created_payment(
     payment_create: dict, payment: Payment, response: Response
 ):
     assert response.status_code == 303
-    assert response.headers.get("location") == SETTINGS.urls.create_payment
+    if payment_create.get("grams"):
+        assert (
+            response.headers.get("location")
+            == SETTINGS.urls.create_payment_food
+        )
+    else:
+        assert (
+            response.headers.get("location")
+            == SETTINGS.urls.create_payment_non_food
+        )
     assert payment.name == payment_create["name"]
-    assert payment.price == convert_to_copecks(payment_create["price"])
+    assert payment.amount == convert_to_copecks(payment_create["amount"])
     assert payment.category_id == payment_create["category_id"]
-    assert payment.is_spending == payment_create["is_spending"]
 
 
 def check_updated_payment(
@@ -39,12 +47,11 @@ def check_updated_payment(
     assert response.headers.get("location") == SETTINGS.urls.payments
     assert updated_payment.id == payment_update["id"]
     assert updated_payment.name == payment_update["name"]
-    if isinstance(payment_update["price"], str):
-        payment_update["price"] = get_number_for_db(payment_update["price"])
+    if isinstance(payment_update["amount"], str):
+        payment_update["amount"] = get_number_for_db(payment_update["amount"])
         # get_number_for_db calls convert_to_copecks inside it
     else:
-        payment_update["price"] = convert_to_copecks(payment_update["price"])
-    assert updated_payment.price == payment_update["price"]
+        payment_update["amount"] = convert_to_copecks(payment_update["amount"])
+    assert updated_payment.amount == payment_update["amount"]
     assert updated_payment.payment_category.id == payment_update["category_id"]
-    assert updated_payment.is_spending == payment_update["is_spending"]
     assert updated_payment.user_id == payment_update["user_id"]

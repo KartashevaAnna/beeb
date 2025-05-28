@@ -53,7 +53,6 @@ def create_user_in_db(
             SETTINGS.templates.home_page,
             context={
                 "exception": exc.detail,
-                "status_code": exc.status_code,
             },
             status_code=exc.status_code,
             block_name=block_name,

@@ -4,7 +4,12 @@ import random
 import re
 from hashlib import sha256
 
-from app.exceptions import EmptyStringError
+from app.exceptions import (
+    EmptyStringError,
+    NotIntegerError,
+    NotPositiveValueError,
+    ValueTooLargeError,
+)
 from app.models import Payment
 from app.settings import SETTINGS
 from app.utils.constants import INT_TO_MONTHES, PRODUCTS
@@ -14,7 +19,7 @@ def add_payments_to_db(session, category_id: int, user_id: int) -> Payment:
     payment = Payment(
         user_id=user_id,
         name=random.choice(PRODUCTS),
-        price=random.randrange(100, 5000, 100),
+        amount=random.randrange(100, 5000, 100),
         category_id=category_id,
     )
     session.add(payment)
@@ -22,25 +27,32 @@ def add_payments_to_db(session, category_id: int, user_id: int) -> Payment:
     return payment
 
 
-def convert_to_copecks(price: int) -> int:
-    return price * 100
+def convert_to_copecks(amount: int) -> int:
+    return amount * 100
 
 
-def convert_to_rub(price: int) -> int:
-    return price // 100
+def convert_to_rub(amount: int) -> int:
+    return amount // 100
 
 
-def get_readable_price(price: int) -> str:
-    """Formats price as per Russian locale and appends currency symbol."""
+def get_readable_number(amount: int) -> str:
+    """Formats amount as per Russian locale"""
+    return locale.format_string("%.0f", amount, grouping=True)
+
+
+def get_readable_amount(amount: int) -> str:
+    """Formats amount as per Russian locale and appends currency symbol."""
     return (
-        locale.format_string("%.0f", (convert_to_rub(price)), grouping=True)
+        locale.format_string(
+            "%.0f", (convert_to_rub(amount)), grouping=True, monetary=True
+        )
         + " "
         + locale.localeconv()["currency_symbol"]
     )
 
 
 def get_number_for_db(frontend_input: str) -> int:
-    """Removes price format as per Russian locale, returns price in kopecks."""
+    """Removes amount format as per Russian locale, returns amount in kopecks."""
     currency_symbol = locale.localeconv()["currency_symbol"]
     removed_currency_symbol = frontend_input.replace(currency_symbol, "")
     return convert_to_copecks(locale.atoi(removed_currency_symbol))
@@ -50,10 +62,10 @@ def get_monthly_payments(all_payments: list[Payment]) -> dict[int, str]:
     monthly_payments = {}
     for payment in all_payments:
         if payment.created_at.strftime("%m") not in monthly_payments.keys():
-            monthly_payments[payment.created_at.strftime("%m")] = payment.price
+            monthly_payments[payment.created_at.strftime("%m")] = payment.amount
         else:
             monthly_payments[payment.created_at.strftime("%m")] = (
-                payment.price
+                payment.amount
                 + monthly_payments[payment.created_at.strftime("%m")]
             )
     return monthly_payments
@@ -149,3 +161,16 @@ def get_current_year_and_month() -> list:
 def check_current_year_and_month(year: int, month: int) -> list:
     current_year, current_month = get_current_year_and_month()
     return current_year == year and INT_TO_MONTHES[current_month] == month
+
+
+def validate_positive_number_for_db(value: int | None = None) -> int | None:
+    if value:
+        try:
+            value = int(value)
+        except ValueError:
+            raise NotIntegerError(value)
+        if value <= 0:
+            raise NotPositiveValueError(value)
+        if value > 9999999:
+            raise ValueTooLargeError(value)
+    return value

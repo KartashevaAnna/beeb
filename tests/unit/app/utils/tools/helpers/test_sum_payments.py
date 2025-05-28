@@ -14,21 +14,21 @@ def test_get_monthly_payments(session, category, user):
     first_payment = add_payment(
         user=user,
         session=session,
-        price=100,
+        amount=100,
         category_id=category.id,
         created_at=datetime.datetime.now(),
     )
     second_payment = add_payment(
         session=session,
         user=user,
-        price=400,
+        amount=400,
         category_id=category.id,
         created_at=datetime.datetime.now() - datetime.timedelta(weeks=-8),
     )
     third_payment = add_payment(
         user=user,
         session=session,
-        price=200,
+        amount=200,
         category_id=category.id,
         created_at=datetime.datetime.now() - datetime.timedelta(weeks=-8),
     )
@@ -39,9 +39,9 @@ def test_get_monthly_payments(session, category, user):
     monthly_breakdown = get_monthly_payments(all_payments)
     assert (
         monthly_breakdown[first_payment.created_at.strftime("%m")]
-        == first_payment.price
+        == first_payment.amount
     )
     assert (
         monthly_breakdown[second_payment.created_at.strftime("%m")]
-        == second_payment.price + third_payment.price
+        == second_payment.amount + third_payment.amount
     )

@@ -18,7 +18,7 @@ QUOTES = [
     "Without some goal and some effort to reach it, no man can live. When he has lost all hope, all object in life, man becomes a monster in his misery.",  # noqa
     "Go, speed the stars of Thought On to their shining goals; – The sower scatters broad his seed, The wheat thou strew’st be souls.",  # noqa
     "Make at least one definite move daily toward your goal.",
-    "Understand and accept that you will have to make sacrifices to achieve your goal. If you are willing to pay the price, however high, you may be surprised by what you get in exchange. Pay the price.",  # noqa
+    "Understand and accept that you will have to make sacrifices to achieve your goal. If you are willing to pay the amount, however high, you may be surprised by what you get in exchange. Pay the amount.",  # noqa
     "Shoot for the moon. Even if you miss, you'll land among the stars.",
     "If you aim at nothing, you will hit it every time.",
 ]

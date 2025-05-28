@@ -1,8 +1,7 @@
 import copy
-import datetime
+import csv
 import locale
 import os
-import csv
 import random
 from typing import Annotated
 
@@ -97,11 +96,11 @@ def upload_payments_from_libreoffice_calc_file(
                 ),
             )
             name = entry[0]
-            price = convert_to_copecks(locale.atoi(entry[2][:3]))
+            amount = convert_to_copecks(locale.atoi(entry[2][:3]))
             payment = Payment(
                 user_id=user_id,
                 name=name,
-                price=price,
+                amount=amount,
                 category_id=category.id,
                 created_at=date,
             )
@@ -137,11 +136,11 @@ def upload_payments_from_csv(
                         ),
                     )
                     name = row[0]
-                    price = get_number_for_db(row[2].replace(",", ""))
+                    amount = get_number_for_db(row[2].replace(",", ""))
                     payment = Payment(
                         user_id=user_id,
                         name=name,
-                        price=price,
+                        amount=amount,
                         category_id=category.id,
                         created_at=date,
                     )

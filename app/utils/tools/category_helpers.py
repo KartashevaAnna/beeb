@@ -2,7 +2,7 @@ import math
 
 from app.models import Category, Payment
 from app.schemas.categories import CategoryCreate
-from app.utils.tools.helpers import get_readable_price
+from app.utils.tools.helpers import get_readable_amount
 
 
 def get_payments_sums_per_category(
@@ -15,11 +15,11 @@ def get_payments_sums_per_category(
             not in payments_sums_per_category.keys()
         ):
             payments_sums_per_category[payment.payment_category.name] = (
-                payment.price
+                payment.amount
             )
         else:
             payments_sums_per_category[payment.payment_category.name] = (
-                payment.price
+                payment.amount
                 + payments_sums_per_category[payment.payment_category.name]
             )
     return payments_sums_per_category
@@ -29,7 +29,7 @@ def get_payments_shares(payments_per_categories: dict, total: int) -> dict:
     return {
         math.floor(payments_per_categories[key] * 100 / total): (
             key,
-            get_readable_price(payments_per_categories[key]),
+            get_readable_amount(payments_per_categories[key]),
         )
         for key in payments_per_categories
     }

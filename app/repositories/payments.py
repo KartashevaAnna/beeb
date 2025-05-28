@@ -29,7 +29,7 @@ from app.utils.tools.helpers import (
     get_current_year_and_month,
     get_date_from_datetime_without_year,
     get_monthly_payments,
-    get_readable_price,
+    get_readable_amount,
 )
 
 
@@ -107,10 +107,10 @@ class PaymentRepo:
         ]
 
     def get_total(self, payments: list[Payment]) -> int:
-        return self.sum_payments_prices(payments)
+        return self.sum_payment_amounts(payments)
 
-    def sum_payments_prices(self, payments):
-        all_values = [int(x.price) for x in payments]
+    def sum_payment_amounts(self, payments):
+        all_values = [int(x.amount) for x in payments]
         result = sum(all_values)
         return result if result else 0
 
@@ -180,7 +180,7 @@ class PaymentRepo:
         sorted_monthly_payments = dict(sorted(monthly_payments.items()))
         return {
             MONTHES[calendar.month_name[int(key)]]: (
-                get_readable_price(value),
+                get_readable_amount(value),
                 f"/dashboard/{year}/{key}" if year else None,
             )
             for key, value in sorted_monthly_payments.items()
@@ -213,14 +213,13 @@ class PaymentRepo:
         )
 
     def create(self, payment: PaymentCreate, user_id: int) -> Payment:
-        if payment.is_spending:
-            year, month = get_current_year_and_month()
-            balance = self.get_user_balance(
-                user_id=user_id, year=year, month=month
-            )["balance"]
-            balance -= int(payment.price)
-            if balance <= 0:
-                raise SpendingOverBalanceError(int(payment.price) // 100)
+        # year, month = get_current_year_and_month()
+        # balance = self.get_user_balance(
+        #     user_id=user_id, year=year, month=month
+        # )["balance"]
+        # balance -= int(payment.amount)
+        # if balance <= 0:
+        #     raise SpendingOverBalanceError(int(payment.amount) // 100)
         new_payment = Payment(**payment.model_dump())
         self.session.add(new_payment)
         self.session.commit()
@@ -238,10 +237,9 @@ class PaymentRepo:
             .values(
                 user_id=to_update.user_id,
                 name=to_update.name,
-                price=to_update.price_in_kopecks,
+                amount=to_update.amount_in_kopecks,
                 category_id=to_update.category_id,
                 created_at=to_update.date_to_update,
-                is_spending=to_update.is_spending,
             )
         )
         self.session.execute(stmt)
@@ -288,7 +286,7 @@ class PaymentRepo:
         total_spending = self.get_total_amounts(all_spendings)
         balance_income_spending = self.get_balance(all_spendings)
         available_amount = balance_income_spending["balance"]
-        available_amount_frontend = get_readable_price(available_amount)
+        available_amount_frontend = get_readable_amount(available_amount)
         total_days = self.calculate_total_days(user_id, year, month)
         rate_per_day = self.get_rate_per_day(
             expenses=total_spending, elapsed_days=total_days
@@ -309,15 +307,15 @@ class PaymentRepo:
             ),
             "available_amount_frontend": available_amount_frontend,
             "days_left": left_until,
-            "total_income": get_readable_price(
+            "total_income": get_readable_amount(
                 balance_income_spending["income"]
             ),
-            "total_spending": get_readable_price(total_spending),
+            "total_spending": get_readable_amount(total_spending),
             "all_spendings": all_spendings,
             "total_per_month": self.get_monthly_payments(
                 payments=all_spendings, year=year
             ),
-            "rate_per_day": get_readable_price(rate_per_day),
+            "rate_per_day": get_readable_amount(rate_per_day),
             "total_shares": list(
                 self.get_total_monthly_payments_shares(all_spendings).items()
             ),

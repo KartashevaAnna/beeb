@@ -13,7 +13,7 @@ def test_payments_total(fill_db, session):
     Checks that the repo return total payments correctly.
     """
     all_payments = get_payments(session)
-    total = sum(payment.price for payment in all_payments)
+    total = sum(payment.amount for payment in all_payments)
     repo = PaymentRepo(session)
     assert repo.get_total(repo.get_all_payments(user_id=TEST_USER_ID)) == total
 
@@ -49,14 +49,14 @@ def test_payments_total_days_delta_two_days(session, category, fill_db, user):
         session=session,
         category_id=category_id,
         created_at=created_at_now,
-        price=40,
+        amount=40,
     )
     second_payment = add_payment(
         user=user,
         session=session,
         category_id=category_id,
         created_at=created_at_two_days_before,
-        price=40,
+        amount=40,
     )
     max_date = first_payment.created_at
     min_date = second_payment.created_at
@@ -98,7 +98,7 @@ def test_get_payments_per_year_one_in_previous_year(
         session=session,
         category_id=category_id,
         created_at=created_at,
-        price=40,
+        amount=40,
     )
     payments = PaymentRepo(session).get_payments_per_year(
         year, user_id=TEST_USER_ID
@@ -107,10 +107,10 @@ def test_get_payments_per_year_one_in_previous_year(
     assert payments[0].created_at.year == year
 
 
-def test_sum_payments_prices(session, fill_db):
+def test_sum_payments_amount(session, fill_db):
     payments = get_payments(session)
-    repo_sum = PaymentRepo(session).sum_payments_prices(payments)
-    checksum = sum(payment.price for payment in payments)
+    repo_sum = PaymentRepo(session).sum_payment_amounts(payments)
+    checksum = sum(payment.amount for payment in payments)
     assert repo_sum == checksum
 
 
@@ -125,7 +125,7 @@ def test_get_payments_per_year_with_category_one_in_previous_year(
         session=session,
         category_id=category_id,
         created_at=created_at,
-        price=40,
+        amount=40,
     )
     payments = PaymentRepo(session).get_payments_per_year_with_category(
         year, user_id=TEST_USER_ID
@@ -142,13 +142,13 @@ def test_get_rate_per_day(session, category, fill_db, user):
         session=session,
         category_id=category_id,
         created_at=created_at,
-        price=40,
+        amount=40,
     )
     max_date = session.scalar(select(func.max(Payment.created_at)))
     min_date = session.scalar(select(func.min(Payment.created_at)))
     total_days = max_date - min_date
     total_days = int(total_days.days)
-    statement = select(func.sum(Payment.price))
+    statement = select(func.sum(Payment.amount))
     results = session.execute(statement)
     total = results.fetchall()[0][0]
     computed = PaymentRepo(session).get_rate_per_day(

@@ -5,22 +5,33 @@
 
     <div class="container-fluid">
         <div class="row my-2">
+            <div class="col-12">
+                <button 
+                    hx-get={{ create }} 
+                    hx-target="#modals-here" 
+                    hx-trigger="click" 
+                    hx-push-url="false"
+                    data-bs-toggle="modal"
+                    data-bs-target="#modals-here" 
+                    class="btn beeb-submit-button-large">Добавить</button>
+                </div>
+            </div>
 
-              <div class="col-12">
-                <a href="{{ create }}" 
-                class="btn beeb-submit-button-large">
-                    Добавить
-                </a>
-              </div>
 
-
-
+<div id="modals-here" class="modal modal-blur fade" style="display: none" tabindex="-1">
+    <div class="modal-dialog modal-lg modal-dialog-centered" role="document" >
+                <div class="modal-content"></div>
+            </div>
+    </div>
+</div>
 
 <div class="container-fluid my-2">
 <table class="table table-hover" style="text-align: center; vertical-align: middle;">
     <tr>
         <th>имя</th>
         <th>сумма</th>
+        <th> штук</th>
+        <th> грамм</th>
         <th>категория</th>
         <th>дата</th>
         <th>тип</th>
@@ -32,7 +43,9 @@
 {% for payment in payments %}
 <tr>
     <td scope="row">{{ payment.name }}</td>
-    <td>{{ payment.price_in_rub }}</td>
+    <td>{{ payment.amount_in_rub }}</td>
+    <td>{{ payment.readable_quantity if payment.quantity is not none else "—"}}</td>
+    <td>{{ payment.readable_grams if payment.grams is not none else "—"}}</td>
     {% if payment.category == 'продукты' %}
         <td>
             <h5><span class="badge" style="
@@ -81,13 +94,7 @@
     
     <td>{{ payment.date }} </td>
     <td>
-        {% if not payment.is_spending  %}
-        <h5><span class="badge" style="color: var(--bs-emphasis-color); background-color: var(--bs-secondary-bg);">доход</span></h5> 
-
-        {% else %}
         <h5><span class="badge" style="color: var(--bs-emphasis-color); background-color: var(--bs-tertiary-color);">расход</span></h5> 
-
-        {% endif %}
     </td>
     <td><a href="{{ update }}/{{payment.id}}" ><i class="material-icons">✏️</i></a></td>
 

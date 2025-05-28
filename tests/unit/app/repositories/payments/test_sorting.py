@@ -18,7 +18,7 @@ def test_payments_default_sorting(client, fill_db, category, session, user):
     payment = Payment(
         user_id=TEST_USER_ID,
         name=random.choice(PRODUCTS),
-        price=random.randrange(100, 5000, 100),
+        amount=random.randrange(100, 5000, 100),
         category_id=category.id,
     )
     session.add(payment)

@@ -1,8 +1,11 @@
 from sqlalchemy import select
 from sqlalchemy.orm import Session
 
-from app.exceptions import (DuplicateNameCreateError, UserNotFoundError,
-                            WrongPasswordError)
+from app.exceptions import (
+    DuplicateNameCreateError,
+    UserNotFoundError,
+    WrongPasswordError,
+)
 from app.models import User
 from app.schemas.users import UserCreate
 from app.utils.tools.helpers import is_same_password
