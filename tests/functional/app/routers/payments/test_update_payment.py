@@ -12,7 +12,7 @@ from tests.conftest import clean_db, get_categories, raise_always
 from tests.conftest_helpers import check_updated_payment
 
 NAME = "potatoe"
-PRICE = 6500
+amount = 6500
 
 
 def test_template(client, payment):
@@ -22,7 +22,7 @@ def test_template(client, payment):
     assert response.status_code == status.HTTP_200_OK
     assert payment.name in response.text
     assert str(payment.id) in response.text
-    assert str(payment.price // 100) in response.text
+    assert str(payment.amount // 100) in response.text
     assert payment.payment_category.name in response.text
 
 
@@ -53,7 +53,7 @@ def test_template_wrong_token(client, payment, wrong_token):
     assert response.headers.get("location") == SETTINGS.urls.login
 
 
-def test_name_lowercase_price_int_is_spending_true(
+def test_name_lowercase_amount_int_is_spending_true(
     client,
     payment,
     session,
@@ -69,7 +69,7 @@ def test_name_lowercase_price_int_is_spending_true(
     check_updated_payment(updated_payment, payment_update, response)
 
 
-def test_name_lowercase_price_int_is_speding_false(
+def test_name_lowercase_amount_int_is_speding_false(
     client, payment, session, payment_update
 ):
     payment_update = copy(payment_update)
@@ -83,7 +83,7 @@ def test_name_lowercase_price_int_is_speding_false(
     check_updated_payment(updated_payment, payment_update, response)
 
 
-def test_title_price_int(client, payment, session, payment_update):
+def test_title_amount_int(client, payment, session, payment_update):
     payment_update = copy(payment_update)
     payment_update["name"] = NAME.title()
     response = client.post(
@@ -95,7 +95,7 @@ def test_title_price_int(client, payment, session, payment_update):
     check_updated_payment(updated_payment, payment_update, response)
 
 
-def test_name_upper_price_int(client, payment, session, payment_update):
+def test_name_upper_amount_int(client, payment, session, payment_update):
     payment_update = copy(payment_update)
     payment_update["name"] = NAME.upper()
     response = client.post(
@@ -107,11 +107,11 @@ def test_name_upper_price_int(client, payment, session, payment_update):
     check_updated_payment(updated_payment, payment_update, response)
 
 
-def test_name_lowercase_price_frontend(
+def test_name_lowercase_amount_frontend(
     client, payment, session, payment_update
 ):
     payment_update = copy(payment_update)
-    payment_update["price"] = "65₽"
+    payment_update["amount"] = "65₽"
     response = client.post(
         SETTINGS.urls.update_payment.format(payment_id=payment.id),
         data=payment_update,
@@ -121,9 +121,9 @@ def test_name_lowercase_price_frontend(
     check_updated_payment(updated_payment, payment_update, response)
 
 
-def test_name_lowercase_price_int_zero(client, payment, payment_update):
+def test_name_lowercase_amount_int_zero(client, payment, payment_update):
     payment_update = copy(payment_update)
-    payment_update["price"] = 0
+    payment_update["amount"] = 0
     response = client.post(
         SETTINGS.urls.update_payment.format(payment_id=payment.id),
         data=payment_update,
@@ -131,9 +131,9 @@ def test_name_lowercase_price_int_zero(client, payment, payment_update):
     assert "number must be positive" in response.text
 
 
-def test_name_lowercase_price_frontend_zero(client, payment, payment_update):
+def test_name_lowercase_amount_frontend_zero(client, payment, payment_update):
     payment_update = copy(payment_update)
-    payment_update["price"] = "00₽"
+    payment_update["amount"] = "00₽"
     response = client.post(
         SETTINGS.urls.update_payment.format(payment_id=payment.id),
         data=payment_update,
@@ -141,11 +141,11 @@ def test_name_lowercase_price_frontend_zero(client, payment, payment_update):
     assert "number must be positive" in response.text
 
 
-def test_name_lowercase_price_frontend_negative(
+def test_name_lowercase_amount_frontend_negative(
     client, payment, payment_update
 ):
     payment_update = copy(payment_update)
-    payment_update["price"] = "-56₽"
+    payment_update["amount"] = "-56₽"
     response = client.post(
         SETTINGS.urls.update_payment.format(payment_id=payment.id),
         data=payment_update,
@@ -153,9 +153,9 @@ def test_name_lowercase_price_frontend_negative(
     assert "number must be positive" in response.text
 
 
-def test_name_lowercase_price_int_negative(client, payment, payment_update):
+def test_name_lowercase_amount_int_negative(client, payment, payment_update):
     payment_update = copy(payment_update)
-    payment_update["price"] = "-56₽"
+    payment_update["amount"] = "-56₽"
     response = client.post(
         SETTINGS.urls.update_payment.format(payment_id=payment.id),
         data=payment_update,

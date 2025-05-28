@@ -1,16 +1,28 @@
 import datetime
 from typing import Annotated
 
-from pydantic import (BaseModel, Field, StringConstraints, computed_field,
-                      field_validator)
+from pydantic import (
+    BaseModel,
+    Field,
+    StringConstraints,
+    computed_field,
+    field_validator,
+)
 
-from app.exceptions import (NotIntegerError, NotPositiveValueError,
-                            ValueTooLargeError)
-from app.utils.tools.helpers import (get_date_for_database,
-                                     get_date_from_datetime_without_year,
-                                     get_number_for_db,
-                                     get_pure_date_from_datetime,
-                                     get_readable_price, prevent_blank_strings)
+from app.exceptions import (
+    NotIntegerError,
+    NotPositiveValueError,
+    ValueTooLargeError,
+)
+from app.utils.tools.helpers import (
+    get_date_for_database,
+    get_date_from_datetime_without_year,
+    get_number_for_db,
+    get_pure_date_from_datetime,
+    get_readable_amount,
+    prevent_blank_strings,
+    validate_positive_number_for_db,
+)
 
 
 class PaymentBase(BaseModel):
@@ -21,19 +33,20 @@ class PaymentBase(BaseModel):
         ),
     ]
     category_id: int = Field()
-    is_spending: Annotated[bool, Field()]
+    grams: Annotated[int, Field(gt=0)] | None = None
+    quantity: Annotated[int, Field(gt=0)] | None = None
 
 
 class PaymentShow(PaymentBase):
     id: Annotated[int, Field()]
-    price: Annotated[int, Field()]
+    amount: Annotated[int, Field()]
     created_at: Annotated[datetime.datetime, Field(exclude=True)]
     category: Annotated[str, Field()]
 
     @computed_field
     @property
-    def price_in_rub(cls) -> str:
-        return get_readable_price(cls.price)
+    def amount_in_rub(cls) -> str:
+        return get_readable_amount(cls.amount)
 
     @computed_field
     @property
@@ -51,27 +64,29 @@ class PaymentShowOne(PaymentShow):
 
 
 class PaymentCreate(PaymentBase):
-    price_in_rub: Annotated[int, Field(exclude=True)]
+    amount_in_rub: Annotated[int, Field(exclude=True)]
     created_at: datetime.datetime
     user_id: Annotated[int, Field(gt=0)]
 
-    @field_validator("price_in_rub", mode="before")
+    @field_validator("amount_in_rub", mode="before")
     @classmethod
-    def validate_price_in_rub(cls, value) -> int:
-        try:
-            value = int(value)
-        except ValueError:
-            raise NotIntegerError(value)
-        if value <= 0:
-            raise NotPositiveValueError(value)
-        if value > 9999999:
-            raise ValueTooLargeError(value)
-        return value
+    def validate_amount_in_rub(cls, value) -> int:
+        return validate_positive_number_for_db(value)
+
+    @field_validator("grams", mode="before")
+    @classmethod
+    def validate_grams(cls, value) -> int | None:
+        return validate_positive_number_for_db(value)
+
+    @field_validator("quantity", mode="before")
+    @classmethod
+    def validate_quantity(cls, value) -> int | None:
+        return validate_positive_number_for_db(value)
 
     @computed_field
     @property
-    def price(cls) -> str:
-        return f"{cls.price_in_rub}00"
+    def amount(cls) -> str:
+        return f"{cls.amount_in_rub}00"
 
     @field_validator("name")
     def prevent_blank_name(cls, value):
@@ -79,7 +94,7 @@ class PaymentCreate(PaymentBase):
 
 
 class PaymentUpdate(PaymentBase):
-    price: Annotated[str, Field()]
+    amount: Annotated[str, Field()]
     date: Annotated[
         str,
         StringConstraints(
@@ -100,8 +115,8 @@ class PaymentUpdate(PaymentBase):
 
     @computed_field
     @property
-    def price_in_kopecks(cls) -> int:
-        return cls.get_positive_number(get_number_for_db(cls.price))
+    def amount_in_kopecks(cls) -> int:
+        return cls.get_positive_number(get_number_for_db(cls.amount))
 
     @computed_field
     @property

@@ -46,10 +46,9 @@ def create_category(
     except BeebError as exc:
         return TEMPLATES.TemplateResponse(
             request,
-            SETTINGS.templates.create_payment,
+            SETTINGS.templates.create_category,
             context={
                 "exception": exc.detail,
-                "status_code": exc.status_code,
             },
             status_code=exc.status_code,
         )

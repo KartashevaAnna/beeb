@@ -12,13 +12,14 @@ CREATE TABLE IF NOT EXISTS "main"."category" (
 
 CREATE TABLE IF NOT EXISTS "main"."payments" (
     "id" SERIAL PRIMARY KEY,
+    "uuid" UUID NOT NULL UNIQUE,
     "name" VARCHAR (255) NOT NULL,
-    "price" INT NOT NULL,
+    "grams" INT,
+    "quantity" INT,
+    "amount" INT NOT NULL,
     "category_id" INT NOT NULL,
     "user_id" INT NOT NULL,
-    "created_at" TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
-    "is_spending" BOOLEAN NOT NULL DEFAULT TRUE,
-    "updated_at" TIMESTAMP WITH TIME ZONE
+    "created_at" TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
 );
 
 CREATE TABLE IF NOT EXISTS "main"."users"(

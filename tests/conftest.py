@@ -140,15 +140,16 @@ def add_categories(session):
         session.commit()
 
 
-def add_payments(session, user):
+def add_payments_food(session, user):
     categories = get_categories(session)
     category_ids = [x.id for x in categories]
     for _ in range(10):
         payment = Payment(
             user_id=TEST_USER_ID,
             name=random.choice(PRODUCTS),
-            price=random.randrange(100, 5000, 100),
+            amount=random.randrange(100, 5000, 100),
             category_id=random.choice(category_ids),
+            grams=random.randrange(100, 1000, 100),
         )
         session.flush()
         session.add(payment)
@@ -160,15 +161,19 @@ def add_payment(
     session: Session,
     category_id: int,
     created_at: datetime.datetime,
-    price: int,
+    amount: int,
     user,
+    grams: int | None = None,
+    quantity: int | None = None,
 ) -> Payment:
     payment = Payment(
         user_id=TEST_USER_ID,
         name=random.choice(PRODUCTS),
-        price=price,
+        amount=amount,
         category_id=category_id,
         created_at=created_at,
+        grams=grams,
+        quantity=quantity,
     )
     session.flush()
     session.add(payment)
@@ -178,7 +183,7 @@ def add_payment(
 @pytest.fixture(scope="function")
 def fill_db(session):
     add_categories(session)
-    add_payments(session, user)
+    add_payments_food(session, user)
     yield
     clean_db(session)
 
@@ -204,7 +209,7 @@ def payment(fill_db, session):
 
 @pytest.fixture(scope="function")
 def total_payments(session):
-    statement = select(functions.sum(Payment.price))
+    statement = select(functions.sum(Payment.amount))
     results = session.execute(statement)
     return results.scalars().first()
 
@@ -247,8 +252,18 @@ def payment_create_with_id(payment_as_dict, session, category) -> dict:
 
 
 @pytest.fixture(scope="function")
-def payment_create(payment_as_dict, session, category) -> dict:
-    return payment_create_with_id(payment_as_dict, session, category)
+def payment_create_food(payment_as_dict, session, category) -> dict:
+    new_dict = payment_create_with_id(payment_as_dict, session, category)
+    new_dict.pop("quantity")
+    return new_dict
+
+
+@pytest.fixture(scope="function")
+def payment_create_non_food(payment_as_dict, session, category) -> dict:
+    new_dict = payment_create_with_id(payment_as_dict, session, category)
+    new_dict.pop("grams")
+    new_dict["quantity"] = 20
+    return new_dict
 
 
 def payment_create_function(payment_as_dict, session, category) -> dict:
@@ -256,13 +271,13 @@ def payment_create_function(payment_as_dict, session, category) -> dict:
 
 
 @pytest.fixture(scope="function")
-def payment_create_no_id(payment_create) -> dict:
-    return remove_id(payment_create)
+def payment_create_no_id(payment_create_food) -> dict:
+    return remove_id(payment_create_food)
 
 
 @pytest.fixture(scope="function")
-def dict_for_new_payment(payment_create):
-    new_dict = copy(payment_create)
+def dict_for_new_payment(payment_create_food):
+    new_dict = copy(payment_create_food)
     new_dict.pop("id", None)
     new_dict.pop("created_at", None)
     new_dict.pop("updated_at", None)
@@ -271,9 +286,18 @@ def dict_for_new_payment(payment_create):
 
 
 @pytest.fixture(scope="function")
-def payment_create_no_category(payment_create_no_id) -> dict:
+def payment_create_no_category_food(payment_create_no_id) -> dict:
     new_dict = copy(payment_create_no_id)
     payment_create_no_id.pop("category_id", None)
+    return new_dict
+
+
+@pytest.fixture(scope="function")
+def payment_create_no_category_non_food(payment_create_no_id) -> dict:
+    new_dict = copy(payment_create_no_id)
+    payment_create_no_id.pop("category_id", None)
+    payment_create_no_id["quantity"] = 20
+    payment_create_no_id.pop("grams")
     return new_dict
 
 
@@ -321,7 +345,7 @@ def current_payment(
     payment = Payment(
         user_id=TEST_USER_ID,
         name="текущий платёж",
-        price=500,
+        amount=500,
         category_id=category.id,
         created_at=datetime.datetime.now(),
     )
@@ -335,7 +359,7 @@ def month_ago_payment(category, user, session: Session):
     payment = Payment(
         user_id=TEST_USER_ID,
         name="платёж прошлого месяца",
-        price=500,
+        amount=500,
         category_id=category.id,
         created_at=datetime.datetime.now() - datetime.timedelta(weeks=8),
     )
@@ -349,10 +373,9 @@ def positive_balance(category, user, session: Session):
     payment = Payment(
         user_id=TEST_USER_ID,
         name="зарплата",
-        price=500000000,
+        amount=500000000,
         category_id=category.id,
         created_at=datetime.datetime.now(),
-        is_spending=False,
     )
     session.add(payment)
     session.flush()
@@ -367,7 +390,7 @@ def month_ago_payment_later(
     payment = Payment(
         user_id=TEST_USER_ID,
         name=random.choice(PRODUCTS),
-        price=500,
+        amount=500,
         category_id=category.id,
         created_at=month_ago_payment.created_at + datetime.timedelta(minutes=3),
     )
@@ -381,7 +404,7 @@ def year_ago_payment(category, user, session: Session):
     payment = Payment(
         user_id=TEST_USER_ID,
         name="платёж прошлого года",
-        price=500,
+        amount=500,
         category_id=category.id,
         created_at=datetime.datetime.now() - datetime.timedelta(weeks=53),
     )
@@ -395,7 +418,7 @@ def year_after_payment(category, user, session: Session):
     payment = Payment(
         user_id=TEST_USER_ID,
         name=random.choice(PRODUCTS),
-        price=500,
+        amount=500,
         category_id=category.id,
         created_at=datetime.datetime.now() + datetime.timedelta(weeks=53),
     )
@@ -409,7 +432,7 @@ def year_ago_payment_later(user, year_ago_payment, category, session: Session):
     payment = Payment(
         user_id=TEST_USER_ID,
         name=random.choice(PRODUCTS),
-        price=500,
+        amount=500,
         category_id=category.id,
         created_at=year_ago_payment.created_at + datetime.timedelta(days=3),
     )

@@ -21,6 +21,8 @@
     <tr>
         <th>имя</th>
         <th>сумма</th>
+        <th> штук</th>
+        <th> грамм</th>
         <th>категория</th>
         <th>дата</th>
         <th>тип</th>
@@ -32,7 +34,9 @@
 {% for payment in payments %}
 <tr>
     <td scope="row">{{ payment.name }}</td>
-    <td>{{ payment.price_in_rub }}</td>
+    <td>{{ payment.amount_in_rub }}</td>
+    <td>{{ payment.quantity if payment.quantity is not none else "—"}}</td>
+    <td>{{ payment.grams if payment.grams is not none else "—"}}</td>
     {% if payment.category == 'продукты' %}
         <td>
             <h5><span class="badge" style="
@@ -81,13 +85,7 @@
     
     <td>{{ payment.date }} </td>
     <td>
-        {% if not payment.is_spending  %}
-        <h5><span class="badge" style="color: var(--bs-emphasis-color); background-color: var(--bs-secondary-bg);">доход</span></h5> 
-
-        {% else %}
         <h5><span class="badge" style="color: var(--bs-emphasis-color); background-color: var(--bs-tertiary-color);">расход</span></h5> 
-
-        {% endif %}
     </td>
     <td><a href="{{ update }}/{{payment.id}}" ><i class="material-icons">✏️</i></a></td>
 

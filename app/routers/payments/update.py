@@ -19,14 +19,13 @@ update_payment_router = fastapi.APIRouter()
 @authenticate
 def update_payment(
     name: Annotated[str, Form()],
-    price: Annotated[str, Form()],
+    amount: Annotated[str, Form()],
     category: Annotated[str, Form()],
     date: Annotated[str, Form()],
     payment_id: int,
     repo: Annotated[PaymentRepo, Depends(payments_repo)],
     category_repo: Annotated[CategoryRepo, Depends(categories_repo)],
     request: Request,
-    is_spending: bool = Form(False),
     user_id: int | None = None,
 ):
     try:
@@ -34,10 +33,9 @@ def update_payment(
         to_update = PaymentUpdate(
             user_id=user_id,
             name=name,
-            price=price,
+            amount=amount,
             category_id=options[category],
             date=date,
-            is_spending=is_spending,
         )
         repo.update(payment_id=payment_id, to_update=to_update)
         return RedirectResponse(
@@ -49,7 +47,6 @@ def update_payment(
             SETTINGS.templates.read_payment,
             context={
                 "exception": exc.detail,
-                "status_code": exc.status_code,
             },
             status_code=exc.status_code,
         )

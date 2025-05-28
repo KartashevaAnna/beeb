@@ -8,10 +8,9 @@ def test_normal_function(
 ):
     salary = Payment(
         name="зарплата",
-        price="20000",
+        amount="20000",
         user_id=TEST_USER_ID,
         category_id=category.id,
-        is_spending=False,
     )
     session.add(salary)
     session.flush()

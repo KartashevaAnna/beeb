@@ -1,8 +1,11 @@
 from typing import Tuple, Type
 
 from pydantic import BaseModel, ConfigDict, computed_field
-from pydantic_settings import (BaseSettings, PydanticBaseSettingsSource,
-                               SettingsConfigDict)
+from pydantic_settings import (
+    BaseSettings,
+    PydanticBaseSettingsSource,
+    SettingsConfigDict,
+)
 from sqlalchemy import URL
 
 from app.utils.tools.config_loader import load_custom_config_source
@@ -62,7 +65,10 @@ class Urls(BaseModel):
     ping: str
     signup: str
     login: str
+    select_food_non_food: str
     create_payment: str
+    create_payment_food: str
+    create_payment_non_food: str
     payment: str
     payments: str
     update_payment_core: str
@@ -86,7 +92,9 @@ class Templates(BaseModel):
     login: str
     read_payment: str
     read_payments: str
-    create_payment: str
+    select_food_non_food: str
+    create_payment_food: str
+    create_payment_non_food: str
     delete_payment: str
     payments_dashboard_yearly: str
     payments_dashboard: str

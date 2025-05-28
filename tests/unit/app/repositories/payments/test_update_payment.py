@@ -13,7 +13,7 @@ def test_not_owner(payment_update, category, session):
     payment_update_local.pop("form_disabled", None)
     payment_update_local["category_id"] = category.id
     payment_update_local["user_id"] = str(500)
-    payment_update_local["price"] = str(payment_update_local["price"])
+    payment_update_local["amount"] = str(payment_update_local["amount"])
     update = PaymentUpdate(**payment_update_local)
     with pytest.raises(NotOwnerError):
         PaymentRepo(session).update(

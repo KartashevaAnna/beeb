@@ -53,7 +53,7 @@
 {% for payment in payments %}
 <tr>
     <td scope="row">{{ payment.name.title() }}</td>
-    <td>{{ payment.price_in_rub }}</td>
+    <td>{{ payment.amount_in_rub }}</td>
     <td>{{ payment.category}} </td>
     <td>{{ payment.date }} </td>
     <td><a href="/payments/update/{{payment.id}}" class="btn beeb-secondary-button"><i class="material-icons" style="color: #191919d6 !important">edit</i></a></td>

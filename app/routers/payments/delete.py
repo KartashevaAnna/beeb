@@ -41,7 +41,6 @@ def delete_payment(
             SETTINGS.templates.delete_payment,
             context={
                 "exception": exc.detail,
-                "status_code": exc.status_code,
             },
             status_code=exc.status_code,
         )

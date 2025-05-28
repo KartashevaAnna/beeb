@@ -1,7 +1,17 @@
 import datetime
+from uuid import UUID, uuid4
 
-from sqlalchemy import (DateTime, ForeignKey, Integer, LargeBinary, MetaData,
-                        String, func)
+from sqlalchemy import (
+    BigInteger,
+    DateTime,
+    ForeignKey,
+    Integer,
+    LargeBinary,
+    MetaData,
+    String,
+    func,
+    types,
+)
 from sqlalchemy.orm import DeclarativeBase, Mapped, mapped_column, relationship
 
 
@@ -51,13 +61,23 @@ class Category(AlchemyBaseModel):
 class Payment(AlchemyBaseModel):
     __tablename__ = "payments"
     id: Mapped[int] = mapped_column(Integer, primary_key=True)
+    uuid: Mapped[UUID] = mapped_column(
+        types.UUID, nullable=False, unique=True, default=uuid4
+    )
     name: Mapped[str] = mapped_column(String(255), nullable=False)
-    price: Mapped[str] = mapped_column(String(255), nullable=False)
+    grams: Mapped[int] = mapped_column(
+        BigInteger, nullable=True, doc="для расходов на еду"
+    )
+    quantity: Mapped[int] = mapped_column(
+        BigInteger,
+        nullable=True,
+        doc="для расходов на непродовольственные товары",
+    )
+    amount: Mapped[int] = mapped_column(
+        BigInteger, nullable=False, doc="стоимость"
+    )
     created_at: Mapped[datetime.datetime] = mapped_column(
         DateTime(timezone=True), server_default=func.now(), nullable=False
-    )
-    updated_at: Mapped[datetime.datetime] = mapped_column(
-        DateTime(timezone=True), nullable=True
     )
     category_id: Mapped[int] = mapped_column(
         Integer, ForeignKey("category.id"), nullable=False
@@ -71,4 +91,3 @@ class Payment(AlchemyBaseModel):
     payment_user: Mapped["User"] = relationship(
         back_populates="payments_list",
     )
-    is_spending: Mapped[bool] = mapped_column(nullable=False, default=True)

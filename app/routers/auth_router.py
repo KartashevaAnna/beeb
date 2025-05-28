@@ -8,8 +8,11 @@ from app.exceptions import BeebError
 from app.models import User
 from app.repositories.users import UserRepo
 from app.settings import SETTINGS, TEMPLATES
-from app.utils.dependencies import (get_block_name, get_user_id_from_token,
-                                    user_repo)
+from app.utils.dependencies import (
+    get_block_name,
+    get_user_id_from_token,
+    user_repo,
+)
 from app.utils.tools.auth_handler import AuthHandler
 
 auth_router = APIRouter(tags=["Auth"])
@@ -73,7 +76,6 @@ def login(
             SETTINGS.templates.login,
             context={
                 "exception": exc.detail,
-                "status_code": exc.status_code,
             },
             block_name=block_name,
             status_code=exc.status_code,

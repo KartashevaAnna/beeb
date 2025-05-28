@@ -1,9 +1,9 @@
 import os
 import pathlib
-import tomllib
 from pathlib import Path
 from typing import Any
 
+import tomllib
 from jinja2 import Template
 
 
