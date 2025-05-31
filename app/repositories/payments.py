@@ -2,7 +2,16 @@ import calendar
 import datetime
 
 from fastapi import Request
-from sqlalchemy import Column, String, delete, extract, func, select, update
+from sqlalchemy import (
+    Column,
+    String,
+    delete,
+    extract,
+    func,
+    select,
+    text,
+    update,
+)
 from sqlalchemy.orm import Session
 
 from sqlalchemy.orm import aliased, joinedload
@@ -41,41 +50,48 @@ class PaymentRepo:
         self.session = session
 
     def get_all_payments(self, user_id: int) -> list[dict[Income, Payment]]:
-        statement = (
-            select(Income, Payment, Category.name)
-            .join(Payment, Income.user_id == Payment.user_id)
-            .join(Category, Payment.category_id == Category.id)
-            .where((Income.user_id == user_id) and (Payment.user_id == user_id))
-            .order_by(Income.created_at, Payment.created_at)
-        )
-        results = self.session.execute(statement)
+        first_query = f"""
+        SELECT  
+        id, 
+        uuid, name, 
+        NULL as grams, 
+        NULL as quantity, 
+        amount, 
+        NULL as category_id,
+        user_id, 
+        created_at,
+        NULL as category_name
+        
+        FROM main.income
+        
+        WHERE user_id = {user_id}
+        """  # noqa: W291
+        union = " UNION "
+        second_query = f"""
+        SELECT 
+        main.payments.id, 
+        main.payments.uuid, 
+        main.payments.name, 
+        main.payments.grams, 
+        main.payments.quantity, 
+        main.payments.amount, 
+        main.payments.category_id,
+        main.payments.user_id, 
+        main.payments.created_at,
+        main.category.name as category_name 
+        
+        FROM main.payments
 
-        results = [list(x) for x in results]
+        JOIN main.category ON main.payments.category_id = main.category.id
+        
+        WHERE main.payments.user_id = {user_id}
 
-        def get_category_in_payment(entry_pack: list):
-            payment = entry_pack[1].__dict__
-            payment["category"] = entry_pack[2]
-            salary = entry_pack[0].__dict__
-            return [salary, payment]
-
-        results_with_category = [get_category_in_payment(x) for x in results]
-        no_duplicates = []
-        [
-            no_duplicates.append(item)
-            for sublist in results_with_category
-            for item in sublist
-            if item not in no_duplicates
-        ]
-        if not no_duplicates:
-            statement = (
-                select(Income)
-                .where(Income.user_id == user_id)
-                .order_by(Income.created_at)
-            )
-            results = self.session.execute(statement)
-            incomes = results.scalars().all()
-            return [x.__dict__ for x in incomes]
-        return no_duplicates
+        """  # noqa: W291
+        order_by = "ORDER BY created_at DESC"
+        base_expression = first_query + union + second_query + order_by + ";"
+        stmt = text(base_expression)
+        res = self.session.execute(stmt)
+        return [list(x) for x in res]
 
     def get_spendings(self, payments: list[Payment]) -> list[Payment]:
         return [payment for payment in payments if payment.is_spending is True]
