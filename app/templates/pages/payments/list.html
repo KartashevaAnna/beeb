@@ -6,24 +6,11 @@
     <div class="container-fluid">
         <div class="row my-2">
             <div class="col-12">
-                <button 
-                    hx-get={{ create }} 
-                    hx-target="#modals-here" 
-                    hx-trigger="click" 
-                    hx-push-url="false"
-                    data-bs-toggle="modal"
-                    data-bs-target="#modals-here" 
-                    class="btn beeb-submit-button-large">Добавить</button>
+                <button onclick="location.href='{{ create }}'" class="btn beeb-submit-button-large"><br></button>
                 </div>
             </div>
 
 
-<div id="modals-here" class="modal modal-blur fade" style="display: none" tabindex="-1">
-    <div class="modal-dialog modal-lg modal-dialog-centered" role="document" >
-                <div class="modal-content"></div>
-            </div>
-    </div>
-</div>
 
 <div class="container-fluid my-2">
 <table class="table table-hover" style="text-align: center; vertical-align: middle;">
@@ -94,17 +81,29 @@
     
     <td>{{ payment.date }} </td>
     <td>
-        <h5><span class="badge" style="color: var(--bs-emphasis-color); background-color: var(--bs-tertiary-color);">расход</span></h5> 
-    </td>
-    <td><a href="{{ update }}/{{payment.id}}" ><i class="material-icons">✏️</i></a></td>
+        {% if not payment.category %}
+        <h5><span class="badge" style="color: var(--bs-emphasis-color); background-color: var(--bs-tertiary-bg);">доход</span></h5> 
+        {% else %}
+     
+        <h5><span class="badge" style="color: var(--bs-emphasis-color); background-color: var(--bs-tertiary-color-darker);">расход</span></h5> 
 
-    <form action="{{ delete }}/{{payment.id}}" method="post">
+        {% endif %}
+    </td>
+    <td>
+        
+        <a href="{{ update_payment }}/{{payment.id}}"  ><i class="material-icons">✏️</i></a></td>
+    {% if payment.category %}
+    <form action="{{ delete_payment }}/{{payment.id}}"  method="post">
     <td><button class="beeb-delete-button"><i class="material-icons" style="color: var(--bs-body-color);">delete</i></button></td>
     </form>
+    {% else %}
+    <form action="{{ delete_income }}/{{payment.id}}"  method="post">
+    <td><button class="beeb-delete-button"><i class="material-icons" style="color: var(--bs-body-color);">delete</i></button></td>
+    </form>
+    {% endif %}
 </tr>
 {% endfor %}
 </table>
-
 </div>
 
 

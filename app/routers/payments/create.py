@@ -33,6 +33,22 @@ def serve_select_food_non_food_template(
     )
 
 
+@create_payments_router.get(SETTINGS.urls.select_income_expense)
+@authenticate
+def serve_select_income_expense_template(
+    request: Request,
+    user_id: int | None = None,
+):
+    return TEMPLATES.TemplateResponse(
+        request,
+        SETTINGS.templates.select_income_expense,
+        context={
+            "create_income": SETTINGS.urls.create_income,
+            "create_expense": SETTINGS.urls.select_food_non_food,
+        },
+    )
+
+
 @create_payments_router.get(SETTINGS.urls.create_payment_food)
 @authenticate
 def serve_create_food_template(

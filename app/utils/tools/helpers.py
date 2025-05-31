@@ -5,6 +5,7 @@ import re
 from hashlib import sha256
 
 from app.exceptions import (
+    BeebError,
     EmptyStringError,
     NotIntegerError,
     NotPositiveValueError,
@@ -163,7 +164,9 @@ def check_current_year_and_month(year: int, month: int) -> list:
     return current_year == year and INT_TO_MONTHES[current_month] == month
 
 
-def validate_positive_number_for_db(value: int | None = None) -> int | None:
+def validate_positive_number_for_db(
+    value: int | None = None,
+) -> int | BeebError:
     if value:
         try:
             value = int(value)

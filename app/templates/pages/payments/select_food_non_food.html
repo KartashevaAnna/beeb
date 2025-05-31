@@ -1,0 +1,24 @@
+{% extends "base.html" %}
+{% block body %}
+
+ <div class="container-fluid">
+    <div class="row align-items-center justify-content-lg-center my-4 p-2">
+        <div class="col-lg-4 justify-content-center my-4">
+          <div class="card rounded-0 my-4">
+            <div class="card-body" id="my_card_body">
+                <div class="row align-items-center justify-content-sm-center my-1 p-2">
+                  <div class="col-xs-2 justify-content-center align-items-*-center">
+                    <div class="row"><div class="col-6" >
+                      <button onclick="location.href='{{ create_non_food }}'" class="btn beeb-submit-button-large" style="margin-top:1%; margin-bottom: 1%;  margin-left: 1%;">Вещь<br></button>
+                    </div>
+                    <div class="col-6">
+                      <button onclick="location.href='{{ create_food }}'" class="btn beeb-submit-button-large" style="margin-top:1%; margin-bottom: 1%;  margin-left: 1%;">Еда</button>
+                    </div>
+                </div>
+            </div>
+          </div>
+        </div>
+      </div>
+  </div>
+
+{% endblock %}

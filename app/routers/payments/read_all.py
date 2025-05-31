@@ -20,14 +20,16 @@ def read_all(
 ):
     try:
         payments = repo.read_all(user_id)
+
         return TEMPLATES.TemplateResponse(
             request,
             SETTINGS.templates.read_payments,
             context={
                 "payments": payments,
-                "create": SETTINGS.urls.select_food_non_food,
-                "update": SETTINGS.urls.update_payment_core,
-                "delete": SETTINGS.urls.delete_payment_core,
+                "create": SETTINGS.urls.select_income_expense,
+                "update_payment": SETTINGS.urls.update_payment_core,
+                "delete_payment": SETTINGS.urls.delete_payment_core,
+                "delete_income": SETTINGS.urls.delete_income_core,
             },
         )
     except Exception as exc:

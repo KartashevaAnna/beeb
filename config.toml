@@ -26,6 +26,7 @@ login = "{{ urls.URL_LOGIN }}"
 
 payments = "{{ urls.URL_PAYMENTS }}"
 select_food_non_food = "{{ urls.URL_SELECT_FOOD_NON_FOOD }}"
+select_income_expense = "{{ urls.URL_SELECT_INCOME_EXPENSE }}"
 create_payment_food = "{{ urls.URL_CREATE_PAYMENT_FOOD }}"
 create_payment = "{{ urls.URL_CREATE_PAYMENT }}"
 create_payment_non_food = "{{ urls.URL_CREATE_PAYMENT_NON_FOOD }}"
@@ -34,8 +35,11 @@ update_payment = "{{ urls.URL_UPDATE_PAYMENT }}"
 delete_payment_core = "{{ urls.URL_DELETE_PAYMENT_CORE }}"
 delete_payment = "{{ urls.URL_DELETE_PAYMENT }}"
 payment = "{{ urls.URL_PAYMENT }}"
-
 total_payments_monthly = "{{ urls.URL_PAYMENTS_TOTAL_MONTHLY }}"
+
+create_income = "{{ urls.URL_CREATE_INCOME }}"
+delete_income_core = "{{ urls.URL_DELETE_INCOME_CORE }}"
+delete_income = "{{ urls.URL_DELETE_INCOME }}"
 
 categories = "{{ urls.URL_CATEGORIES }}"
 create_category = "{{ urls.URL_CREATE_CATEGORY }}"
@@ -56,11 +60,14 @@ login = "{{ templates.TEMPLATE_LOGIN }}"
 
 read_payments = "{{ templates.TEMPLATE_READ_PAYMENTS }}"
 select_food_non_food = "{{ templates.TEMPLATE_SELECT_FOOD_NON_FOOD }}"
+select_income_expense = "{{ templates.TEMPLATE_SELECT_INCOME_EXPENSE }}"
 create_payment_food = "{{ templates.TEMPLATE_CREATE_PAYMENT_FOOD }}"
 create_payment_non_food = "{{ templates.TEMPLATE_CREATE_PAYMENT_NON_FOOD }}"
 create_payment = "{{ templates.TEMPLATE_CREATE_PAYMENT }}"
 read_payment = "{{ templates.TEMPLATE_READ_PAYMENT }}"
 delete_payment = "{{ templates.TEMPLATE_DELETE_PAYMENT }}"
+create_income = "{{ templates.TEMPLATE_CREATE_INCOME }}"
+
 
 payments_dashboard = "{{ templates.TEMPLATE_PAYMENTS_DASHBOARD }}"
 payments_dashboard_yearly = "{{ templates.TEMPLATE_PAYMENTS_DASHBOARD_YEARLY }}"

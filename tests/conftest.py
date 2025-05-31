@@ -10,7 +10,7 @@ from sqlalchemy.orm import Session, sessionmaker
 from sqlalchemy.sql import functions
 
 from app.application import build_app
-from app.models import AlchemyBaseModel, Category, Payment, User
+from app.models import AlchemyBaseModel, Category, Income, Payment, User
 from app.settings import ENGINE
 from app.utils.constants import CATEGORIES, PRODUCTS
 from app.utils.tools.auth_handler import AuthHandler
@@ -90,6 +90,7 @@ def clean_db(session):
     session.query(Payment).delete()
     session.query(Category).delete()
     session.query(User).delete()
+    session.query(Income).delete()
     session.commit()
 
 
@@ -128,6 +129,12 @@ def get_user(session):
     return res.scalars().all()[0]
 
 
+def get_all_income(session):
+    statement = select(Income)
+    res = session.execute(statement)
+    return res.scalars().all()
+
+
 def add_categories(session):
     categories = get_categories(session)
     if not categories:
@@ -138,6 +145,14 @@ def add_categories(session):
             session.flush()
             session.add(category)
         session.commit()
+
+
+def add_income(session, user):
+    for _ in range(10):
+        income = Income(name="зарплата", amount=100000, user_id=TEST_USER_ID)
+        session.flush()
+        session.add(income)
+    session.commit()
 
 
 def add_payments_food(session, user):
@@ -184,6 +199,7 @@ def add_payment(
 def fill_db(session):
     add_categories(session)
     add_payments_food(session, user)
+    add_income(session, user)
     yield
     clean_db(session)
 
@@ -208,6 +224,11 @@ def payment(fill_db, session):
 
 
 @pytest.fixture(scope="function")
+def income(fill_db, session):
+    return session.scalars(select(Income)).all()[0]
+
+
+@pytest.fixture(scope="function")
 def total_payments(session):
     statement = select(functions.sum(Payment.amount))
     results = session.execute(statement)
@@ -223,6 +244,26 @@ def payment_as_dict(payment, session) -> dict:
         .mappings()
         .all()[0]
     )
+
+
+@pytest.fixture(scope="function")
+def income_as_dict(income, session) -> dict:
+    return dict(
+        session.execute(
+            select("*").where(Income.id == income.id).select_from(Income)
+        )
+        .mappings()
+        .all()[0]
+    )
+
+
+@pytest.fixture(scope="function")
+def create_income(income_as_dict, session) -> dict:
+    new_dict = copy(income_as_dict)
+    new_dict.pop("id")
+    new_dict.pop("uuid")
+    new_dict.pop("created_at")
+    return new_dict
 
 
 def add_category_name(payment_as_dict, session):
@@ -243,7 +284,7 @@ def change_created_at_to_date(payment_as_dict):
     return new_dict
 
 
-def payment_create_with_id(payment_as_dict, session, category) -> dict:
+def create_payment_with_id(payment_as_dict, session, category) -> dict:
     new_dict = copy(payment_as_dict)
     new_dict = change_to_a_defined_category(payment_as_dict, category)
     new_dict = add_category_name(payment_as_dict, session)
@@ -252,32 +293,32 @@ def payment_create_with_id(payment_as_dict, session, category) -> dict:
 
 
 @pytest.fixture(scope="function")
-def payment_create_food(payment_as_dict, session, category) -> dict:
-    new_dict = payment_create_with_id(payment_as_dict, session, category)
+def create_payment_food(payment_as_dict, session, category) -> dict:
+    new_dict = create_payment_with_id(payment_as_dict, session, category)
     new_dict.pop("quantity")
     return new_dict
 
 
 @pytest.fixture(scope="function")
-def payment_create_non_food(payment_as_dict, session, category) -> dict:
-    new_dict = payment_create_with_id(payment_as_dict, session, category)
+def create_payment_non_food(payment_as_dict, session, category) -> dict:
+    new_dict = create_payment_with_id(payment_as_dict, session, category)
     new_dict.pop("grams")
     new_dict["quantity"] = 20
     return new_dict
 
 
 def payment_create_function(payment_as_dict, session, category) -> dict:
-    return payment_create_with_id(payment_as_dict, session, category)
+    return create_payment_with_id(payment_as_dict, session, category)
 
 
 @pytest.fixture(scope="function")
-def payment_create_no_id(payment_create_food) -> dict:
-    return remove_id(payment_create_food)
+def create_payment_no_id(create_payment_food) -> dict:
+    return remove_id(create_payment_food)
 
 
 @pytest.fixture(scope="function")
-def dict_for_new_payment(payment_create_food):
-    new_dict = copy(payment_create_food)
+def get_dict_for_new_payment(create_payment_food):
+    new_dict = copy(create_payment_food)
     new_dict.pop("id", None)
     new_dict.pop("created_at", None)
     new_dict.pop("updated_at", None)
@@ -286,24 +327,24 @@ def dict_for_new_payment(payment_create_food):
 
 
 @pytest.fixture(scope="function")
-def payment_create_no_category_food(payment_create_no_id) -> dict:
-    new_dict = copy(payment_create_no_id)
-    payment_create_no_id.pop("category_id", None)
+def create_payment_no_category_food(create_payment_no_id) -> dict:
+    new_dict = copy(create_payment_no_id)
+    create_payment_no_id.pop("category_id", None)
     return new_dict
 
 
 @pytest.fixture(scope="function")
-def payment_create_no_category_non_food(payment_create_no_id) -> dict:
-    new_dict = copy(payment_create_no_id)
-    payment_create_no_id.pop("category_id", None)
-    payment_create_no_id["quantity"] = 20
-    payment_create_no_id.pop("grams")
+def create_payment_no_category_non_food(create_payment_no_id) -> dict:
+    new_dict = copy(create_payment_no_id)
+    create_payment_no_id.pop("category_id", None)
+    create_payment_no_id["quantity"] = 20
+    create_payment_no_id.pop("grams")
     return new_dict
 
 
 @pytest.fixture(scope="function")
-def payment_update(payment_as_dict, session, category) -> dict:
-    new_dict = payment_create_with_id(payment_as_dict, session, category)
+def update_payment(payment_as_dict, session, category) -> dict:
+    new_dict = create_payment_with_id(payment_as_dict, session, category)
     new_dict["form_disabled"] = True
     new_dict["user_id"] = TEST_USER_ID
     return new_dict
@@ -311,6 +352,12 @@ def payment_update(payment_as_dict, session, category) -> dict:
 
 def get_newly_created_payment(max_id_before: int, session: Session) -> Payment:
     statement = select(Payment).where(Payment.id == (max_id_before + 1))
+    results = session.execute(statement)
+    return results.scalars().one_or_none()
+
+
+def get_newly_created_income(max_id_before: int, session: Session) -> Income:
+    statement = select(Income).where(Income.id == (max_id_before + 1))
     results = session.execute(statement)
     return results.scalars().one_or_none()
 
@@ -369,18 +416,17 @@ def month_ago_payment(category, user, session: Session):
 
 
 @pytest.fixture(scope="function")
-def positive_balance(category, user, session: Session):
-    payment = Payment(
+def positive_balance(user, session: Session):
+    income = Income(
         user_id=TEST_USER_ID,
         name="зарплата",
         amount=500000000,
-        category_id=category.id,
         created_at=datetime.datetime.now(),
     )
-    session.add(payment)
+    session.add(income)
     session.flush()
     session.commit()
-    return payment
+    return income
 
 
 @pytest.fixture(scope="function")
@@ -477,7 +523,13 @@ def wrong_user_token(auth_handler):
     return auth_handler.encode_token(username=username, id=500)
 
 
-def check_that_payments_belong_to_test_user(payments: list[Payment]):
+def check_that_payments_belong_to_test_user(payments: list):
     user_ids = set([x.user_id for x in payments])
+    assert len(user_ids) == 1
+    assert list(user_ids)[0] == TEST_USER_ID
+
+
+def check_that_payments_belong_to_test_user_dict(payments: list):
+    user_ids = set([x["user_id"] for x in payments])
     assert len(user_ids) == 1
     assert list(user_ids)[0] == TEST_USER_ID

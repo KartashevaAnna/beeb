@@ -2,15 +2,18 @@ import calendar
 import datetime
 
 from fastapi import Request
-from sqlalchemy import delete, extract, func, select, update
+from sqlalchemy import Column, String, delete, extract, func, select, update
 from sqlalchemy.orm import Session
+
+from sqlalchemy.orm import aliased, joinedload
+
 
 from app.exceptions import (
     NothingToComputeError,
     NotOwnerError,
     SpendingOverBalanceError,
 )
-from app.models import Category, Payment
+from app.models import Category, Income, Payment
 from app.schemas.dates import DateFilter
 from app.schemas.payments import (
     PaymentCreate,
@@ -37,15 +40,42 @@ class PaymentRepo:
     def __init__(self, session: Session) -> None:
         self.session = session
 
-    def get_all_payments(self, user_id: int) -> list[Payment]:
+    def get_all_payments(self, user_id: int) -> list[dict[Income, Payment]]:
         statement = (
-            select(Payment, Category.name)
-            .where(Payment.user_id == user_id)
-            .join(Payment.payment_category)
-            .order_by(Payment.created_at.desc())
+            select(Income, Payment, Category.name)
+            .join(Payment, Income.user_id == Payment.user_id)
+            .join(Category, Payment.category_id == Category.id)
+            .where((Income.user_id == user_id) and (Payment.user_id == user_id))
+            .order_by(Income.created_at, Payment.created_at)
         )
-        res = self.session.execute(statement)
-        return res.scalars().all()
+        results = self.session.execute(statement)
+
+        results = [list(x) for x in results]
+
+        def get_category_in_payment(entry_pack: list):
+            payment = entry_pack[1].__dict__
+            payment["category"] = entry_pack[2]
+            salary = entry_pack[0].__dict__
+            return [salary, payment]
+
+        results_with_category = [get_category_in_payment(x) for x in results]
+        no_duplicates = []
+        [
+            no_duplicates.append(item)
+            for sublist in results_with_category
+            for item in sublist
+            if item not in no_duplicates
+        ]
+        if not no_duplicates:
+            statement = (
+                select(Income)
+                .where(Income.user_id == user_id)
+                .order_by(Income.created_at)
+            )
+            results = self.session.execute(statement)
+            incomes = results.scalars().all()
+            return [x.__dict__ for x in incomes]
+        return no_duplicates
 
     def get_spendings(self, payments: list[Payment]) -> list[Payment]:
         return [payment for payment in payments if payment.is_spending is True]
@@ -97,11 +127,11 @@ class PaymentRepo:
         res = self.session.execute(statement)
         return res.scalars().all()
 
-    def read_all(self, user_id: int) -> list[Payment]:
+    def read_all(self, user_id: int) -> list[Payment, Income]:
         results = self.get_all_payments(user_id)
         return [
             PaymentShow(
-                **payment.__dict__, category=payment.payment_category.name
+                **payment,
             )
             for payment in results
         ]

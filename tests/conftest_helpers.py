@@ -1,8 +1,8 @@
 from copy import copy
 
-from fastapi import Response
+from fastapi import Response, status
 
-from app.models import Payment
+from app.models import Income, Payment
 from app.settings import SETTINGS
 from app.utils.tools.helpers import convert_to_copecks, get_number_for_db
 
@@ -20,10 +20,10 @@ def change_to_a_defined_category(payment_as_dict, category) -> dict:
 
 
 def check_created_payment(
-    payment_create: dict, payment: Payment, response: Response
+    create_payment: dict, payment: Payment, response: Response
 ):
     assert response.status_code == 303
-    if payment_create.get("grams"):
+    if create_payment.get("grams"):
         assert (
             response.headers.get("location")
             == SETTINGS.urls.create_payment_food
@@ -33,9 +33,18 @@ def check_created_payment(
             response.headers.get("location")
             == SETTINGS.urls.create_payment_non_food
         )
-    assert payment.name == payment_create["name"]
-    assert payment.amount == convert_to_copecks(payment_create["amount"])
-    assert payment.category_id == payment_create["category_id"]
+    assert payment.name == create_payment["name"]
+    assert payment.amount == convert_to_copecks(create_payment["amount"])
+    assert payment.category_id == create_payment["category_id"]
+
+
+def check_created_income(
+    create_income: dict, income: Income, response: Response
+):
+    assert response.status_code == status.HTTP_303_SEE_OTHER
+    assert response.headers.get("location") == SETTINGS.urls.payments
+    assert income.name == create_income["name"]
+    assert income.amount == convert_to_copecks(create_income["amount"])
 
 
 def check_updated_payment(

@@ -7,8 +7,8 @@ from app.repositories.payments import PaymentRepo
 from app.schemas.payments import PaymentUpdate
 
 
-def test_not_owner(payment_update, category, session):
-    payment_update_local = copy(payment_update)
+def test_not_owner(update_payment, category, session):
+    payment_update_local = copy(update_payment)
     payment_update_local.pop("category", None)
     payment_update_local.pop("form_disabled", None)
     payment_update_local["category_id"] = category.id

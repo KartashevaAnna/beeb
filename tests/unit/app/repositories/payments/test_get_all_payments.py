@@ -6,6 +6,7 @@ from app.schemas.payments import PaymentCreate
 from tests.conftest import (
     TEST_USER_ID,
     check_that_payments_belong_to_test_user,
+    check_that_payments_belong_to_test_user_dict,
     clean_db,
 )
 
@@ -18,24 +19,25 @@ def test_payment_repo_get_all_payments_for_the_user(
     month_ago_payment,
     month_ago_payment_later,
     current_payment,
-    dict_for_new_payment,
+    get_dict_for_new_payment,
 ):
-    dict_for_new_payment["user_id"] = 600
-    del dict_for_new_payment["amount"]
-    del dict_for_new_payment["date"]
-    dict_for_new_payment["amount_in_rub"] = 400
-    dict_for_new_payment["created_at"] = datetime.datetime.now()
+    get_dict_for_new_payment["user_id"] = 600
+    del get_dict_for_new_payment["amount"]
+    del get_dict_for_new_payment["date"]
+    get_dict_for_new_payment["amount_in_rub"] = 400
+    get_dict_for_new_payment["created_at"] = datetime.datetime.now()
 
-    payment = PaymentCreate(**dict_for_new_payment)
+    payment = PaymentCreate(**get_dict_for_new_payment)
     new_payment = Payment(**payment.model_dump())
     session.add(new_payment)
     session.commit()
-    result = PaymentRepo(session).get_all_payments(TEST_USER_ID)
-    assert year_ago_payment in result
-    assert year_ago_payment_later in result
-    assert month_ago_payment in result
-    assert month_ago_payment_later in result
-    assert current_payment in result
-    assert year_after_payment in result
-    check_that_payments_belong_to_test_user(payments=result)
+    received_payments = PaymentRepo(session).get_all_payments(TEST_USER_ID)
+    result = str(received_payments)
+    assert year_ago_payment.name in result
+    assert year_ago_payment_later.name in result
+    assert month_ago_payment.name in result
+    assert month_ago_payment_later.name in result
+    assert current_payment.name in result
+    assert year_after_payment.name in result
+    check_that_payments_belong_to_test_user_dict(payments=received_payments)
     clean_db(session)

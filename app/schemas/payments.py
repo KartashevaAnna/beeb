@@ -42,7 +42,8 @@ class PaymentShow(PaymentBase):
     id: Annotated[int, Field()]
     amount: Annotated[int, Field()]
     created_at: Annotated[datetime.datetime, Field(exclude=True)]
-    category: Annotated[str, Field()]
+    category: str | None = None
+    category_id: int | None = None
 
     @computed_field
     @property
