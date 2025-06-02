@@ -1,6 +1,6 @@
 from app.models import Payment
 from app.repositories.payments import PaymentRepo
-from tests.conftest import TEST_USER_ID, clean_db
+from tests.conftest import TEST_USER_ID
 
 
 def test_normal_function(
@@ -24,4 +24,3 @@ def test_normal_function(
     all_spendings = [(x.name, x.created_at) for x in all_spendings]
     obtained_result = [(x.name, x.created_at) for x in obtained_result]
     assert all_spendings == obtained_result
-    clean_db(session)

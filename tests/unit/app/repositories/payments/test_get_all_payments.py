@@ -7,7 +7,6 @@ from tests.conftest import (
     TEST_USER_ID,
     check_that_payments_belong_to_test_user,
     check_that_payments_belong_to_test_user_dict,
-    clean_db,
 )
 
 
@@ -31,7 +30,7 @@ def test_payment_repo_get_all_payments_for_the_user(
     new_payment = Payment(**payment.model_dump())
     session.add(new_payment)
     session.commit()
-    received_payments = PaymentRepo(session).get_all_payments(TEST_USER_ID)
+    received_payments = PaymentRepo(session).read_all(TEST_USER_ID)
     result = str(received_payments)
     assert year_ago_payment.name in result
     assert year_ago_payment_later.name in result
@@ -39,5 +38,4 @@ def test_payment_repo_get_all_payments_for_the_user(
     assert month_ago_payment_later.name in result
     assert current_payment.name in result
     assert year_after_payment.name in result
-    check_that_payments_belong_to_test_user_dict(payments=received_payments)
-    clean_db(session)
+    check_that_payments_belong_to_test_user(payments=received_payments)

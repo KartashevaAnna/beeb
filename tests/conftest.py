@@ -1,7 +1,9 @@
 import datetime
+import os
 import random
 from copy import copy
 from pathlib import Path
+import shutil
 
 import pytest
 from fastapi.testclient import TestClient
@@ -78,8 +80,6 @@ def add_user(session) -> User:
 @pytest.fixture(scope="function", autouse=True)
 def user(session):
     add_user(session)
-    yield
-    clean_db(session)
 
 
 def raise_always(scope="function", *args, **kwargs):
@@ -92,6 +92,12 @@ def clean_db(session):
     session.query(User).delete()
     session.query(Income).delete()
     session.commit()
+
+
+@pytest.fixture(scope="function", autouse=True)
+def tear_down(session):
+    yield
+    clean_db(session)
 
 
 def delete_category(session):
@@ -201,14 +207,11 @@ def fill_db(session):
     add_payments_food(session, user)
     add_income(session, user)
     yield
-    clean_db(session)
 
 
 @pytest.fixture(scope="function")
 def categories(session):
     add_categories(session)
-    yield
-    clean_db(session)
 
 
 @pytest.fixture(scope="function")

@@ -12,7 +12,6 @@ def test_dev_router_populating_the_database_with_payments(client, session):
     all_payments = get_payments(session)
     assert all_payments
     assert len(all_payments) == len(PRODUCTS)
-    clean_db(session)
 
 
 def test_dev_router_populating_the_database_with_categories(client, session):

@@ -17,7 +17,6 @@ def test_template(client, category, session):
     )
     assert response.status_code == status.HTTP_200_OK
     assert category.name in response.text
-    clean_db(session)
 
 
 def test_template_no_cookie(client, category, session):
@@ -28,7 +27,6 @@ def test_template_no_cookie(client, category, session):
     )
     assert response.status_code == status.HTTP_303_SEE_OTHER
     assert response.headers.get("location") == SETTINGS.urls.login
-    clean_db(session)
 
 
 def test_template_stale_token(client, category, session, stale_token):
@@ -49,7 +47,6 @@ def test_template_wrong_token(client, category, session, wrong_token):
     )
     assert response.status_code == status.HTTP_303_SEE_OTHER
     assert response.headers.get("location") == SETTINGS.urls.login
-    clean_db(session)
 
 
 def test_update_name(client, category, category_create, session):
@@ -69,7 +66,6 @@ def test_update_name(client, category, category_create, session):
     assert category_id == updated_category.id
     assert updated_category.name == NAME
     assert updated_category.is_active == category.is_active
-    clean_db(session)
 
 
 def test_change_status(client, category, category_create, session):
@@ -81,7 +77,6 @@ def test_change_status(client, category, category_create, session):
     )
     assert response.status_code == status.HTTP_303_SEE_OTHER
     assert response.headers.get("location") == SETTINGS.urls.categories
-    clean_db(session)
 
 
 def test_duplicate_name(client, categories, category_create, session):
@@ -94,7 +89,6 @@ def test_duplicate_name(client, categories, category_create, session):
         data=category_create,
     )
     assert response.status_code == status.HTTP_304_NOT_MODIFIED
-    clean_db(session)
 
 
 def test_name_is_None(client, category, category_create, session):
@@ -105,7 +99,6 @@ def test_name_is_None(client, category, category_create, session):
         data=category_create,
     )
     assert response.status_code == status.HTTP_422_UNPROCESSABLE_ENTITY
-    clean_db(session)
 
 
 def test_404(client):
@@ -121,7 +114,6 @@ def test_any_other_exception(client, category, session):
         data={"name": NAME, "is_active": category.is_active},
     )
     assert response.status_code == status.HTTP_501_NOT_IMPLEMENTED
-    clean_db(session)
 
 
 def test_no_cookie(client, category, category_create, session):
@@ -133,7 +125,6 @@ def test_no_cookie(client, category, category_create, session):
     )
     assert response.status_code == status.HTTP_303_SEE_OTHER
     assert response.headers.get("location") == SETTINGS.urls.login
-    clean_db(session)
 
 
 def test_stale_token(client, category, category_create, session, stale_token):
@@ -145,7 +136,6 @@ def test_stale_token(client, category, category_create, session, stale_token):
     )
     assert response.status_code == status.HTTP_303_SEE_OTHER
     assert response.headers.get("location") == SETTINGS.urls.login
-    clean_db(session)
 
 
 def test_wrong_token(client, category, category_create, session, wrong_token):
@@ -157,4 +147,3 @@ def test_wrong_token(client, category, category_create, session, wrong_token):
     )
     assert response.status_code == status.HTTP_303_SEE_OTHER
     assert response.headers.get("location") == SETTINGS.urls.login
-    clean_db(session)

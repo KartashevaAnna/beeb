@@ -8,7 +8,7 @@ from app.models import Payment
 from app.repositories.payments import PaymentRepo
 from app.settings import SETTINGS
 from app.utils.tools.helpers import get_date_from_datetime
-from tests.conftest import clean_db, get_categories, raise_always
+from tests.conftest import get_categories, raise_always
 from tests.conftest_helpers import check_updated_payment
 
 NAME = "potatoe"
@@ -251,7 +251,6 @@ def test_wrong_token_post(
     )
     assert response.status_code == status.HTTP_303_SEE_OTHER
     assert response.headers.get("location") == SETTINGS.urls.login
-    clean_db(session)
 
 
 def test_wrong_user(client, payment, session, update_payment, wrong_user_token):

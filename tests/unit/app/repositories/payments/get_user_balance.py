@@ -1,6 +1,6 @@
 from app.models import Payment
 from app.repositories.payments import PaymentRepo
-from tests.conftest import TEST_USER_ID, clean_db
+from tests.conftest import TEST_USER_ID
 
 
 def test_get_user_balance(
@@ -36,7 +36,6 @@ def test_get_user_balance(
     expected_result = salary.amount - spendings
     obtained_result = PaymentRepo(session).get_user_balance(TEST_USER_ID)
     assert expected_result == obtained_result
-    clean_db(session)
 
 
 def test_get_user_balance_month_ago(
@@ -66,4 +65,3 @@ def test_get_user_balance_month_ago(
         TEST_USER_ID, month=month, year=year
     )
     assert expected_result == obtained_result
-    clean_db(session)

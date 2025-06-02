@@ -15,7 +15,7 @@ from app.models import Payment
 from app.repositories.payments import PaymentRepo
 from app.settings import SETTINGS
 from app.utils.tools.helpers import get_datetime_without_seconds
-from tests.conftest import clean_db, get_newly_created_payment, raise_always
+from tests.conftest import get_newly_created_payment, raise_always
 from tests.conftest_helpers import check_created_payment
 
 NAME = "milk"
@@ -105,7 +105,6 @@ def test_valid_data_localized_date_food(
         payment=payment,
         response=response,
     )
-    clean_db(session)
 
 
 def test_valid_data_localized_date_non_food(
@@ -126,7 +125,6 @@ def test_valid_data_localized_date_non_food(
     check_created_payment(
         create_payment=check_payment_create, payment=payment, response=response
     )
-    clean_db(session)
 
 
 # # def test_valid_data_spending_over_balance(
@@ -163,7 +161,6 @@ def test_valid_data_non_localized_date_food(
     check_created_payment(
         create_payment=payment_create_check, payment=payment, response=response
     )
-    clean_db(session)
 
 
 def test_valid_data_non_localized_date_non_food(
@@ -183,7 +180,6 @@ def test_valid_data_non_localized_date_non_food(
     check_created_payment(
         create_payment=payment_create_check, payment=payment, response=response
     )
-    clean_db(session)
 
 
 def test_invalid_data_negative_amount_food(client, create_payment_food):

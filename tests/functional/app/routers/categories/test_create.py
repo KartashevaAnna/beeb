@@ -7,7 +7,7 @@ from sqlalchemy import select
 from app.models import Category
 from app.repositories.categories import CategoryRepo
 from app.settings import SETTINGS
-from tests.conftest import clean_db, delete_category, raise_always
+from tests.conftest import delete_category, raise_always
 
 
 def test_template(client):
@@ -51,7 +51,6 @@ def test_valid_data(session, client, category_create):
     category = results.scalars().one_or_none()
     assert category
     assert response.headers.get("location") == SETTINGS.urls.categories
-    clean_db(session)
 
 
 def test_invalid_name(client, category_create, session):

@@ -1,6 +1,6 @@
 from app.models import Payment
 from app.repositories.payments import PaymentRepo
-from tests.conftest import TEST_USER_ID, clean_db
+from tests.conftest import TEST_USER_ID
 
 
 def test_get_balance(
@@ -24,7 +24,6 @@ def test_get_balance(
     payments = [salary, current_payment, month_ago_payment, year_ago_payment]
     obtained_result = PaymentRepo(session).get_balance(payments)["balance"]
     assert expected_result == obtained_result
-    clean_db(session)
 
 
 def test_get_balance_no_salary(
@@ -39,7 +38,6 @@ def test_get_balance_no_salary(
     payments = [current_payment, month_ago_payment, year_ago_payment]
     obtained_result = PaymentRepo(session).get_balance(payments)["balance"]
     assert expected_result == obtained_result
-    clean_db(session)
 
 
 def test_get_balance_only_salary(session, category):
@@ -57,7 +55,6 @@ def test_get_balance_only_salary(session, category):
     payments = [salary]
     obtained_result = PaymentRepo(session).get_balance(payments)["balance"]
     assert expected_result == obtained_result
-    clean_db(session)
 
 
 def test_get_balance_two_salaries(
@@ -104,4 +101,3 @@ def test_get_balance_two_salaries(
     ]
     obtained_result = PaymentRepo(session).get_balance(payments)["balance"]
     assert expected_result == obtained_result
-    clean_db(session)

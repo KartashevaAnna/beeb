@@ -4,7 +4,7 @@ from sqlalchemy import select
 from app.exceptions import DuplicateNameCreateError, EmptyStringError
 from app.models import User
 from app.settings import SETTINGS
-from tests.conftest import clean_db, get_dict_to_create_user, get_users
+from tests.conftest import get_dict_to_create_user, get_users
 
 
 def test_create_user_template(client):
@@ -27,7 +27,6 @@ def test_create(session, client, user):
     result = session.execute(statement)
     assert result.scalars().one_or_none()
     assert response.headers.get("location") == SETTINGS.urls.login
-    clean_db(session)
 
 
 def test_create_duplicate(client, session, user):
@@ -45,7 +44,6 @@ def test_create_duplicate(client, session, user):
     error = DuplicateNameCreateError(user_params.get("username"))
     assert response.status_code == error.status_code
     assert error.detail in response.text
-    clean_db(session)
 
 
 def test_create_no_username(client, session, user):

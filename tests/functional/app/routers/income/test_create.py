@@ -13,7 +13,7 @@ from app.utils.tools.helpers import (
     convert_to_copecks,
     get_datetime_without_seconds,
 )
-from tests.conftest import clean_db, get_all_income, get_newly_created_income
+from tests.conftest import get_all_income, get_newly_created_income
 from tests.conftest_helpers import check_created_income
 
 
@@ -58,7 +58,6 @@ def test_valid_data_localized_date(session, client, create_income):
     check_created_income(
         create_income=create_income_check, income=income, response=response
     )
-    clean_db(session)
 
 
 def test_valid_data_non_localized_date(session, client, create_income):
@@ -72,7 +71,6 @@ def test_valid_data_non_localized_date(session, client, create_income):
     check_created_income(
         create_income=income_create_check, income=income, response=response
     )
-    clean_db(session)
 
 
 def test_invalid_data_negative_amount(client, create_income):

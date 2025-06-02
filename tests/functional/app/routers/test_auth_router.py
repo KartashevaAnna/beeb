@@ -10,7 +10,6 @@ from app.utils.tools.auth_handler import AuthHandler
 from tests.conftest import (
     TEST_USER_NAME,
     TEST_USER_PASSWORD,
-    clean_db,
     get_user,
     raise_always,
 )
@@ -32,7 +31,6 @@ def test_correct_credentials(client, session):
     assert "username" in decoded_token
     user = get_user(session)
     assert decoded_token["username"] == user.username
-    clean_db(session)
 
 
 def test_no_such_login(client):
