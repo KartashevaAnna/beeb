@@ -1,4 +1,4 @@
-from copy import copy
+from copy import deepcopy
 import datetime
 from fastapi import status
 from sqlalchemy import func, select
@@ -47,7 +47,7 @@ def test_template_wrong_token(client, fill_db, wrong_token):
 
 
 def test_valid_data_localized_date(session, client, create_income):
-    create_income_check = copy(create_income)
+    create_income_check = deepcopy(create_income)
     max_id_before = session.scalar(select(func.max(Income.id)))
     response = client.post(
         url=SETTINGS.urls.create_income,
@@ -62,7 +62,7 @@ def test_valid_data_localized_date(session, client, create_income):
 
 def test_valid_data_non_localized_date(session, client, create_income):
     max_id_before = session.scalar(select(func.max(Income.id)))
-    income_create_check = copy(create_income)
+    income_create_check = deepcopy(create_income)
     create_income["date"] = get_datetime_without_seconds(
         datetime.datetime.now()
     )

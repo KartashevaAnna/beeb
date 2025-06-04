@@ -1,4 +1,4 @@
-from copy import copy
+from copy import deepcopy
 
 from fastapi import Response, status
 
@@ -8,7 +8,7 @@ from app.utils.tools.helpers import convert_to_copecks, get_number_for_db
 
 
 def remove_id(to_change: dict) -> dict:
-    new_dict = copy(to_change)
+    new_dict = deepcopy(to_change)
     new_dict.pop("id", None)
     return new_dict
 
@@ -50,7 +50,7 @@ def check_created_income(
 def check_updated_payment(
     updated_payment: Payment, payment_update: dict, response: Response
 ):
-    payment_update = copy(payment_update)
+    payment_update = deepcopy(payment_update)
     payment_update["name"] = payment_update["name"].lower()
     assert response.status_code == 303
     assert response.headers.get("location") == SETTINGS.urls.payments
@@ -64,3 +64,13 @@ def check_updated_payment(
     assert updated_payment.amount == payment_update["amount"]
     assert updated_payment.payment_category.id == payment_update["category_id"]
     assert updated_payment.user_id == payment_update["user_id"]
+
+
+def check_updated_income(
+    updated_income: Income, income_update: dict, response: Response
+):
+    income_update = deepcopy(income_update)
+    assert response.status_code == 303
+    assert response.headers.get("location") == SETTINGS.urls.payments
+    assert updated_income.name == income_update["frontend_name"]
+    assert updated_income.amount == income_update["amount_in_rub"] * 100

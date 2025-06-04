@@ -151,6 +151,8 @@ def prevent_blank_strings(value):
         value = value.replace("  ", " ")
     if value.isspace():
         raise EmptyStringError
+    if not value:
+        raise EmptyStringError
     return value
 
 
@@ -167,13 +169,14 @@ def check_current_year_and_month(year: int, month: int) -> list:
 def validate_positive_number_for_db(
     value: int | None = None,
 ) -> int | BeebError:
-    if value:
-        try:
-            value = int(value)
-        except ValueError:
-            raise NotIntegerError(value)
-        if value <= 0:
-            raise NotPositiveValueError(value)
-        if value > 9999999:
-            raise ValueTooLargeError(value)
+    if value is None:
+        return value
+    try:
+        value = int(value)
+    except ValueError:
+        raise NotIntegerError(value)
+    if value <= 0:
+        raise NotPositiveValueError(value)
+    if value > 9999999:
+        raise ValueTooLargeError(value)
     return value

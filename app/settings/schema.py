@@ -80,6 +80,8 @@ class Urls(BaseModel):
     create_income: str
     delete_income_core: str
     delete_income: str
+    update_income_core: str
+    update_income: str
     create_category: str
     category: str
     categories: str
@@ -102,6 +104,7 @@ class Templates(BaseModel):
     create_payment_non_food: str
     delete_payment: str
     create_income: str
+    update_income: str
     payments_dashboard_yearly: str
     payments_dashboard: str
     payments_dashboard_monthly: str

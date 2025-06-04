@@ -117,3 +117,13 @@ class SpendingOverBalanceError(BeebError):
         self.message = f"Расход {value} превышает сумму, которая есть на счету."
         self.status_code = status.HTTP_406_NOT_ACCEPTABLE
         self.detail = f"Код ошибки: {self.status_code}. " + self.message
+
+
+class IncomeNotFoundError(BeebError):
+    def __init__(
+        self,
+        value: str,
+    ):
+        self.message = f"Доход под номером {value} не найден"
+        self.status_code = status.HTTP_404_NOT_FOUND
+        self.detail = f"Код ошибки: {self.status_code}. " + self.message

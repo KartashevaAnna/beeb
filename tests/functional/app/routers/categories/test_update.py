@@ -10,7 +10,7 @@ from tests.conftest import clean_db, get_categories, raise_always
 NAME = "exotic_category"
 
 
-def test_template(client, category, session):
+def test_template(client, category):
     category_id = category.id
     response = client.get(
         SETTINGS.urls.update_category.format(category_id=category_id)
@@ -19,7 +19,7 @@ def test_template(client, category, session):
     assert category.name in response.text
 
 
-def test_template_no_cookie(client, category, session):
+def test_template_no_cookie(client, category):
     category_id = category.id
     client.cookies = {}
     response = client.get(
@@ -29,7 +29,7 @@ def test_template_no_cookie(client, category, session):
     assert response.headers.get("location") == SETTINGS.urls.login
 
 
-def test_template_stale_token(client, category, session, stale_token):
+def test_template_stale_token(client, category, stale_token):
     category_id = category.id
     client.cookies = {"token": stale_token}
     response = client.get(
@@ -39,7 +39,7 @@ def test_template_stale_token(client, category, session, stale_token):
     assert response.headers.get("location") == SETTINGS.urls.login
 
 
-def test_template_wrong_token(client, category, session, wrong_token):
+def test_template_wrong_token(client, category, wrong_token):
     category_id = category.id
     client.cookies = {"token": wrong_token}
     response = client.get(
@@ -68,7 +68,7 @@ def test_update_name(client, category, category_create, session):
     assert updated_category.is_active == category.is_active
 
 
-def test_change_status(client, category, category_create, session):
+def test_change_status(client, category, category_create):
     category_id = category.id
 
     response = client.post(
@@ -91,7 +91,7 @@ def test_duplicate_name(client, categories, category_create, session):
     assert response.status_code == status.HTTP_304_NOT_MODIFIED
 
 
-def test_name_is_None(client, category, category_create, session):
+def test_name_is_None(client, category, category_create):
     category_id = category.id
     category_create["name"] = None
     response = client.post(
@@ -107,7 +107,7 @@ def test_404(client):
 
 
 @patch.object(CategoryRepo, "update", raise_always)
-def test_any_other_exception(client, category, session):
+def test_any_other_exception(client, category):
     category_id = category.id
     response = client.post(
         SETTINGS.urls.update_category.format(category_id=category_id),
@@ -116,7 +116,7 @@ def test_any_other_exception(client, category, session):
     assert response.status_code == status.HTTP_501_NOT_IMPLEMENTED
 
 
-def test_no_cookie(client, category, category_create, session):
+def test_no_cookie(client, category, category_create):
     category_id = category.id
     client.cookies = {}
     response = client.post(
@@ -127,7 +127,7 @@ def test_no_cookie(client, category, category_create, session):
     assert response.headers.get("location") == SETTINGS.urls.login
 
 
-def test_stale_token(client, category, category_create, session, stale_token):
+def test_stale_token(client, category, category_create, stale_token):
     category_id = category.id
     client.cookies = {"token": stale_token}
     response = client.post(
@@ -138,7 +138,7 @@ def test_stale_token(client, category, category_create, session, stale_token):
     assert response.headers.get("location") == SETTINGS.urls.login
 
 
-def test_wrong_token(client, category, category_create, session, wrong_token):
+def test_wrong_token(client, category, category_create, wrong_token):
     category_id = category.id
     client.cookies = {"token": wrong_token}
     response = client.post(

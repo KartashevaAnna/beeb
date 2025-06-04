@@ -64,8 +64,8 @@ teardown-test:
 	docker-compose -f tests/docker-compose.local.small.yml rm -f
 
 
-.PHONY: docker-run
-docker-run:
+.PHONY: docker-test-run
+docker-test-run:
 	${MAKE} compose-one-down && ${MAKE} compose-one-up
 
 

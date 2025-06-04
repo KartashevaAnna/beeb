@@ -1,6 +1,6 @@
 from typing import Annotated
 
-import fastapi
+from fastapi import APIRouter
 from fastapi import Depends, Request, status
 
 from app.exceptions import BeebError
@@ -10,7 +10,7 @@ from app.settings import SETTINGS, TEMPLATES
 from app.utils.dependencies import payments_repo
 from app.utils.tools.helpers import get_current_year_and_month
 
-payments_dashboard_router = fastapi.APIRouter()
+payments_dashboard_router = APIRouter()
 
 
 @payments_dashboard_router.get(SETTINGS.urls.payments_dashboard)

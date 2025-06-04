@@ -6,10 +6,13 @@ from sqlalchemy import (
     Column,
     String,
     delete,
+    desc,
     extract,
     func,
+    null,
     select,
     text,
+    union,
     update,
 )
 from sqlalchemy.orm import Session
@@ -49,49 +52,40 @@ class PaymentRepo:
     def __init__(self, session: Session) -> None:
         self.session = session
 
-    def get_all_payments(self, user_id: int) -> list[dict[Income, Payment]]:
-        first_query = f"""
-        SELECT  
-        id, 
-        uuid, name, 
-        NULL as grams, 
-        NULL as quantity, 
-        amount, 
-        NULL as category_id,
-        user_id, 
-        created_at,
-        NULL as category_name
-        
-        FROM main.income
-        
-        WHERE user_id = {user_id}
-        """  # noqa: W291
-        union = " UNION "
-        second_query = f"""
-        SELECT 
-        main.payments.id, 
-        main.payments.uuid, 
-        main.payments.name, 
-        main.payments.grams, 
-        main.payments.quantity, 
-        main.payments.amount, 
-        main.payments.category_id,
-        main.payments.user_id, 
-        main.payments.created_at,
-        main.category.name as category_name 
-        
-        FROM main.payments
-
-        JOIN main.category ON main.payments.category_id = main.category.id
-        
-        WHERE main.payments.user_id = {user_id}
-
-        """  # noqa: W291
-        order_by = "ORDER BY created_at DESC"
-        base_expression = first_query + union + second_query + order_by + ";"
-        stmt = text(base_expression)
-        res = self.session.execute(stmt)
-        return [list(x) for x in res]
+    def read_all(self, user_id: int) -> list[PaymentShow]:
+        income_statement = select(
+            Income.id,
+            Income.uuid,
+            Income.name,
+            null().label("grams"),
+            null().label("quantity"),
+            Income.amount,
+            null().label("category_id"),
+            Income.user_id,
+            Income.created_at,
+            null().label("category"),
+        ).where(Income.user_id == user_id)
+        payment_statement = (
+            select(
+                Payment.id,
+                Payment.uuid,
+                Payment.name,
+                Payment.grams,
+                Payment.quantity,
+                Payment.amount,
+                Payment.category_id,
+                Payment.user_id,
+                Payment.created_at,
+                Category.name.label("category"),
+            )
+            .where(Payment.user_id == user_id)
+            .join(Payment.payment_category)
+        )
+        union_query = union(income_statement, payment_statement).order_by(
+            desc("created_at")
+        )
+        final_query = self.session.execute(union_query)
+        return [PaymentShow(**row._mapping) for row in final_query]
 
     def get_spendings(self, payments: list[Payment]) -> list[Payment]:
         return [payment for payment in payments if payment.is_spending is True]
@@ -142,15 +136,6 @@ class PaymentRepo:
         )
         res = self.session.execute(statement)
         return res.scalars().all()
-
-    def read_all(self, user_id: int) -> list[Payment, Income]:
-        results = self.get_all_payments(user_id)
-        return [
-            PaymentShow(
-                **payment,
-            )
-            for payment in results
-        ]
 
     def get_total(self, payments: list[Payment]) -> int:
         return self.sum_payment_amounts(payments)
@@ -281,7 +266,6 @@ class PaymentRepo:
             update(Payment)
             .where(Payment.id == payment_id)
             .values(
-                user_id=to_update.user_id,
                 name=to_update.name,
                 amount=to_update.amount_in_kopecks,
                 category_id=to_update.category_id,

@@ -1,9 +1,10 @@
 import datetime
-from copy import copy
+from copy import deepcopy
 from unittest.mock import patch
 
 from fastapi import status
 
+from app.exceptions import NotPositiveValueError
 from app.models import Payment
 from app.repositories.payments import PaymentRepo
 from app.settings import SETTINGS
@@ -53,7 +54,7 @@ def test_template_wrong_token(client, payment, wrong_token):
     assert response.headers.get("location") == SETTINGS.urls.login
 
 
-def test_name_lowercase_amount_int_is_spending_true(
+def test_name_lowercase_amount_int(
     client,
     payment,
     session,
@@ -69,22 +70,8 @@ def test_name_lowercase_amount_int_is_spending_true(
     check_updated_payment(updated_payment, update_payment, response)
 
 
-def test_name_lowercase_amount_int_is_speding_false(
-    client, payment, session, update_payment
-):
-    update_payment = copy(update_payment)
-    update_payment["is_spending"] = False
-    response = client.post(
-        SETTINGS.urls.update_payment.format(payment_id=payment.id),
-        data=update_payment,
-    )
-    session.expire_all()
-    updated_payment = session.get(Payment, payment.id)
-    check_updated_payment(updated_payment, update_payment, response)
-
-
 def test_title_amount_int(client, payment, session, update_payment):
-    update_payment = copy(update_payment)
+    update_payment = deepcopy(update_payment)
     update_payment["name"] = NAME.title()
     response = client.post(
         SETTINGS.urls.update_payment.format(payment_id=payment.id),
@@ -96,7 +83,7 @@ def test_title_amount_int(client, payment, session, update_payment):
 
 
 def test_name_upper_amount_int(client, payment, session, update_payment):
-    update_payment = copy(update_payment)
+    update_payment = deepcopy(update_payment)
     update_payment["name"] = NAME.upper()
     response = client.post(
         SETTINGS.urls.update_payment.format(payment_id=payment.id),
@@ -110,7 +97,7 @@ def test_name_upper_amount_int(client, payment, session, update_payment):
 def test_name_lowercase_amount_frontend(
     client, payment, session, update_payment
 ):
-    update_payment = copy(update_payment)
+    update_payment = deepcopy(update_payment)
     update_payment["amount"] = "65₽"
     response = client.post(
         SETTINGS.urls.update_payment.format(payment_id=payment.id),
@@ -122,45 +109,45 @@ def test_name_lowercase_amount_frontend(
 
 
 def test_name_lowercase_amount_int_zero(client, payment, update_payment):
-    update_payment = copy(update_payment)
+    update_payment = deepcopy(update_payment)
     update_payment["amount"] = 0
     response = client.post(
         SETTINGS.urls.update_payment.format(payment_id=payment.id),
         data=update_payment,
     )
-    assert "number must be positive" in response.text
+    assert NotPositiveValueError(0).detail in response.text
 
 
 def test_name_lowercase_amount_frontend_zero(client, payment, update_payment):
-    update_payment = copy(update_payment)
+    update_payment = deepcopy(update_payment)
     update_payment["amount"] = "00₽"
     response = client.post(
         SETTINGS.urls.update_payment.format(payment_id=payment.id),
         data=update_payment,
     )
-    assert "number must be positive" in response.text
+    assert NotPositiveValueError(0).detail in response.text
 
 
 def test_name_lowercase_amount_frontend_negative(
     client, payment, update_payment
 ):
-    update_payment = copy(update_payment)
+    update_payment = deepcopy(update_payment)
     update_payment["amount"] = "-56₽"
     response = client.post(
         SETTINGS.urls.update_payment.format(payment_id=payment.id),
         data=update_payment,
     )
-    assert "number must be positive" in response.text
+    assert NotPositiveValueError(-56).detail in response.text
 
 
 def test_name_lowercase_amount_int_negative(client, payment, update_payment):
-    update_payment = copy(update_payment)
+    update_payment = deepcopy(update_payment)
     update_payment["amount"] = "-56₽"
     response = client.post(
         SETTINGS.urls.update_payment.format(payment_id=payment.id),
         data=update_payment,
     )
-    assert "number must be positive" in response.text
+    assert NotPositiveValueError(-56).detail in response.text
 
 
 def test_404(client):
@@ -184,7 +171,7 @@ def test_update_category(client, session, fill_db, payment, update_payment):
     categories = {x.name: x.id for x in categories}
     categories_names.remove(previous_category)
     new_category_name = categories_names[0]
-    update_payment = copy(update_payment)
+    update_payment = deepcopy(update_payment)
     update_payment["category"] = new_category_name
     update_payment.pop("created_at", None)
     update_payment.pop("categoty_id", None)
@@ -241,9 +228,7 @@ def test_stale_token_post(client, payment, update_payment, stale_token):
     assert response.headers.get("location") == SETTINGS.urls.login
 
 
-def test_wrong_token_post(
-    client, payment, update_payment, wrong_token, session
-):
+def test_wrong_token_post(client, payment, update_payment, wrong_token):
     client.cookies = {"token": wrong_token}
     response = client.post(
         SETTINGS.urls.update_payment.format(payment_id=payment.id),

@@ -1,6 +1,6 @@
 from typing import Annotated
 
-import fastapi
+from fastapi import APIRouter
 from fastapi import Depends, Form, HTTPException, Request, status
 from fastapi.responses import RedirectResponse
 from pydantic import ValidationError
@@ -12,7 +12,7 @@ from app.schemas.categories import CategoryCreate
 from app.settings import SETTINGS, TEMPLATES
 from app.utils.dependencies import categories_repo
 
-update_category_router = fastapi.APIRouter()
+update_category_router = APIRouter()
 
 
 @update_category_router.get(SETTINGS.urls.update_category)
@@ -31,7 +31,6 @@ def serve_update_category_template(
             SETTINGS.templates.read_category,
             context={
                 "category": category,
-                "form_disabled": False,
                 "options": repo.get_status_options(
                     current_option=category.is_active
                 ),

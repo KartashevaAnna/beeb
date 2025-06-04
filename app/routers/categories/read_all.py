@@ -1,6 +1,6 @@
 from typing import Annotated
 
-import fastapi
+from fastapi import APIRouter
 from fastapi import Depends, Request, status
 
 from app.repositories.categories import CategoryRepo
@@ -8,7 +8,7 @@ from app.routers.auth_router import authenticate
 from app.settings import SETTINGS, TEMPLATES
 from app.utils.dependencies import categories_repo
 
-read_categories_router = fastapi.APIRouter()
+read_categories_router = APIRouter()
 
 
 @read_categories_router.get(SETTINGS.urls.categories)

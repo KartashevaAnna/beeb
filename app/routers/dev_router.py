@@ -1,11 +1,11 @@
-import copy
+from copy import deepcopy
 import csv
 import locale
 import os
 import random
 from typing import Annotated
+from fastapi import APIRouter
 
-import fastapi
 from fastapi import Depends
 from pyexcel_odsr import get_data
 from sqlalchemy.orm import Session
@@ -25,7 +25,7 @@ from app.utils.tools.helpers import (
     get_number_for_db,
 )
 
-dev_router = fastapi.APIRouter(tags=["Dev"], include_in_schema=True)
+dev_router = APIRouter(tags=["Dev"], include_in_schema=True)
 
 
 @dev_router.post("/populate-categories")
@@ -37,7 +37,7 @@ def create_category_in_db(
     current_categories = repo.read_all(user_id)
 
     current_categories = [x.name for x in current_categories]
-    my_categories = copy.deepcopy(CATEGORIES)
+    my_categories = deepcopy(CATEGORIES)
     name = my_categories[0]
     if name not in current_categories:
         add_category_to_db(session=session, name=name, user_id=user_id)

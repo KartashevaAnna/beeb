@@ -1,5 +1,5 @@
 import datetime
-from copy import copy
+from copy import deepcopy
 from unittest.mock import patch
 
 from fastapi import status
@@ -93,7 +93,7 @@ def test_valid_data_localized_date_food(
     positive_balance,
 ):
     max_id_before = session.scalar(select(func.max(Payment.id)))
-    payment_create_check = copy(create_payment_food)
+    payment_create_check = deepcopy(create_payment_food)
     create_payment_food.pop("category_id", None)
     response = client.post(
         url=SETTINGS.urls.create_payment, data=create_payment_food
@@ -114,7 +114,7 @@ def test_valid_data_localized_date_non_food(
     positive_balance,
 ):
     max_id_before = session.scalar(select(func.max(Payment.id)))
-    check_payment_create = copy(create_payment_non_food)
+    check_payment_create = deepcopy(create_payment_non_food)
     create_payment_non_food.pop("category_id", None)
     response = client.post(
         url=SETTINGS.urls.create_payment,
@@ -149,7 +149,7 @@ def test_valid_data_non_localized_date_food(
     session, client, create_payment_food, positive_balance
 ):
     max_id_before = session.scalar(select(func.max(Payment.id)))
-    payment_create_check = copy(create_payment_food)
+    payment_create_check = deepcopy(create_payment_food)
     create_payment_food.pop("category_id", None)
     create_payment_food["date"] = get_datetime_without_seconds(
         datetime.datetime.now()
@@ -167,7 +167,7 @@ def test_valid_data_non_localized_date_non_food(
     session, client, create_payment_non_food, positive_balance
 ):
     max_id_before = session.scalar(select(func.max(Payment.id)))
-    payment_create_check = copy(create_payment_non_food)
+    payment_create_check = deepcopy(create_payment_non_food)
     create_payment_non_food.pop("category_id", None)
     create_payment_non_food["date"] = get_datetime_without_seconds(
         datetime.datetime.now()

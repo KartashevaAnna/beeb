@@ -3,107 +3,119 @@
 
 {% block bodycontent %}
 
-    <div class="container-fluid">
-        <div class="row my-2">
-            <div class="col-12">
-                <button onclick="location.href='{{ create }}'" class="btn beeb-submit-button-large"><br></button>
-                </div>
-            </div>
+       
 
 
 
 <div class="container-fluid my-2">
-<table class="table table-hover" style="text-align: center; vertical-align: middle;">
+    <div class="row my-2">
+        <div class="col-12">
+            <button onclick="location.href='{{ create }}'" class="btn beeb-submit-button-large">Добавить</button>
+        </div>
+    </div>
+
+    <table class="table table-hover" style="text-align: center; vertical-align: middle;">
+        <tr>
+            <th>имя</th>
+            <th>сумма</th>
+            <th> штук</th>
+            <th> грамм</th>
+            <th>категория</th>
+            <th>дата</th>
+            <th>тип</th>
+            <th> </th>
+            <th> </th>
+        </tr>
+
+
+    {% for payment in payments %}
     <tr>
-        <th>имя</th>
-        <th>сумма</th>
-        <th> штук</th>
-        <th> грамм</th>
-        <th>категория</th>
-        <th>дата</th>
-        <th>тип</th>
-        <th> </th>
-        <th> </th>
-      </tr>
-
-
-{% for payment in payments %}
-<tr>
-    <td scope="row">{{ payment.name }}</td>
-    <td>{{ payment.amount_in_rub }}</td>
-    <td>{{ payment.readable_quantity if payment.quantity is not none else "—"}}</td>
-    <td>{{ payment.readable_grams if payment.grams is not none else "—"}}</td>
-    {% if payment.category == 'продукты' %}
+        <td scope="row">{{ payment.name }}</td>
+        <td>{{ payment.amount_in_rub }}</td>
+        <td>{{ payment.readable_quantity if payment.quantity is not none else "—"}}</td>
+        <td>{{ payment.readable_grams if payment.grams is not none else "—"}}</td>
+        
+        {% if payment.category == 'зарплата' %}
+            <td>
+                <h5><span class="badge" style="
+                color: var(--bs-emphasis-color); background-color: var(--bs-tertiary-bg);">{{payment.category}}</span></h5> 
+            </td>
+        
+        {% elif payment.category == 'продукты' %}
+            <td>
+                <h5><span class="badge" style="
+                color: var(--bs-emphasis-color); background-color: var(--bs-secondary-bg);">{{payment.category}}</span></h5> 
+            </td>
+        {% elif payment.category == 'лишнее' %}
         <td>
             <h5><span class="badge" style="
-            color: var(--bs-emphasis-color); background-color: var(--bs-secondary-bg);">{{payment.category}}</span></h5> 
+            color: var(--bs-emphasis-color); background-color: var(--bs-danger-text-emphasis);">{{payment.category}}</span></h5> 
         </td>
-    {% elif payment.category == 'лишнее' %}
-    <td>
-        <h5><span class="badge" style="
-        color: var(--bs-emphasis-color); background-color: var(--bs-danger-text-emphasis);">{{payment.category}}</span></h5> 
-    </td>
-    {% elif payment.category == 'озон' %}
-    <td>
-        <h5><span class="badge" style="
-        color: var(--bs-emphasis-color); background-color: var(--bs-primary-text-emphasis);">{{payment.category}}</span></h5> 
-    </td>
-    {% elif payment.category == 'такси' %}
-    <td>
-        <h5><span class="badge" style="
-        color: var(--bs-emphasis-color); background-color: var(--bs-warning-text-emphasis);">{{payment.category}}</span></h5> 
-    </td>
-    {% elif payment.category == 'квартплата' %}
-    <td>
-        <h5><span class="badge" style="
-        color: var(--bs-emphasis-color); background-color: var(--bs-tertiary-bg);">{{payment.category}}</span></h5> 
-    </td>
+        {% elif payment.category == 'озон' %}
+        <td>
+            <h5><span class="badge" style="
+            color: var(--bs-emphasis-color); background-color: var(--bs-primary-text-emphasis);">{{payment.category}}</span></h5> 
+        </td>
+        {% elif payment.category == 'такси' %}
+        <td>
+            <h5><span class="badge" style="
+            color: var(--bs-emphasis-color); background-color: var(--bs-warning-text-emphasis);">{{payment.category}}</span></h5> 
+        </td>
+        {% elif payment.category == 'квартплата' %}
+        <td>
+            <h5><span class="badge" style="
+            color: var(--bs-emphasis-color); background-color: var(--bs-tertiary-bg);">{{payment.category}}</span></h5> 
+        </td>
 
-    {% elif payment.category == 'электричество' %}
-    <td>
-        <h5><span class="badge" style="
-        color: var(--bs-emphasis-color); background-color: var(--bs-form-valid-color);">{{payment.category}}</span></h5> 
-    </td>
+        {% elif payment.category == 'электричество' %}
+        <td>
+            <h5><span class="badge" style="
+            color: var(--bs-emphasis-color); background-color: var(--bs-form-valid-color);">{{payment.category}}</span></h5> 
+        </td>
 
-    {% elif payment.category == 'одежда' %}
-    <td>
-        <h5><span class="badge" style="
-        color: var(--bs-emphasis-color); background-color: var(--bs-secondary-text-emphasis);">{{payment.category}}</span></h5> 
-    </td>
+        {% elif payment.category == 'одежда' %}
+        <td>
+            <h5><span class="badge" style="
+            color: var(--bs-emphasis-color); background-color: var(--bs-secondary-text-emphasis);">{{payment.category}}</span></h5> 
+        </td>
 
-    {% else %}
-    <td>
-        <h5><span class="badge" style="
-        color: var(--bs-emphasis-color); background-color: var(--bs-tertiary-color);">{{payment.category}}</span></h5> 
-    </td>
-
-    {% endif %}
-    
-    <td>{{ payment.date }} </td>
-    <td>
-        {% if not payment.category %}
-        <h5><span class="badge" style="color: var(--bs-emphasis-color); background-color: var(--bs-tertiary-bg);">доход</span></h5> 
         {% else %}
-     
-        <h5><span class="badge" style="color: var(--bs-emphasis-color); background-color: var(--bs-tertiary-color-darker);">расход</span></h5> 
+        <td>
+            <h5><span class="badge" style="
+            color: var(--bs-emphasis-color); background-color: var(--bs-tertiary-color);">{{payment.category}}</span></h5> 
+        </td>
 
         {% endif %}
-    </td>
-    <td>
         
-        <a href="{{ update_payment }}/{{payment.id}}"  ><i class="material-icons">✏️</i></a></td>
-    {% if payment.category %}
-    <form action="{{ delete_payment }}/{{payment.id}}"  method="post">
-    <td><button class="beeb-delete-button"><i class="material-icons" style="color: var(--bs-body-color);">delete</i></button></td>
-    </form>
-    {% else %}
-    <form action="{{ delete_income }}/{{payment.id}}"  method="post">
-    <td><button class="beeb-delete-button"><i class="material-icons" style="color: var(--bs-body-color);">delete</i></button></td>
-    </form>
-    {% endif %}
-</tr>
-{% endfor %}
-</table>
+        <td>{{ payment.date }} </td>
+        <td>
+            {% if payment.type == 'доход' %}
+            <h5><span class="badge" style="color: var(--bs-emphasis-color); background-color: var(--bs-tertiary-bg);">доход</span></h5> 
+            {% else %}
+        
+            <h5><span class="badge" style="color: var(--bs-emphasis-color); background-color: var(--bs-tertiary-color-darker);">расход</span></h5> 
+
+            {% endif %}
+        </td>
+        <td>
+            {% if payment.type == "доход" %}
+            <a href="{{ update_income }}/{{payment.id}}"  ><i class="material-icons">✏️</i></a>
+            {% else %}
+            <a href="{{ update_payment }}/{{payment.id}}"  ><i class="material-icons">✏️</i></a>
+            {% endif %}
+        </td>
+        {% if payment.type == "доход" %}
+            <form action="{{ delete_income }}/{{payment.id}}"  method="post">
+            <td><button class="beeb-delete-button"><i class="material-icons" style="color: var(--bs-body-color);">delete</i></button></td>
+            </form>
+        {% else %}
+            <form action="{{ delete_payment }}/{{payment.id}}"  method="post">
+            <td><button class="beeb-delete-button"><i class="material-icons" style="color: var(--bs-body-color);">delete</i></button></td>
+            </form>
+        {% endif %}
+    </tr>
+    {% endfor %}
+    </table>
 </div>
 
 

@@ -1,6 +1,6 @@
 from datetime import datetime
 from typing import Annotated, Optional
-import fastapi
+from fastapi import APIRouter
 from fastapi import Depends, Form, Request, status
 from fastapi.responses import RedirectResponse
 from app.exceptions import BeebError
@@ -9,15 +9,15 @@ from app.routers.auth_router import authenticate
 from app.schemas.income import IncomeCreate
 from app.settings import SETTINGS, TEMPLATES
 from app.utils.dependencies import income_repo
+from fastapi import Request
 
-
-create_income_router = fastapi.APIRouter()
+create_income_router = APIRouter()
 
 
 @create_income_router.get(SETTINGS.urls.create_income)
 @authenticate
 def serve_create_income_template(
-    request: fastapi.Request,
+    request: Request,
     user_id: int | None = None,
 ):
     return TEMPLATES.TemplateResponse(

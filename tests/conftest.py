@@ -1,7 +1,7 @@
 import datetime
 import os
 import random
-from copy import copy
+from copy import deepcopy
 from pathlib import Path
 import shutil
 
@@ -16,7 +16,11 @@ from app.models import AlchemyBaseModel, Category, Income, Payment, User
 from app.settings import ENGINE
 from app.utils.constants import CATEGORIES, PRODUCTS
 from app.utils.tools.auth_handler import AuthHandler
-from app.utils.tools.helpers import get_date_from_datetime, hash_password
+from app.utils.tools.helpers import (
+    get_date_from_datetime,
+    get_pure_date_from_datetime,
+    hash_password,
+)
 from tests.conftest_helpers import change_to_a_defined_category, remove_id
 
 TEST_CATEGORY_NAME = "древесина"
@@ -24,6 +28,8 @@ TEST_PASSWORD = "test_password"
 TEST_USER_NAME = "beebo"
 TEST_USER_ID = 1
 TEST_USER_PASSWORD = "sW0rDf!s4"
+TEST_INCOME_NAME = "доход"
+TEST_INCOME_UPDATED_NAME = "обновлённый доход"
 
 
 @pytest.fixture(scope="function")
@@ -262,7 +268,7 @@ def income_as_dict(income, session) -> dict:
 
 @pytest.fixture(scope="function")
 def create_income(income_as_dict, session) -> dict:
-    new_dict = copy(income_as_dict)
+    new_dict = deepcopy(income_as_dict)
     new_dict.pop("id")
     new_dict.pop("uuid")
     new_dict.pop("created_at")
@@ -281,14 +287,14 @@ def add_category_name(payment_as_dict, session):
 
 
 def change_created_at_to_date(payment_as_dict):
-    new_dict = copy(payment_as_dict)
+    new_dict = deepcopy(payment_as_dict)
     date = new_dict.pop("created_at", None)
     new_dict["date"] = get_date_from_datetime(date)
     return new_dict
 
 
 def create_payment_with_id(payment_as_dict, session, category) -> dict:
-    new_dict = copy(payment_as_dict)
+    new_dict = deepcopy(payment_as_dict)
     new_dict = change_to_a_defined_category(payment_as_dict, category)
     new_dict = add_category_name(payment_as_dict, session)
     new_dict = change_created_at_to_date(new_dict)
@@ -321,7 +327,7 @@ def create_payment_no_id(create_payment_food) -> dict:
 
 @pytest.fixture(scope="function")
 def get_dict_for_new_payment(create_payment_food):
-    new_dict = copy(create_payment_food)
+    new_dict = deepcopy(create_payment_food)
     new_dict.pop("id", None)
     new_dict.pop("created_at", None)
     new_dict.pop("updated_at", None)
@@ -331,14 +337,14 @@ def get_dict_for_new_payment(create_payment_food):
 
 @pytest.fixture(scope="function")
 def create_payment_no_category_food(create_payment_no_id) -> dict:
-    new_dict = copy(create_payment_no_id)
+    new_dict = deepcopy(create_payment_no_id)
     create_payment_no_id.pop("category_id", None)
     return new_dict
 
 
 @pytest.fixture(scope="function")
 def create_payment_no_category_non_food(create_payment_no_id) -> dict:
-    new_dict = copy(create_payment_no_id)
+    new_dict = deepcopy(create_payment_no_id)
     create_payment_no_id.pop("category_id", None)
     create_payment_no_id["quantity"] = 20
     create_payment_no_id.pop("grams")
@@ -348,8 +354,23 @@ def create_payment_no_category_non_food(create_payment_no_id) -> dict:
 @pytest.fixture(scope="function")
 def update_payment(payment_as_dict, session, category) -> dict:
     new_dict = create_payment_with_id(payment_as_dict, session, category)
-    new_dict["form_disabled"] = True
     new_dict["user_id"] = TEST_USER_ID
+    return new_dict
+
+
+@pytest.fixture(scope="function")
+def update_income(income_as_dict, session, category) -> dict:
+    new_dict = deepcopy(income_as_dict)
+    new_dict["user_id"] = TEST_USER_ID
+    new_dict["frontend_name"] = TEST_INCOME_NAME
+    new_dict["date"] = get_pure_date_from_datetime(income_as_dict["created_at"])
+    new_dict["amount_in_rub"] = income_as_dict["amount"] // 100
+    new_dict.pop("amount")
+    new_dict.pop("created_at")
+    new_dict.pop("uuid")
+    new_dict.pop("user_id")
+    new_dict.pop("id")
+    new_dict.pop("name")
     return new_dict
 
 
@@ -378,7 +399,7 @@ def category_as_dict(category, session) -> dict:
 
 @pytest.fixture(scope="function")
 def category_create(category_as_dict, session) -> dict:
-    category = copy(category_as_dict)
+    category = deepcopy(category_as_dict)
     del category["id"]
     del category["created_at"]
     del category["updated_at"]

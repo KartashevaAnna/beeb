@@ -1,6 +1,6 @@
 from typing import Annotated
 
-import fastapi
+from fastapi import APIRouter
 from fastapi import Depends, HTTPException, Request, status
 
 from app.repositories.categories import CategoryRepo
@@ -8,7 +8,7 @@ from app.routers.auth_router import authenticate
 from app.settings import SETTINGS, TEMPLATES
 from app.utils.dependencies import categories_repo
 
-read_category_router = fastapi.APIRouter()
+read_category_router = APIRouter()
 
 
 @read_category_router.get(SETTINGS.urls.category)
@@ -27,7 +27,6 @@ def read_category(
             SETTINGS.templates.read_category,
             context={
                 "category": category,
-                "form_disabled": True,
             },
         )
     except HTTPException as exc:

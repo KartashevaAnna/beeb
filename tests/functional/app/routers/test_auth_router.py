@@ -1,6 +1,5 @@
-import copy
 from unittest.mock import patch
-
+from copy import deepcopy
 from fastapi import status
 
 from app.exceptions import UserNotFoundError, WrongPasswordError
@@ -35,7 +34,7 @@ def test_correct_credentials(client, session):
 
 def test_no_such_login(client):
     wrong_username = "wrong_username"
-    WRONG_DATA = copy.deepcopy(TEST_LOGIN_DATA)
+    WRONG_DATA = deepcopy(TEST_LOGIN_DATA)
     WRONG_DATA["username"] = wrong_username
     response = client.post(
         SETTINGS.urls.login,
@@ -48,7 +47,7 @@ def test_no_such_login(client):
 
 def test_wrong_password(client):
     wrong_password = "wrong_password"
-    WRONG_DATA = copy.deepcopy(TEST_LOGIN_DATA)
+    WRONG_DATA = deepcopy(TEST_LOGIN_DATA)
     WRONG_DATA["password"] = wrong_password
     response = client.post(
         SETTINGS.urls.login,

@@ -1,6 +1,6 @@
 from typing import Annotated
 
-import fastapi
+from fastapi import APIRouter
 from fastapi import Depends, Request, status
 from fastapi.responses import RedirectResponse
 
@@ -10,7 +10,7 @@ from app.routers.auth_router import authenticate
 from app.settings import SETTINGS, TEMPLATES
 from app.utils.dependencies import income_repo
 
-delete_income_router = fastapi.APIRouter()
+delete_income_router = APIRouter()
 
 
 @delete_income_router.post(SETTINGS.urls.delete_income)
@@ -44,7 +44,3 @@ def delete_income(
             },
             status_code=status.HTTP_501_NOT_IMPLEMENTED,
         )
-
-
-# "POST /payments/delete/23 HTTP/1.1" 303 See Other
-# "POST /income/delete/2 HTTP/1.1" 404 Not Found
