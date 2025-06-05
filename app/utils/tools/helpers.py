@@ -3,7 +3,7 @@ import locale
 import random
 import re
 from hashlib import sha256
-
+from calendar import isleap
 from app.exceptions import (
     BeebError,
     EmptyStringError,
@@ -13,7 +13,7 @@ from app.exceptions import (
 )
 from app.models import Payment
 from app.settings import SETTINGS
-from app.utils.constants import INT_TO_MONTHES, PRODUCTS
+from app.utils.constants import INT_TO_MONTHS, PRODUCTS
 
 
 def add_payments_to_db(session, category_id: int, user_id: int) -> Payment:
@@ -163,7 +163,7 @@ def get_current_year_and_month() -> list:
 
 def check_current_year_and_month(year: int, month: int) -> list:
     current_year, current_month = get_current_year_and_month()
-    return current_year == year and INT_TO_MONTHES[current_month] == month
+    return current_year == year and INT_TO_MONTHS[current_month] == month
 
 
 def validate_positive_number_for_db(
@@ -180,3 +180,27 @@ def validate_positive_number_for_db(
     if value > 9999999:
         raise ValueTooLargeError(value)
     return value
+
+
+def get_max_days_in_month(month: int, year: int) -> int:
+    days_in_month = {
+        "январь": 1,
+        "февраль": 29 if isleap(year) else 28,
+        "март": 31,
+        "апрель": 30,
+        "май": 31,
+        "июнь": 30,
+        "июль": 31,
+        "август": 31,
+        "сентябрь": 30,
+        "октябрь": 31,
+        "ноябрь": 30,
+        "декабрь": 31,
+    }
+    return days_in_month[INT_TO_MONTHS[month]]
+
+
+def get_date_from_year_and_month(year: int, month: int) -> datetime.datetime:
+    time = "23:59:59.999999"
+    day = get_max_days_in_month(year=year, month=month)
+    return f"{year}-{str(month).zfill(2)}-{str(day).zfill(2)} {time}"

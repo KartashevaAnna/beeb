@@ -30,12 +30,12 @@ def dashboard_for_all_years(
         payments = repo.read_all(user_id)
 
         dashboard = repo.get_dashboard(
-            request=request,
             payments=payments,
             user_id=user_id,
             year=current_year,
             month=current_month,
         )
+
         dashboard["all_years"] = repo.get_all_years(user_id)
         dashboard["header_text"] = "Расходы за всё время"
 
@@ -91,7 +91,7 @@ def read_all_payments_per_year(
     try:
         payments = repo.get_payments_per_year(year=year, user_id=user_id)
         dashboard = repo.get_dashboard(
-            request=request, payments=payments, year=year, user_id=user_id
+            payments=payments, year=year, user_id=user_id
         )
         dashboard["header_text"] = f"Расходы за {year} год"
 
@@ -134,7 +134,6 @@ def read_all_payments_per_month(
             year=year, month=month, user_id=user_id
         )
         dashboard = repo.get_dashboard(
-            request=request,
             payments=payments,
             year=year,
             month=month,

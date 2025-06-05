@@ -35,7 +35,7 @@ from app.schemas.payments import (
     PaymentShowOne,
     PaymentUpdate,
 )
-from app.utils.constants import INT_TO_MONTHES, MONTHES
+from app.utils.constants import INT_TO_MONTHS, MONTHS
 from app.utils.tools.category_helpers import (
     get_payments_shares,
     get_payments_sums_per_category,
@@ -45,6 +45,7 @@ from app.utils.tools.helpers import (
     check_current_year_and_month,
     get_current_year_and_month,
     get_date_from_datetime_without_year,
+    get_date_from_year_and_month,
     get_monthly_payments,
     get_readable_amount,
 )
@@ -92,7 +93,7 @@ class PaymentRepo:
         return [PaymentShow(**row._mapping) for row in final_query]
 
     def get_spendings(self, payments: list[Payment]) -> list[Payment]:
-        return [payment for payment in payments if payment.type == "расход"]
+        return [payment for payment in payments if payment.type != "доход"]
 
     def get_incomes(self, payments: list[Payment]) -> list[Payment]:
         return [payment for payment in payments if payment.type == "доход"]
@@ -204,7 +205,7 @@ class PaymentRepo:
 
     def get_rate_per_day(self, expenses: int, elapsed_days: int) -> int:
         try:
-            return expenses / elapsed_days
+            return expenses // elapsed_days
         except ZeroDivisionError:
             return expenses
 
@@ -214,7 +215,7 @@ class PaymentRepo:
         monthly_payments = get_monthly_payments(payments)
         sorted_monthly_payments = dict(sorted(monthly_payments.items()))
         return {
-            MONTHES[calendar.month_name[int(key)]]: (
+            MONTHS[calendar.month_name[int(key)]]: (
                 get_readable_amount(value),
                 f"/dashboard/{year}/{key}" if year else None,
             )
@@ -330,7 +331,7 @@ class PaymentRepo:
         self.session.commit()
 
     def get_all_years(self, user_id: int):
-        all_payments = self.get_all_payments(user_id)
+        all_payments = self.read_all(user_id)
         all_payments = list({x.created_at.year for x in all_payments})
         all_payments.sort(reverse=True)
         return all_payments
@@ -338,51 +339,51 @@ class PaymentRepo:
     def get_dashboard(
         self,
         user_id: int,
-        request: Request,
         payments: list[Payment],
         year: int = None,
         month: int | None = None,
     ):
-        all_spendings = self.sum_payments(user_id)
+        max_date = get_date_from_year_and_month(year=year, month=month)
 
-        return all_spendings
-        # balance_income_spending = self.get_sum(all_spendings)
-        # available_amount = balance_income_spending["balance"]
-        # available_amount_frontend = get_readable_amount(available_amount)
-        # total_days = self.calculate_total_days(user_id, year, month)
-        # rate_per_day = self.get_rate_per_day(
-        #     expenses=total_spending, elapsed_days=total_days
-        # )
-        # try:
-        #     remaining_days = int(available_amount / rate_per_day)
-        #     left_until = get_date_from_datetime_without_year(
-        #         self.get_next_date(remaining_days)
-        #     )
-        # except ZeroDivisionError:
-        #     raise NothingToComputeError
-        # month = INT_TO_MONTHES.get(month)
-        # capitalized_month = month.title() if month is not None else None
-        # return {
-        #     "request": request,
-        #     "current_month": check_current_year_and_month(
-        #         year=year, month=month
-        #     ),
-        #     "available_amount_frontend": available_amount_frontend,
-        #     "days_left": left_until,
-        #     "total_income": get_readable_amount(
-        #         balance_income_spending["income"]
-        #     ),
-        #     "total_spending": get_readable_amount(total_spending),
-        #     "all_spendings": all_spendings,
-        #     "total_per_month": self.get_monthly_payments(
-        #         payments=all_spendings, year=year
-        #     ),
-        #     "rate_per_day": get_readable_amount(rate_per_day),
-        #     "total_shares": list(
-        #         self.get_total_monthly_payments_shares(all_spendings).items()
-        #     ),
-        #     "header_text": f"{capitalized_month} {year} года",
-        # }
+        total_spending = self.sum_payments(user_id=user_id, max_date=max_date)
+        total_income = IncomeRepo(self.session).sum_income(
+            user_id=user_id, max_date=max_date
+        )
+        available_amount = self.get_balance(user_id=user_id, max_date=max_date)
+        available_amount_frontend = get_readable_amount(available_amount)
+        total_days = self.calculate_total_days(user_id, year, month)
+        rate_per_day = self.get_rate_per_day(
+            expenses=total_spending, elapsed_days=total_days
+        )
+        all_spendings = self.get_spendings(payments)
+
+        try:
+            remaining_days = int(available_amount / rate_per_day)
+            left_until = get_date_from_datetime_without_year(
+                self.get_next_date(remaining_days)
+            )
+        except ZeroDivisionError:
+            raise NothingToComputeError
+        month = INT_TO_MONTHS.get(month)
+        capitalized_month = month.title()
+        return {
+            "current_month": check_current_year_and_month(
+                year=year, month=month
+            ),
+            "available_amount_frontend": available_amount_frontend,
+            "days_left": left_until,
+            "total_income": get_readable_amount(total_income),
+            "total_spending": get_readable_amount(total_spending),
+            "all_spendings": all_spendings,
+            "total_per_month": self.get_monthly_payments(
+                payments=all_spendings, year=year
+            ),
+            "rate_per_day": get_readable_amount(rate_per_day),
+            "total_shares": list(
+                self.get_total_monthly_payments_shares(all_spendings).items()
+            ),
+            "header_text": f"{capitalized_month} {year} года",
+        }
 
     def calculate_total_days(self, user_id, year, month):
         max_date = self.get_max_date(
