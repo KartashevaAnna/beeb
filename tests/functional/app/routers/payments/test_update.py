@@ -55,10 +55,7 @@ def test_template_wrong_token(client, payment, wrong_token):
 
 
 def test_name_lowercase_amount_int(
-    client,
-    payment,
-    session,
-    update_payment,
+    client, payment, session, update_payment, positive_balance
 ):
     response = client.post(
         SETTINGS.urls.update_payment.format(payment_id=payment.id),
@@ -70,7 +67,9 @@ def test_name_lowercase_amount_int(
     check_updated_payment(updated_payment, update_payment, response)
 
 
-def test_title_amount_int(client, payment, session, update_payment):
+def test_title_amount_int(
+    client, payment, session, update_payment, positive_balance
+):
     update_payment = deepcopy(update_payment)
     update_payment["name"] = NAME.title()
     response = client.post(
@@ -82,7 +81,9 @@ def test_title_amount_int(client, payment, session, update_payment):
     check_updated_payment(updated_payment, update_payment, response)
 
 
-def test_name_upper_amount_int(client, payment, session, update_payment):
+def test_name_upper_amount_int(
+    client, payment, session, update_payment, positive_balance
+):
     update_payment = deepcopy(update_payment)
     update_payment["name"] = NAME.upper()
     response = client.post(
@@ -95,7 +96,7 @@ def test_name_upper_amount_int(client, payment, session, update_payment):
 
 
 def test_name_lowercase_amount_frontend(
-    client, payment, session, update_payment
+    client, payment, session, update_payment, positive_balance
 ):
     update_payment = deepcopy(update_payment)
     update_payment["amount"] = "65₽"
@@ -108,7 +109,9 @@ def test_name_lowercase_amount_frontend(
     check_updated_payment(updated_payment, update_payment, response)
 
 
-def test_name_lowercase_amount_int_zero(client, payment, update_payment):
+def test_name_lowercase_amount_int_zero(
+    client, payment, update_payment, positive_balance
+):
     update_payment = deepcopy(update_payment)
     update_payment["amount"] = 0
     response = client.post(
@@ -118,7 +121,9 @@ def test_name_lowercase_amount_int_zero(client, payment, update_payment):
     assert NotPositiveValueError(0).detail in response.text
 
 
-def test_name_lowercase_amount_frontend_zero(client, payment, update_payment):
+def test_name_lowercase_amount_frontend_zero(
+    client, payment, update_payment, positive_balance
+):
     update_payment = deepcopy(update_payment)
     update_payment["amount"] = "00₽"
     response = client.post(
@@ -129,7 +134,7 @@ def test_name_lowercase_amount_frontend_zero(client, payment, update_payment):
 
 
 def test_name_lowercase_amount_frontend_negative(
-    client, payment, update_payment
+    client, payment, update_payment, positive_balance
 ):
     update_payment = deepcopy(update_payment)
     update_payment["amount"] = "-56₽"
@@ -140,7 +145,9 @@ def test_name_lowercase_amount_frontend_negative(
     assert NotPositiveValueError(-56).detail in response.text
 
 
-def test_name_lowercase_amount_int_negative(client, payment, update_payment):
+def test_name_lowercase_amount_int_negative(
+    client, payment, update_payment, positive_balance
+):
     update_payment = deepcopy(update_payment)
     update_payment["amount"] = "-56₽"
     response = client.post(
@@ -156,7 +163,9 @@ def test_404(client):
 
 
 @patch.object(PaymentRepo, "update", raise_always)
-def test_update_payment_any_other_exception(client, payment, update_payment):
+def test_update_payment_any_other_exception(
+    client, payment, update_payment, positive_balance
+):
     response = client.post(
         SETTINGS.urls.update_payment.format(payment_id=payment.id),
         data=update_payment,
@@ -164,7 +173,9 @@ def test_update_payment_any_other_exception(client, payment, update_payment):
     assert response.status_code == 501
 
 
-def test_update_category(client, session, fill_db, payment, update_payment):
+def test_update_category(
+    client, session, fill_db, payment, update_payment, positive_balance
+):
     previous_category = payment.payment_category.name
     categories = get_categories(session)
     categories_names = [x.name for x in categories]
@@ -192,7 +203,9 @@ def test_update_category(client, session, fill_db, payment, update_payment):
     assert updated_payment.payment_category.name != previous_category
 
 
-def test_update_date(client, session, payment, update_payment):
+def test_update_date(
+    client, session, payment, update_payment, positive_balance
+):
     previous_date = payment.created_at
     new_date = payment.created_at - datetime.timedelta(weeks=-4)
     new_date = new_date.astimezone()
@@ -208,7 +221,7 @@ def test_update_date(client, session, payment, update_payment):
     assert updated_payment.created_at.date() == new_date.date()
 
 
-def test_no_cookie(client, payment, update_payment):
+def test_no_cookie(client, payment, update_payment, positive_balance):
     client.cookies = {}
     response = client.post(
         SETTINGS.urls.update_payment.format(payment_id=payment.id),
@@ -218,7 +231,9 @@ def test_no_cookie(client, payment, update_payment):
     assert response.headers.get("location") == SETTINGS.urls.login
 
 
-def test_stale_token_post(client, payment, update_payment, stale_token):
+def test_stale_token_post(
+    client, payment, update_payment, stale_token, positive_balance
+):
     client.cookies = {"token": stale_token}
     response = client.post(
         SETTINGS.urls.update_payment.format(payment_id=payment.id),
@@ -228,7 +243,9 @@ def test_stale_token_post(client, payment, update_payment, stale_token):
     assert response.headers.get("location") == SETTINGS.urls.login
 
 
-def test_wrong_token_post(client, payment, update_payment, wrong_token):
+def test_wrong_token_post(
+    client, payment, update_payment, wrong_token, positive_balance
+):
     client.cookies = {"token": wrong_token}
     response = client.post(
         SETTINGS.urls.update_payment.format(payment_id=payment.id),
@@ -238,7 +255,9 @@ def test_wrong_token_post(client, payment, update_payment, wrong_token):
     assert response.headers.get("location") == SETTINGS.urls.login
 
 
-def test_wrong_user(client, payment, session, update_payment, wrong_user_token):
+def test_wrong_user(
+    client, payment, session, update_payment, wrong_user_token, positive_balance
+):
     client.cookies["token"] = wrong_user_token
     response = client.post(
         SETTINGS.urls.update_payment.format(payment_id=payment.id),

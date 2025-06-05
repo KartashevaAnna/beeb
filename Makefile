@@ -44,24 +44,24 @@ tests:
 
 .PHONY: compose-one-up
 compose-one-up:
-	docker-compose -f docker-compose.local.small.yml up --build
+	docker-compose -f docker-compose.local.individual_test.yml up --build
 
 
 .PHONY: compose-one-down
 compose-one-down:
-	docker-compose -f docker-compose.local.small.yml rm -f
+	docker-compose -f docker-compose.local.individual_test.yml rm -f
 
 .PHONY: run-test
 run-test:
-	docker-compose -f tests/docker-compose.local.small.yml up --abort-on-container-exit --remove-orphans
+	docker-compose -f tests/docker-compose.local.individual_test.yml up --abort-on-container-exit --remove-orphans
 
 .PHONY: build-test
 build-test:
-	docker-compose -f tests/docker-compose.local.small.yml build
+	docker-compose -f tests/docker-compose.local.individual_test.yml build
 
 .PHONY: teardown-test
 teardown-test:
-	docker-compose -f tests/docker-compose.local.small.yml rm -f
+	docker-compose -f tests/docker-compose.local.individual_test.yml rm -f
 
 
 .PHONY: docker-test-run

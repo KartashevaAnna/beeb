@@ -9,6 +9,7 @@ from sqlalchemy import (
     desc,
     extract,
     func,
+    literal,
     null,
     select,
     text,
@@ -26,6 +27,7 @@ from app.exceptions import (
     SpendingOverBalanceError,
 )
 from app.models import Category, Income, Payment
+from app.repositories.income import IncomeRepo
 from app.schemas.dates import DateFilter
 from app.schemas.payments import (
     PaymentCreate,
@@ -64,6 +66,7 @@ class PaymentRepo:
             Income.user_id,
             Income.created_at,
             null().label("category"),
+            literal("доход").label("type"),
         ).where(Income.user_id == user_id)
         payment_statement = (
             select(
@@ -77,6 +80,7 @@ class PaymentRepo:
                 Payment.user_id,
                 Payment.created_at,
                 Category.name.label("category"),
+                literal("расход").label("type"),
             )
             .where(Payment.user_id == user_id)
             .join(Payment.payment_category)
@@ -88,10 +92,10 @@ class PaymentRepo:
         return [PaymentShow(**row._mapping) for row in final_query]
 
     def get_spendings(self, payments: list[Payment]) -> list[Payment]:
-        return [payment for payment in payments if payment.is_spending is True]
+        return [payment for payment in payments if payment.type == "расход"]
 
-    def get_all_incomes(self, payments: list[Payment]) -> list[Payment]:
-        return [payment for payment in payments if payment.is_spending is False]
+    def get_incomes(self, payments: list[Payment]) -> list[Payment]:
+        return [payment for payment in payments if payment.type == "доход"]
 
     def get_total_amounts(self, payments: list[Payment]) -> int:
         amount = self.get_total(payments)
@@ -243,14 +247,45 @@ class PaymentRepo:
             else None
         )
 
+    def sum_payments(self, user_id: int, max_date: datetime.datetime) -> int:
+        payment_sum = (
+            self.session.query(func.sum(Payment.amount))
+            .where(Payment.user_id == user_id)
+            .where(Payment.created_at <= max_date)
+            .scalar()
+        )
+        return payment_sum if payment_sum else 0
+
+    def get_balance(self, user_id: int, max_date: datetime.datetime):
+        payments = self.sum_payments(user_id, max_date=max_date)
+        income = IncomeRepo(self.session).sum_income(
+            user_id=user_id, max_date=max_date
+        )
+        return income - payments
+
+    def check_balance(
+        self,
+        user_id: int,
+        desired_payment_amount: int,
+        max_date: datetime.datetime,
+        previous_payment_amount: int,
+    ):
+        balance = self.get_balance(user_id=user_id, max_date=max_date)
+        balance += previous_payment_amount
+        remains = balance - desired_payment_amount
+        if remains < 0:
+            raise SpendingOverBalanceError(
+                spending=int(desired_payment_amount), balance=balance
+            )
+
     def create(self, payment: PaymentCreate, user_id: int) -> Payment:
-        # year, month = get_current_year_and_month()
-        # balance = self.get_user_balance(
-        #     user_id=user_id, year=year, month=month
-        # )["balance"]
-        # balance -= int(payment.amount)
-        # if balance <= 0:
-        #     raise SpendingOverBalanceError(int(payment.amount) // 100)
+        current_date = datetime.datetime.now()
+        self.check_balance(
+            user_id=user_id,
+            desired_payment_amount=int(payment.amount),
+            previous_payment_amount=0,
+            max_date=current_date,
+        )
         new_payment = Payment(**payment.model_dump())
         self.session.add(new_payment)
         self.session.commit()
@@ -260,9 +295,18 @@ class PaymentRepo:
 
     def update(self, payment_id: int, to_update: PaymentUpdate):
         old_payment = self.read(payment_id)
+
         if old_payment.user_id != to_update.user_id:
             raise NotOwnerError(old_payment.name)
-        stmt = (
+        max_date = old_payment.created_at
+        self.check_balance(
+            user_id=old_payment.user_id,
+            desired_payment_amount=to_update.amount_in_kopecks,
+            previous_payment_amount=old_payment.amount,
+            max_date=max_date,
+        )
+
+        statement = (
             update(Payment)
             .where(Payment.id == payment_id)
             .values(
@@ -270,17 +314,19 @@ class PaymentRepo:
                 amount=to_update.amount_in_kopecks,
                 category_id=to_update.category_id,
                 created_at=to_update.date_to_update,
+                grams=to_update.grams,
+                quantity=to_update.quantity,
             )
         )
-        self.session.execute(stmt)
+        self.session.execute(statement)
         self.session.commit()
 
     def delete(self, payment_id: int, user_id: int):
         old_payment = self.read(payment_id)
         if old_payment.user_id != user_id:
             raise NotOwnerError(old_payment.name)
-        stmt = delete(Payment).where(Payment.id == payment_id)
-        self.session.execute(stmt)
+        statement = delete(Payment).where(Payment.id == payment_id)
+        self.session.execute(statement)
         self.session.commit()
 
     def get_all_years(self, user_id: int):
@@ -288,21 +334,6 @@ class PaymentRepo:
         all_payments = list({x.created_at.year for x in all_payments})
         all_payments.sort(reverse=True)
         return all_payments
-
-    def get_balance(self, payments: list[Payment]) -> dict:
-        all_spendings = self.get_spendings(payments)
-        total_spending = self.get_total_amounts(all_spendings)
-        all_incomes = self.get_all_incomes(payments)
-        total_income = self.get_total_amounts(all_incomes)
-        return {
-            "balance": total_income - total_spending,
-            "income": total_income,
-            "spending": total_spending,
-        }
-
-    def get_expenses(self, payments: list[Payment]) -> int:
-        all_spendings = self.get_spendings(payments)
-        return self.get_total_amounts(all_spendings)
 
     def get_dashboard(
         self,
@@ -312,45 +343,46 @@ class PaymentRepo:
         year: int = None,
         month: int | None = None,
     ):
-        all_spendings = self.get_spendings(payments)
-        total_spending = self.get_total_amounts(all_spendings)
-        balance_income_spending = self.get_balance(all_spendings)
-        available_amount = balance_income_spending["balance"]
-        available_amount_frontend = get_readable_amount(available_amount)
-        total_days = self.calculate_total_days(user_id, year, month)
-        rate_per_day = self.get_rate_per_day(
-            expenses=total_spending, elapsed_days=total_days
-        )
-        try:
-            remaining_days = int(available_amount / rate_per_day)
-            left_until = get_date_from_datetime_without_year(
-                self.get_next_date(remaining_days)
-            )
-        except ZeroDivisionError:
-            raise NothingToComputeError
-        month = INT_TO_MONTHES.get(month)
-        capitalized_month = month.title() if month is not None else None
-        return {
-            "request": request,
-            "current_month": check_current_year_and_month(
-                year=year, month=month
-            ),
-            "available_amount_frontend": available_amount_frontend,
-            "days_left": left_until,
-            "total_income": get_readable_amount(
-                balance_income_spending["income"]
-            ),
-            "total_spending": get_readable_amount(total_spending),
-            "all_spendings": all_spendings,
-            "total_per_month": self.get_monthly_payments(
-                payments=all_spendings, year=year
-            ),
-            "rate_per_day": get_readable_amount(rate_per_day),
-            "total_shares": list(
-                self.get_total_monthly_payments_shares(all_spendings).items()
-            ),
-            "header_text": f"{capitalized_month} {year} года",
-        }
+        all_spendings = self.sum_payments(user_id)
+
+        return all_spendings
+        # balance_income_spending = self.get_sum(all_spendings)
+        # available_amount = balance_income_spending["balance"]
+        # available_amount_frontend = get_readable_amount(available_amount)
+        # total_days = self.calculate_total_days(user_id, year, month)
+        # rate_per_day = self.get_rate_per_day(
+        #     expenses=total_spending, elapsed_days=total_days
+        # )
+        # try:
+        #     remaining_days = int(available_amount / rate_per_day)
+        #     left_until = get_date_from_datetime_without_year(
+        #         self.get_next_date(remaining_days)
+        #     )
+        # except ZeroDivisionError:
+        #     raise NothingToComputeError
+        # month = INT_TO_MONTHES.get(month)
+        # capitalized_month = month.title() if month is not None else None
+        # return {
+        #     "request": request,
+        #     "current_month": check_current_year_and_month(
+        #         year=year, month=month
+        #     ),
+        #     "available_amount_frontend": available_amount_frontend,
+        #     "days_left": left_until,
+        #     "total_income": get_readable_amount(
+        #         balance_income_spending["income"]
+        #     ),
+        #     "total_spending": get_readable_amount(total_spending),
+        #     "all_spendings": all_spendings,
+        #     "total_per_month": self.get_monthly_payments(
+        #         payments=all_spendings, year=year
+        #     ),
+        #     "rate_per_day": get_readable_amount(rate_per_day),
+        #     "total_shares": list(
+        #         self.get_total_monthly_payments_shares(all_spendings).items()
+        #     ),
+        #     "header_text": f"{capitalized_month} {year} года",
+        # }
 
     def calculate_total_days(self, user_id, year, month):
         max_date = self.get_max_date(
@@ -385,7 +417,7 @@ class PaymentRepo:
         payments = self.get_payments_by_requested_month(
             year=year, month=month + 1, user_id=user_id
         )
-        return self.get_balance(payments)
+        return self.get_sum(payments)
 
     def get_user_expenses(
         self,

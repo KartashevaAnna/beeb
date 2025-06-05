@@ -1,13 +1,16 @@
+from datetime import datetime
 from typing import Annotated
 
 from fastapi import APIRouter
 from fastapi import Depends, Request, status
 
 from app.exceptions import BeebError
+from app.repositories.income import IncomeRepo
 from app.repositories.payments import PaymentRepo
 from app.routers.auth_router import authenticate
+from app.schemas.dates import DateFilter
 from app.settings import SETTINGS, TEMPLATES
-from app.utils.dependencies import payments_repo
+from app.utils.dependencies import income_repo, payments_repo
 from app.utils.tools.helpers import get_current_year_and_month
 
 payments_dashboard_router = APIRouter()
@@ -17,13 +20,15 @@ payments_dashboard_router = APIRouter()
 @authenticate
 def dashboard_for_all_years(
     repo: Annotated[PaymentRepo, Depends(payments_repo)],
+    repo2: Annotated[IncomeRepo, Depends(income_repo)],
     request: Request,
     user_id: int | None = None,
 ):
     try:
         current_year, current_month = get_current_year_and_month()
 
-        payments = repo.get_all_payments(user_id)
+        payments = repo.read_all(user_id)
+
         dashboard = repo.get_dashboard(
             request=request,
             payments=payments,

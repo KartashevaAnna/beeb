@@ -5,7 +5,13 @@ services:
       dockerfile: Dockerfile
       target: development
     entrypoint: >
-      sh -c 'CONFIG_SECRETS_PATH=./tests/test.secrets.toml CONFIG_PATH=config.toml CONFIG_RENDERER=jinja2 python3 -m pytest tests/functional/app/routers/income/test_update.py -p no:cacheprovider'
+      sh -c 
+      'CONFIG_SECRETS_PATH=./tests/test.secrets.toml 
+      CONFIG_PATH=config.toml 
+      CONFIG_RENDERER=jinja2 
+      python3 -m pytest 
+      tests/unit/app/repositories/payments/test_update.py 
+      -p no:cacheprovider'
     depends_on:
       - database
 

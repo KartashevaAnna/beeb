@@ -3,7 +3,9 @@ from copy import deepcopy
 from unittest.mock import patch
 
 from fastapi import status
+from fastapi.testclient import TestClient
 from sqlalchemy import func, select
+from sqlalchemy.orm.session import Session
 
 from app.exceptions import (
     NotIntegerError,
@@ -11,7 +13,7 @@ from app.exceptions import (
     SpendingOverBalanceError,
     ValueTooLargeError,
 )
-from app.models import Payment
+from app.models import Income, Payment
 from app.repositories.payments import PaymentRepo
 from app.settings import SETTINGS
 from app.utils.tools.helpers import get_datetime_without_seconds
@@ -127,26 +129,11 @@ def test_valid_data_localized_date_non_food(
     )
 
 
-# # def test_valid_data_spending_over_balance(
-# #     session,
-# #     client,
-# #     payment_create,
-# # ):
-# #     max_id_before = session.scalar(select(func.max(Payment.id)))
-# #     response = client.post(
-# #         url=SETTINGS.urls.create_payment, data=payment_create
-# #     )
-# #     error = SpendingOverBalanceError(payment_create["amount"])
-# #     assert error.detail in response.text
-# #     assert str(error.status_code) in response.text
-# #     assert response.status_code == error.status_code
-# #     max_id_after = session.scalar(select(func.max(Payment.id)))
-# #     assert max_id_before == max_id_after
-# #     clean_db(session)
-
-
 def test_valid_data_non_localized_date_food(
-    session, client, create_payment_food, positive_balance
+    session: Session,
+    client: TestClient,
+    create_payment_food: dict,
+    positive_balance: Income,
 ):
     max_id_before = session.scalar(select(func.max(Payment.id)))
     payment_create_check = deepcopy(create_payment_food)
@@ -164,7 +151,10 @@ def test_valid_data_non_localized_date_food(
 
 
 def test_valid_data_non_localized_date_non_food(
-    session, client, create_payment_non_food, positive_balance
+    session: Session,
+    client: TestClient,
+    create_payment_non_food: dict,
+    positive_balance: Income,
 ):
     max_id_before = session.scalar(select(func.max(Payment.id)))
     payment_create_check = deepcopy(create_payment_non_food)
@@ -182,7 +172,9 @@ def test_valid_data_non_localized_date_non_food(
     )
 
 
-def test_invalid_data_negative_amount_food(client, create_payment_food):
+def test_invalid_data_negative_amount_food(
+    client: TestClient, create_payment_food: dict
+):
     """Case: endpoint raises NotPositiveValueError if amount is negative."""
     negative_amount = -100
     create_payment_food["amount"] = negative_amount
@@ -197,7 +189,9 @@ def test_invalid_data_negative_amount_food(client, create_payment_food):
     assert response.template.name == SETTINGS.templates.create_payment_food
 
 
-def test_invalid_data_negative_amount_non_food(client, create_payment_non_food):
+def test_invalid_data_negative_amount_non_food(
+    client: TestClient, create_payment_non_food: dict
+):
     negative_amount = -100
     create_payment_non_food["amount"] = negative_amount
     response = client.post(
@@ -211,7 +205,9 @@ def test_invalid_data_negative_amount_non_food(client, create_payment_non_food):
     assert response.template.name == SETTINGS.templates.create_payment_non_food
 
 
-def test_invalid_data_zero_amount_food(client, create_payment_food):
+def test_invalid_data_zero_amount_food(
+    client: TestClient, create_payment_food: dict
+):
     zero_amount = 0
     create_payment_food["amount"] = zero_amount
     response = client.post(
@@ -224,7 +220,9 @@ def test_invalid_data_zero_amount_food(client, create_payment_food):
     assert response.template.name == SETTINGS.templates.create_payment_food
 
 
-def test_invalid_data_zero_amount_non_food(client, create_payment_non_food):
+def test_invalid_data_zero_amount_non_food(
+    client: TestClient, create_payment_non_food: dict
+):
     """Case: endpoint raises NotPositiveValueError if amount is zero."""
     zero_amount = 0
     create_payment_non_food["amount"] = zero_amount
@@ -239,7 +237,9 @@ def test_invalid_data_zero_amount_non_food(client, create_payment_non_food):
     assert response.template.name == SETTINGS.templates.create_payment_non_food
 
 
-def test_invalid_data_amount_any_letters_food(client, create_payment_food):
+def test_invalid_data_amount_any_letters_food(
+    client: TestClient, create_payment_food: dict
+):
     """Case: endpoint raises NotIntegerError if amount is zero."""
     amount_any_string = "lalala"
     create_payment_food["amount"] = amount_any_string
@@ -254,7 +254,7 @@ def test_invalid_data_amount_any_letters_food(client, create_payment_food):
 
 
 def test_invalid_data_amount_any_letters_non_food(
-    client, create_payment_non_food
+    client: TestClient, create_payment_non_food: dict
 ):
     """Case: endpoint raises NotIntegerError if amount is zero."""
     amount_any_string = "lalala"
@@ -270,7 +270,9 @@ def test_invalid_data_amount_any_letters_non_food(
     assert response.template.name == SETTINGS.templates.create_payment_non_food
 
 
-def test_invalid_data_amount_too_large_food(client, create_payment_food):
+def test_invalid_data_amount_too_large_food(
+    client: TestClient, create_payment_food: dict
+):
     amount_too_large = 999999978
     create_payment_food["amount"] = amount_too_large
     response = client.post(
@@ -284,7 +286,7 @@ def test_invalid_data_amount_too_large_food(client, create_payment_food):
 
 
 def test_invalid_data_amount_too_large_non_food(
-    client, create_payment_non_food
+    client: TestClient, create_payment_non_food: dict
 ):
     amount_too_large = 999999978
     create_payment_non_food["amount"] = amount_too_large
@@ -298,7 +300,9 @@ def test_invalid_data_amount_too_large_non_food(
     assert response.template.name == SETTINGS.templates.create_payment_non_food
 
 
-def test_invalid_data_negative_grams_food(client, create_payment_food):
+def test_invalid_data_negative_grams_food(
+    client: TestClient, create_payment_food: dict
+):
     negative_grams = -100
     create_payment_food["grams"] = negative_grams
     response = client.post(
@@ -312,7 +316,9 @@ def test_invalid_data_negative_grams_food(client, create_payment_food):
     assert response.template.name == SETTINGS.templates.create_payment_food
 
 
-def test_invalid_data_zero_grams_food(client, create_payment_food):
+def test_invalid_data_zero_grams_food(
+    client: TestClient, create_payment_food: dict
+):
     zero_grams = 0
     create_payment_food["grams"] = zero_grams
     response = client.post(
@@ -323,7 +329,9 @@ def test_invalid_data_zero_grams_food(client, create_payment_food):
     assert response.template.name == SETTINGS.templates.create_payment_food
 
 
-def test_invalid_data_grams_any_letters_food(client, create_payment_food):
+def test_invalid_data_grams_any_letters_food(
+    client: TestClient, create_payment_food: dict
+):
     grams_any_string = "lalala"
     create_payment_food["grams"] = grams_any_string
     response = client.post(
@@ -334,7 +342,9 @@ def test_invalid_data_grams_any_letters_food(client, create_payment_food):
     assert response.template.name == SETTINGS.templates.create_payment_food
 
 
-def test_invalid_data_grams_too_large(client, create_payment_food):
+def test_invalid_data_grams_too_large(
+    client: TestClient, create_payment_food: dict
+):
     grams_too_large = 999999978
     create_payment_food["grams"] = grams_too_large
     response = client.post(
@@ -347,7 +357,9 @@ def test_invalid_data_grams_too_large(client, create_payment_food):
     assert response.template.name == SETTINGS.templates.create_payment_food
 
 
-def test_invalid_data_quantity_non_food(client, create_payment_non_food):
+def test_invalid_data_quantity_non_food(
+    client: TestClient, create_payment_non_food: dict
+):
     negative_quantity = -100
     create_payment_non_food["quantity"] = negative_quantity
     response = client.post(
@@ -361,7 +373,9 @@ def test_invalid_data_quantity_non_food(client, create_payment_non_food):
     assert response.template.name == SETTINGS.templates.create_payment_non_food
 
 
-def test_invalid_data_zero_quantity_non_food(client, create_payment_non_food):
+def test_invalid_data_zero_quantity_non_food(
+    client: TestClient, create_payment_non_food: dict
+):
     zero_quantity = 0
     create_payment_non_food["quantity"] = zero_quantity
     response = client.post(
@@ -375,7 +389,7 @@ def test_invalid_data_zero_quantity_non_food(client, create_payment_non_food):
 
 
 def test_invalid_data_quantity_any_letters_non_food(
-    client, create_payment_non_food
+    client: TestClient, create_payment_non_food: dict
 ):
     quantity_any_string = "lalala"
     create_payment_non_food["quantity"] = quantity_any_string
@@ -389,7 +403,9 @@ def test_invalid_data_quantity_any_letters_non_food(
     assert response.template.name == SETTINGS.templates.create_payment_non_food
 
 
-def test_invalid_data_quantity_too_large(client, create_payment_non_food):
+def test_invalid_data_quantity_too_large(
+    client: TestClient, create_payment_non_food: dict
+):
     quantity_too_large = 999999978
     create_payment_non_food["quantity"] = quantity_too_large
     response = client.post(
@@ -408,7 +424,9 @@ def test_invalid_data_quantity_too_large(client, create_payment_non_food):
     "create",
     raise_always,
 )
-def test_any_other_exception_food(client, create_payment_food):
+def test_any_other_exception_food(
+    client: TestClient, create_payment_food: dict
+):
     """Case: endpoint returns 501.
 
     Covers any exception other than ValidationError.
@@ -420,7 +438,9 @@ def test_any_other_exception_food(client, create_payment_food):
     assert response.template.name == SETTINGS.templates.create_payment_food
 
 
-def test_no_cookie_food(client, fill_db, create_payment_food):
+def test_no_cookie_food(
+    client: TestClient, fill_db: None, create_payment_food: dict
+):
     client.cookies = {}
     response = client.post(
         url=SETTINGS.urls.create_payment, data=create_payment_food
@@ -429,7 +449,12 @@ def test_no_cookie_food(client, fill_db, create_payment_food):
     assert response.headers.get("location") == SETTINGS.urls.login
 
 
-def test_stale_token_food(client, fill_db, stale_token, create_payment_food):
+def test_stale_token_food(
+    client: TestClient,
+    fill_db: None,
+    stale_token,
+    create_payment_food: dict,
+):
     client.cookies = {"token": stale_token}
     response = client.post(
         url=SETTINGS.urls.create_payment, data=create_payment_food
@@ -438,7 +463,12 @@ def test_stale_token_food(client, fill_db, stale_token, create_payment_food):
     assert response.headers.get("location") == SETTINGS.urls.login
 
 
-def test_wrong_token_food(client, fill_db, wrong_token, create_payment_food):
+def test_wrong_token_food(
+    client: TestClient,
+    fill_db: None,
+    wrong_token,
+    create_payment_food: dict,
+):
     client.cookies = {"token": wrong_token}
     response = client.post(
         url=SETTINGS.urls.create_payment, data=create_payment_food
@@ -452,7 +482,9 @@ def test_wrong_token_food(client, fill_db, wrong_token, create_payment_food):
     "create",
     raise_always,
 )
-def test_any_other_exception_non_food(client, create_payment_non_food):
+def test_any_other_exception_non_food(
+    client: TestClient, create_payment_non_food: dict
+):
     """Case: endpoint returns 501.
 
     Covers any exception other than ValidationError.
@@ -464,7 +496,9 @@ def test_any_other_exception_non_food(client, create_payment_non_food):
     assert response.template.name == SETTINGS.templates.create_payment_non_food
 
 
-def test_no_cookie_non_food(client, fill_db, create_payment_non_food):
+def test_no_cookie_non_food(
+    client: TestClient, fill_db: None, create_payment_non_food: dict
+):
     client.cookies = {}
     response = client.post(
         url=SETTINGS.urls.create_payment, data=create_payment_non_food
@@ -474,7 +508,10 @@ def test_no_cookie_non_food(client, fill_db, create_payment_non_food):
 
 
 def test_stale_token_non_food(
-    client, fill_db, stale_token, create_payment_non_food
+    client: TestClient,
+    fill_db: None,
+    stale_token,
+    create_payment_non_food: dict,
 ):
     client.cookies = {"token": stale_token}
     response = client.post(
@@ -485,7 +522,10 @@ def test_stale_token_non_food(
 
 
 def test_wrong_token_non_food(
-    client, fill_db, wrong_token, create_payment_non_food
+    client: TestClient,
+    fill_db: None,
+    wrong_token,
+    create_payment_non_food: dict,
 ):
     client.cookies = {"token": wrong_token}
     response = client.post(

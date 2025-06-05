@@ -7,6 +7,7 @@ from app.exceptions import (
     WrongPasswordError,
 )
 from app.models import User
+from app.repositories.payments import PaymentRepo
 from app.schemas.users import UserCreate
 from app.utils.tools.helpers import is_same_password
 

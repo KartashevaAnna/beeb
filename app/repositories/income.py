@@ -1,8 +1,10 @@
-from sqlalchemy import delete, select, update
+import datetime
+from sqlalchemy import delete, func, select, update
 from sqlalchemy.orm import Session
 
 from app.exceptions import IncomeNotFoundError, NotOwnerError
 from app.models import Income
+from app.schemas.dates import DateFilter
 from app.schemas.income import IncomeCreate, IncomeShowOne, IncomeUpdate
 
 
@@ -30,15 +32,15 @@ class IncomeRepo:
         old_income = self.read(income_id)
         if old_income.user_id != user_id:
             raise NotOwnerError(old_income.name)
-        stmt = delete(Income).where(Income.id == income_id)
-        self.session.execute(stmt)
+        statement = delete(Income).where(Income.id == income_id)
+        self.session.execute(statement)
         self.session.commit()
 
     def update(self, income_id: int, user_id: int, to_update: IncomeUpdate):
         old_income = self.read(income_id)
         if old_income.user_id != user_id:
             raise NotOwnerError(old_income.name)
-        stmt = (
+        statement = (
             update(Income)
             .where(Income.id == income_id)
             .values(
@@ -47,5 +49,19 @@ class IncomeRepo:
                 created_at=to_update.created_at,
             )
         )
-        self.session.execute(stmt)
+        self.session.execute(statement)
         self.session.commit()
+
+    def read_all(self, user_id: int) -> list[Income]:
+        statement = select(Income).where(Income.user_id == user_id)
+        results = self.session.execute(statement)
+        return results.scalars().all()
+
+    def sum_income(self, user_id: int, max_date: datetime.datetime) -> int:
+        income_sum = (
+            self.session.query(func.sum(Income.amount))
+            .where(Income.user_id == user_id)
+            .where(Income.created_at <= max_date)
+            .scalar()
+        )
+        return income_sum if income_sum else 0

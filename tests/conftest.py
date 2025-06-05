@@ -1,3 +1,4 @@
+import copy
 import datetime
 import os
 import random
@@ -359,6 +360,14 @@ def update_payment(payment_as_dict, session, category) -> dict:
 
 
 @pytest.fixture(scope="function")
+def update_payment_repo(update_payment) -> dict:
+    new_dict = copy.deepcopy(update_payment)
+    new_dict.pop("category", None)
+    new_dict["amount"] = str(update_payment["amount"] // 100)
+    return new_dict
+
+
+@pytest.fixture(scope="function")
 def update_income(income_as_dict, session, category) -> dict:
     new_dict = deepcopy(income_as_dict)
     new_dict["user_id"] = TEST_USER_ID
@@ -440,12 +449,12 @@ def month_ago_payment(category, user, session: Session):
 
 
 @pytest.fixture(scope="function")
-def positive_balance(user, session: Session):
+def positive_balance(user, session: Session, year_ago_payment):
     income = Income(
         user_id=TEST_USER_ID,
         name="зарплата",
         amount=500000000,
-        created_at=datetime.datetime.now(),
+        created_at=year_ago_payment.created_at,
     )
     session.add(income)
     session.flush()
