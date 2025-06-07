@@ -468,7 +468,7 @@ def month_ago_payment_later(
 ):
     payment = Payment(
         user_id=TEST_USER_ID,
-        name=random.choice(PRODUCTS),
+        name="платёж следующего месяца позже",
         amount=500,
         category_id=category.id,
         created_at=month_ago_payment.created_at + datetime.timedelta(minutes=3),
@@ -496,10 +496,11 @@ def year_ago_payment(category, user, session: Session):
 def year_after_payment(category, user, session: Session):
     payment = Payment(
         user_id=TEST_USER_ID,
-        name=random.choice(PRODUCTS),
+        name="платёж следующего года",
         amount=500,
         category_id=category.id,
-        created_at=datetime.datetime.now() + datetime.timedelta(weeks=53),
+        created_at=datetime.datetime.now().astimezone()
+        + datetime.timedelta(weeks=53),
     )
     session.add(payment)
     session.flush()
@@ -510,7 +511,7 @@ def year_after_payment(category, user, session: Session):
 def year_ago_payment_later(user, year_ago_payment, category, session: Session):
     payment = Payment(
         user_id=TEST_USER_ID,
-        name=random.choice(PRODUCTS),
+        name="платёж прошлого года позже",
         amount=500,
         category_id=category.id,
         created_at=year_ago_payment.created_at + datetime.timedelta(days=3),

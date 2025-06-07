@@ -184,7 +184,7 @@ def validate_positive_number_for_db(
 
 def get_max_days_in_month(month: int, year: int) -> int:
     days_in_month = {
-        "январь": 1,
+        "январь": 31,
         "февраль": 29 if isleap(year) else 28,
         "март": 31,
         "апрель": 30,
@@ -200,7 +200,29 @@ def get_max_days_in_month(month: int, year: int) -> int:
     return days_in_month[INT_TO_MONTHS[month]]
 
 
-def get_date_from_year_and_month(year: int, month: int) -> datetime.datetime:
+def get_max_date_from_year_and_month(
+    year: int, month: int
+) -> datetime.datetime:
     time = "23:59:59.999999"
     day = get_max_days_in_month(year=year, month=month)
     return f"{year}-{str(month).zfill(2)}-{str(day).zfill(2)} {time}"
+
+
+def get_max_date_from_year_and_month_datetime_format(
+    year: int, month: int
+) -> datetime.datetime:
+    time = "23:59:59.999999"
+    day = get_max_days_in_month(year=year, month=month)
+    date = f"{year}-{str(month).zfill(2)}-{str(day).zfill(2)} {time}"
+    res = datetime.datetime.strptime(date, "%Y-%m-%d %H:%M:%S.%f")
+    return res.astimezone()
+
+
+def get_min_date_from_year_and_month_datetime_format(
+    year: int, month: int
+) -> datetime.datetime:
+    time = "00:00:00.000001"
+    day = 1
+    date = f"{year}-{str(month).zfill(2)}-{str(day).zfill(2)} {time}"
+    res = datetime.datetime.strptime(date, "%Y-%m-%d %H:%M:%S.%f")
+    return res.astimezone()

@@ -8,7 +8,7 @@ def test_sum_no_payments(
     session,
 ):
     expected_result = 0
-    max_date = datetime.datetime.now()
+    max_date = datetime.datetime.now().astimezone()
     obtained_result = PaymentRepo(session).sum_payments(
         user_id=TEST_USER_ID, max_date=max_date
     )
@@ -26,7 +26,7 @@ def test_sum_one_payment(session, category):
     session.add(expense)
     session.flush()
     session.commit()
-    max_date = datetime.datetime.now()
+    max_date = datetime.datetime.now().astimezone()
     expected_result = int(expense.amount)
     obtained_result = PaymentRepo(session).sum_payments(
         user_id=TEST_USER_ID, max_date=max_date
@@ -56,7 +56,7 @@ def test_sum_two_payments(session, category):
     session.add(second_expense)
     session.flush()
     session.commit()
-    max_date = datetime.datetime.now()
+    max_date = datetime.datetime.now().astimezone()
     expected_result = int(expense.amount) + int(second_expense.amount)
     obtained_result = PaymentRepo(session).sum_payments(
         user_id=TEST_USER_ID, max_date=max_date
@@ -86,7 +86,7 @@ def test_sum_two_payments_one_in_the_future(session, category):
     session.add(second_expense)
     session.flush()
     session.commit()
-    max_date = datetime.datetime.now()
+    max_date = datetime.datetime.now().astimezone()
     expected_result = int(expense.amount)
     obtained_result = PaymentRepo(session).sum_payments(
         user_id=TEST_USER_ID, max_date=max_date

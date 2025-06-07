@@ -82,7 +82,7 @@ def test_get_balance_no_salary(
         + month_ago_payment.amount
         + year_ago_payment.amount
     )
-    max_date = datetime.datetime.now()
+    max_date = datetime.datetime.now().astimezone()
     expected_result = -spendings
     obtained_result = PaymentRepo(session).get_balance(
         user_id=TEST_USER_ID, max_date=max_date
@@ -100,7 +100,9 @@ def test_get_balance_only_salary_outside_of_requested_period(session):
     session.add(salary)
     session.flush()
     session.commit()
-    max_date = datetime.datetime.now() - datetime.timedelta(weeks=3)
+    max_date = datetime.datetime.now().astimezone() - datetime.timedelta(
+        weeks=3
+    )
     expected_result = 0
     obtained_result = PaymentRepo(session).get_balance(
         user_id=TEST_USER_ID, max_date=max_date
@@ -118,7 +120,7 @@ def test_get_balance_only_salary(session):
     session.add(salary)
     session.flush()
     session.commit()
-    max_date = datetime.datetime.now()
+    max_date = datetime.datetime.now().astimezone()
     expected_result = salary.amount
     obtained_result = PaymentRepo(session).get_balance(
         user_id=TEST_USER_ID, max_date=max_date
@@ -166,7 +168,7 @@ def test_get_balance_two_salaries(
     session.add(second_salary)
     session.flush()
     session.commit()
-    max_date = datetime.datetime.now()
+    max_date = datetime.datetime.now().astimezone()
     expected_result = int(salary.amount) + int(second_salary.amount)
     obtained_result = PaymentRepo(session).get_balance(
         user_id=TEST_USER_ID, max_date=max_date

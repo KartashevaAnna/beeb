@@ -19,7 +19,7 @@ def test_valid_data_spending_over_balance(
         .where(Income.user_id == TEST_USER_ID)
         .scalar()
     )
-    max_date = datetime.datetime.now()
+    max_date = datetime.datetime.now().astimezone()
     with pytest.raises(SpendingOverBalanceError):
         PaymentRepo(session).check_balance(
             user_id=TEST_USER_ID,
@@ -38,7 +38,7 @@ def test_valid_data_spending_over_balance_previous_amount_above_zero(
         .where(Income.user_id == TEST_USER_ID)
         .scalar()
     )
-    max_date = datetime.datetime.now()
+    max_date = datetime.datetime.now().astimezone()
     with pytest.raises(SpendingOverBalanceError):
         PaymentRepo(session).check_balance(
             user_id=TEST_USER_ID,

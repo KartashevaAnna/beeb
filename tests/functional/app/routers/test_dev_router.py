@@ -25,7 +25,7 @@ def test_dev_router_populating_the_database_with_categories(client, session):
     assert all_categories
 
 
-def test_upload_payments_from_ods_file_non_clean_db(client, session, fill_db):
+def test_upload_payments_from_csv_non_clean_db(client, session, fill_db):
     all_categories_before = get_categories(session)
     all_payments_before = get_payments(session)
     response = client.post("/upload-payments", data={"user_id": 1})
@@ -37,7 +37,7 @@ def test_upload_payments_from_ods_file_non_clean_db(client, session, fill_db):
     assert len(all_payments_after) > len(all_payments_before)
 
 
-def test_upload_payments_from_ods_file_clean_db(client, session, fill_db):
+def test_upload_payments_from_csv_file_clean_db(client, session, fill_db):
     all_categories_before = get_categories(session)
     all_payments_before = get_payments(session)
     response = client.post("/upload-payments")

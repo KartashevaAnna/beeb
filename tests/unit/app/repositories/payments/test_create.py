@@ -1,3 +1,4 @@
+from contextlib import nullcontext
 import datetime
 import pytest
 from sqlalchemy import func, select
@@ -27,3 +28,20 @@ def test_valid_data_spending_over_balance(
         )
     max_id_after = session.scalar(select(func.max(Payment.id)))
     assert max_id_before == max_id_after
+
+
+def test_valid_data_spending(
+    session, fill_db, create_payment_food, positive_balance
+):
+    max_id_before = session.scalar(select(func.max(Payment.id)))
+    previous_payment = session.get(Payment, max_id_before)
+
+    create_payment_food["amount_in_rub"] = 500
+    create_payment_food["created_at"] = datetime.datetime.now()
+    with nullcontext():
+        PaymentRepo(session).create(
+            PaymentCreate(**create_payment_food),
+            user_id=previous_payment.user_id,
+        )
+    max_id_after = session.scalar(select(func.max(Payment.id)))
+    assert max_id_before != max_id_after

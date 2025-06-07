@@ -68,8 +68,9 @@ def test_update_name(client, category, category_create, session):
     assert updated_category.is_active == category.is_active
 
 
-def test_change_status(client, category, category_create):
+def test_change_status(client, category, category_create, session):
     category_id = category.id
+    category_create["is_active"] = False
 
     response = client.post(
         SETTINGS.urls.update_category.format(category_id=category_id),
@@ -77,6 +78,17 @@ def test_change_status(client, category, category_create):
     )
     assert response.status_code == status.HTTP_303_SEE_OTHER
     assert response.headers.get("location") == SETTINGS.urls.categories
+    session.expire_all()
+    updated_category_one = session.get(Category, category_id)
+    assert updated_category_one.is_active is False
+    category_create["is_active"] = True
+    response = client.post(
+        SETTINGS.urls.update_category.format(category_id=category_id),
+        data=category_create,
+    )
+    session.expire_all()
+    updated_category_two = session.get(Category, category_id)
+    assert updated_category_two.is_active is True
 
 
 def test_duplicate_name(client, categories, category_create, session):

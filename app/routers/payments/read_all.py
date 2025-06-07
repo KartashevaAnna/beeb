@@ -19,9 +19,9 @@ def read_all(
     user_id: int | None = None,
 ):
     try:
-        # payments = repo.get_all_payments(user_id)
-        # return payments
-        payments = repo.read_all(user_id)
+        payments = repo.read_all(
+            user_id=user_id,
+        )
 
         return TEMPLATES.TemplateResponse(
             request,

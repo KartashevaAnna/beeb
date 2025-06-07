@@ -8,7 +8,7 @@ def test_sum_no_salary(
     session,
 ):
     expected_result = 0
-    max_date = datetime.datetime.now()
+    max_date = datetime.datetime.now().astimezone()
     obtained_result = IncomeRepo(session).sum_income(
         user_id=TEST_USER_ID, max_date=max_date
     )
@@ -28,7 +28,7 @@ def test_sum_one_salary(
     session.flush()
     session.commit()
     expected_result = int(salary.amount)
-    max_date = datetime.datetime.now()
+    max_date = datetime.datetime.now().astimezone()
 
     obtained_result = IncomeRepo(session).sum_income(
         user_id=TEST_USER_ID, max_date=max_date
@@ -59,7 +59,7 @@ def test_sum_two_salaries(
     session.flush()
     session.commit()
     expected_result = int(salary.amount) + int(second_salary.amount)
-    max_date = datetime.datetime.now()
+    max_date = datetime.datetime.now().astimezone()
     obtained_result = IncomeRepo(session).sum_income(
         user_id=TEST_USER_ID, max_date=max_date
     )
@@ -89,7 +89,7 @@ def test_sum_two_salaries_one_in_the_future(
     session.flush()
     session.commit()
     expected_result = int(salary.amount)
-    max_date = datetime.datetime.now()
+    max_date = datetime.datetime.now().astimezone()
     obtained_result = IncomeRepo(session).sum_income(
         user_id=TEST_USER_ID, max_date=max_date
     )
