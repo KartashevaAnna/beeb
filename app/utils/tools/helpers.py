@@ -3,8 +3,9 @@ import locale
 import random
 import re
 from hashlib import sha256
-
+from calendar import isleap
 from app.exceptions import (
+    BeebError,
     EmptyStringError,
     NotIntegerError,
     NotPositiveValueError,
@@ -12,7 +13,7 @@ from app.exceptions import (
 )
 from app.models import Payment
 from app.settings import SETTINGS
-from app.utils.constants import INT_TO_MONTHES, PRODUCTS
+from app.utils.constants import INT_TO_MONTHS, PRODUCTS
 
 
 def add_payments_to_db(session, category_id: int, user_id: int) -> Payment:
@@ -150,6 +151,8 @@ def prevent_blank_strings(value):
         value = value.replace("  ", " ")
     if value.isspace():
         raise EmptyStringError
+    if not value:
+        raise EmptyStringError
     return value
 
 
@@ -160,17 +163,66 @@ def get_current_year_and_month() -> list:
 
 def check_current_year_and_month(year: int, month: int) -> list:
     current_year, current_month = get_current_year_and_month()
-    return current_year == year and INT_TO_MONTHES[current_month] == month
+    return current_year == year and INT_TO_MONTHS[current_month] == month
 
 
-def validate_positive_number_for_db(value: int | None = None) -> int | None:
-    if value:
-        try:
-            value = int(value)
-        except ValueError:
-            raise NotIntegerError(value)
-        if value <= 0:
-            raise NotPositiveValueError(value)
-        if value > 9999999:
-            raise ValueTooLargeError(value)
+def validate_positive_number_for_db(
+    value: int | None = None,
+) -> int | BeebError:
+    if value is None:
+        return value
+    try:
+        value = int(value)
+    except ValueError:
+        raise NotIntegerError(value)
+    if value <= 0:
+        raise NotPositiveValueError(value)
+    if value > 9999999:
+        raise ValueTooLargeError(value)
     return value
+
+
+def get_max_days_in_month(month: int, year: int) -> int:
+    days_in_month = {
+        "январь": 31,
+        "февраль": 29 if isleap(year) else 28,
+        "март": 31,
+        "апрель": 30,
+        "май": 31,
+        "июнь": 30,
+        "июль": 31,
+        "август": 31,
+        "сентябрь": 30,
+        "октябрь": 31,
+        "ноябрь": 30,
+        "декабрь": 31,
+    }
+    return days_in_month[INT_TO_MONTHS[month]]
+
+
+def get_max_date_from_year_and_month(
+    year: int, month: int
+) -> datetime.datetime:
+    time = "23:59:59.999999"
+    day = get_max_days_in_month(year=year, month=month)
+    return f"{year}-{str(month).zfill(2)}-{str(day).zfill(2)} {time}"
+
+
+def get_max_date_from_year_and_month_datetime_format(
+    year: int, month: int
+) -> datetime.datetime:
+    time = "23:59:59.999999"
+    day = get_max_days_in_month(year=year, month=month)
+    date = f"{year}-{str(month).zfill(2)}-{str(day).zfill(2)} {time}"
+    res = datetime.datetime.strptime(date, "%Y-%m-%d %H:%M:%S.%f")
+    return res.astimezone()
+
+
+def get_min_date_from_year_and_month_datetime_format(
+    year: int, month: int
+) -> datetime.datetime:
+    time = "00:00:00.000001"
+    day = 1
+    date = f"{year}-{str(month).zfill(2)}-{str(day).zfill(2)} {time}"
+    res = datetime.datetime.strptime(date, "%Y-%m-%d %H:%M:%S.%f")
+    return res.astimezone()

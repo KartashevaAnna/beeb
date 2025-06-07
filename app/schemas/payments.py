@@ -1,5 +1,6 @@
 import datetime
 from typing import Annotated
+from uuid import UUID
 
 from pydantic import (
     BaseModel,
@@ -40,29 +41,48 @@ class PaymentBase(BaseModel):
 
 class PaymentShow(PaymentBase):
     id: Annotated[int, Field()]
+    uuid: UUID
     amount: Annotated[int, Field()]
     created_at: Annotated[datetime.datetime, Field(exclude=True)]
-    category: Annotated[str, Field()]
+    category: str | None = None
+    category_id: int | None = None
+    user_id: Annotated[int, Field(exclude=True)]
 
     @computed_field
     @property
     def readable_grams(cls) -> str:
-        return get_readable_number(cls.grams)
+        return get_readable_number(cls.grams) if cls.grams else None
 
     @computed_field
     @property
     def readable_quantity(cls) -> str:
-        return get_readable_number(cls.quantity)
+        return get_readable_number(cls.quantity) if cls.quantity else None
 
     @computed_field
     @property
     def amount_in_rub(cls) -> str:
-        return get_readable_amount(cls.amount)
+        return get_readable_amount(cls.amount) if cls.amount else None
 
     @computed_field
     @property
     def date(cls) -> str:
         return get_date_from_datetime_without_year(date=cls.created_at)
+
+    @computed_field
+    @property
+    def type(cls) -> str:
+        if not any([cls.grams, cls.quantity, cls.category_id]):
+            return "доход"
+        elif not cls.quantity:
+            return "еда"
+        return "вещь"
+
+    @field_validator("category", mode="before")
+    @classmethod
+    def validate_category(cls, value) -> str:
+        if not value:
+            return "зарплата"
+        return value
 
 
 class PaymentShowOne(PaymentShow):
@@ -115,19 +135,18 @@ class PaymentUpdate(PaymentBase):
     ]
     user_id: Annotated[int, Field(gt=0, exclude=True)]
 
-    def get_positive_number(self, number) -> int:
-        if not number or number <= 0:
-            raise ValueError("number must be positive")
-        return number
-
     @field_validator("date")
+    def prevent_blank_strings(cls, value):
+        return prevent_blank_strings(value)
+
+    @field_validator("amount")
     def prevent_blank_strings(cls, value):
         return prevent_blank_strings(value)
 
     @computed_field
     @property
     def amount_in_kopecks(cls) -> int:
-        return cls.get_positive_number(get_number_for_db(cls.amount))
+        return validate_positive_number_for_db(get_number_for_db(cls.amount))
 
     @computed_field
     @property

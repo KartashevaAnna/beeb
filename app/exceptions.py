@@ -112,8 +112,19 @@ class NothingToComputeError(BeebError):
 
 
 class SpendingOverBalanceError(BeebError):
-    def __init__(self, value):
-        self.value = value
-        self.message = f"Расход {value} превышает сумму, которая есть на счету."
+    def __init__(self, spending, balance):
+        self.value = spending
+        self.balance = balance
+        self.message = f"Расход {spending // 100} превышает сумму, которая есть на счету: {balance // 100}."
         self.status_code = status.HTTP_406_NOT_ACCEPTABLE
+        self.detail = f"Код ошибки: {self.status_code}. " + self.message
+
+
+class IncomeNotFoundError(BeebError):
+    def __init__(
+        self,
+        value: str,
+    ):
+        self.message = f"Доход под номером {value} не найден"
+        self.status_code = status.HTTP_404_NOT_FOUND
         self.detail = f"Код ошибки: {self.status_code}. " + self.message

@@ -10,17 +10,16 @@ from tests.conftest import clean_db, get_categories, raise_always
 NAME = "exotic_category"
 
 
-def test_template(client, category, session):
+def test_template(client, category):
     category_id = category.id
     response = client.get(
         SETTINGS.urls.update_category.format(category_id=category_id)
     )
     assert response.status_code == status.HTTP_200_OK
     assert category.name in response.text
-    clean_db(session)
 
 
-def test_template_no_cookie(client, category, session):
+def test_template_no_cookie(client, category):
     category_id = category.id
     client.cookies = {}
     response = client.get(
@@ -28,10 +27,9 @@ def test_template_no_cookie(client, category, session):
     )
     assert response.status_code == status.HTTP_303_SEE_OTHER
     assert response.headers.get("location") == SETTINGS.urls.login
-    clean_db(session)
 
 
-def test_template_stale_token(client, category, session, stale_token):
+def test_template_stale_token(client, category, stale_token):
     category_id = category.id
     client.cookies = {"token": stale_token}
     response = client.get(
@@ -41,7 +39,7 @@ def test_template_stale_token(client, category, session, stale_token):
     assert response.headers.get("location") == SETTINGS.urls.login
 
 
-def test_template_wrong_token(client, category, session, wrong_token):
+def test_template_wrong_token(client, category, wrong_token):
     category_id = category.id
     client.cookies = {"token": wrong_token}
     response = client.get(
@@ -49,7 +47,6 @@ def test_template_wrong_token(client, category, session, wrong_token):
     )
     assert response.status_code == status.HTTP_303_SEE_OTHER
     assert response.headers.get("location") == SETTINGS.urls.login
-    clean_db(session)
 
 
 def test_update_name(client, category, category_create, session):
@@ -69,11 +66,11 @@ def test_update_name(client, category, category_create, session):
     assert category_id == updated_category.id
     assert updated_category.name == NAME
     assert updated_category.is_active == category.is_active
-    clean_db(session)
 
 
 def test_change_status(client, category, category_create, session):
     category_id = category.id
+    category_create["is_active"] = False
 
     response = client.post(
         SETTINGS.urls.update_category.format(category_id=category_id),
@@ -81,7 +78,17 @@ def test_change_status(client, category, category_create, session):
     )
     assert response.status_code == status.HTTP_303_SEE_OTHER
     assert response.headers.get("location") == SETTINGS.urls.categories
-    clean_db(session)
+    session.expire_all()
+    updated_category_one = session.get(Category, category_id)
+    assert updated_category_one.is_active is False
+    category_create["is_active"] = True
+    response = client.post(
+        SETTINGS.urls.update_category.format(category_id=category_id),
+        data=category_create,
+    )
+    session.expire_all()
+    updated_category_two = session.get(Category, category_id)
+    assert updated_category_two.is_active is True
 
 
 def test_duplicate_name(client, categories, category_create, session):
@@ -94,10 +101,9 @@ def test_duplicate_name(client, categories, category_create, session):
         data=category_create,
     )
     assert response.status_code == status.HTTP_304_NOT_MODIFIED
-    clean_db(session)
 
 
-def test_name_is_None(client, category, category_create, session):
+def test_name_is_None(client, category, category_create):
     category_id = category.id
     category_create["name"] = None
     response = client.post(
@@ -105,7 +111,6 @@ def test_name_is_None(client, category, category_create, session):
         data=category_create,
     )
     assert response.status_code == status.HTTP_422_UNPROCESSABLE_ENTITY
-    clean_db(session)
 
 
 def test_404(client):
@@ -114,17 +119,16 @@ def test_404(client):
 
 
 @patch.object(CategoryRepo, "update", raise_always)
-def test_any_other_exception(client, category, session):
+def test_any_other_exception(client, category):
     category_id = category.id
     response = client.post(
         SETTINGS.urls.update_category.format(category_id=category_id),
         data={"name": NAME, "is_active": category.is_active},
     )
     assert response.status_code == status.HTTP_501_NOT_IMPLEMENTED
-    clean_db(session)
 
 
-def test_no_cookie(client, category, category_create, session):
+def test_no_cookie(client, category, category_create):
     category_id = category.id
     client.cookies = {}
     response = client.post(
@@ -133,10 +137,9 @@ def test_no_cookie(client, category, category_create, session):
     )
     assert response.status_code == status.HTTP_303_SEE_OTHER
     assert response.headers.get("location") == SETTINGS.urls.login
-    clean_db(session)
 
 
-def test_stale_token(client, category, category_create, session, stale_token):
+def test_stale_token(client, category, category_create, stale_token):
     category_id = category.id
     client.cookies = {"token": stale_token}
     response = client.post(
@@ -145,10 +148,9 @@ def test_stale_token(client, category, category_create, session, stale_token):
     )
     assert response.status_code == status.HTTP_303_SEE_OTHER
     assert response.headers.get("location") == SETTINGS.urls.login
-    clean_db(session)
 
 
-def test_wrong_token(client, category, category_create, session, wrong_token):
+def test_wrong_token(client, category, category_create, wrong_token):
     category_id = category.id
     client.cookies = {"token": wrong_token}
     response = client.post(
@@ -157,4 +159,3 @@ def test_wrong_token(client, category, category_create, session, wrong_token):
     )
     assert response.status_code == status.HTTP_303_SEE_OTHER
     assert response.headers.get("location") == SETTINGS.urls.login
-    clean_db(session)

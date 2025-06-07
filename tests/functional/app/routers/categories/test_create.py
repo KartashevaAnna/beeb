@@ -1,4 +1,4 @@
-from copy import copy
+from copy import deepcopy
 from unittest.mock import patch
 
 from fastapi import status
@@ -7,7 +7,7 @@ from sqlalchemy import select
 from app.models import Category
 from app.repositories.categories import CategoryRepo
 from app.settings import SETTINGS
-from tests.conftest import clean_db, delete_category, raise_always
+from tests.conftest import delete_category, raise_always
 
 
 def test_template(client):
@@ -51,13 +51,12 @@ def test_valid_data(session, client, category_create):
     category = results.scalars().one_or_none()
     assert category
     assert response.headers.get("location") == SETTINGS.urls.categories
-    clean_db(session)
 
 
 def test_invalid_name(client, category_create, session):
     """Case: endpoint fails creating a category in db with invalid request."""
     delete_category(session)
-    category_create = copy(category_create)
+    category_create = deepcopy(category_create)
     category_create["name"] = None
     response = client.post(
         url=SETTINGS.urls.create_category, data=category_create
@@ -68,7 +67,7 @@ def test_invalid_name(client, category_create, session):
 def test_invalid_data(client, category_create, session):
     """Case: endpoint fails creating a category in db with invalid request."""
     delete_category(session)
-    category_create = copy(category_create)
+    category_create = deepcopy(category_create)
     category_create.pop("name", None)
     category_create["unexpected_parameter"] = "hello_world"
     response = client.post(
@@ -80,7 +79,7 @@ def test_invalid_data(client, category_create, session):
 def test_duplicate_category(client, category, category_create, session):
     """Case: endpoint refuses creating a category with a duplicate name."""
     delete_category(session)
-    category_create = copy(category_create)
+    category_create = deepcopy(category_create)
     category_create["name"] = category.name
     client.post(url=SETTINGS.urls.create_category, data=category_create)
     response = client.post(

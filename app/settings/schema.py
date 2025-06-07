@@ -66,6 +66,7 @@ class Urls(BaseModel):
     signup: str
     login: str
     select_food_non_food: str
+    select_income_expense: str
     create_payment: str
     create_payment_food: str
     create_payment_non_food: str
@@ -76,6 +77,11 @@ class Urls(BaseModel):
     delete_payment_core: str
     delete_payment: str
     total_payments_monthly: str
+    create_income: str
+    delete_income_core: str
+    delete_income: str
+    update_income_core: str
+    update_income: str
     create_category: str
     category: str
     categories: str
@@ -93,9 +99,12 @@ class Templates(BaseModel):
     read_payment: str
     read_payments: str
     select_food_non_food: str
+    select_income_expense: str
     create_payment_food: str
     create_payment_non_food: str
     delete_payment: str
+    create_income: str
+    update_income: str
     payments_dashboard_yearly: str
     payments_dashboard: str
     payments_dashboard_monthly: str

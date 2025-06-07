@@ -1,6 +1,6 @@
 from typing import Annotated
 
-import fastapi
+from fastapi import APIRouter
 from fastapi import Depends, Request, status
 from fastapi.responses import RedirectResponse
 
@@ -10,16 +10,7 @@ from app.routers.auth_router import authenticate
 from app.settings import SETTINGS, TEMPLATES
 from app.utils.dependencies import payments_repo
 
-delete_payments_router = fastapi.APIRouter()
-
-
-@delete_payments_router.get(SETTINGS.urls.delete_payment)
-@authenticate
-def delete_template(request: Request, user_id: int | None = None):
-    return TEMPLATES.TemplateResponse(
-        request,
-        SETTINGS.templates.delete_payment,
-    )
+delete_payments_router = APIRouter()
 
 
 @delete_payments_router.post(SETTINGS.urls.delete_payment)

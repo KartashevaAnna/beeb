@@ -2,15 +2,32 @@ import calendar
 import datetime
 
 from fastapi import Request
-from sqlalchemy import delete, extract, func, select, update
+from sqlalchemy import (
+    Column,
+    String,
+    delete,
+    desc,
+    extract,
+    func,
+    literal,
+    null,
+    select,
+    text,
+    union,
+    update,
+)
 from sqlalchemy.orm import Session
+
+from sqlalchemy.orm import aliased, joinedload
+
 
 from app.exceptions import (
     NothingToComputeError,
     NotOwnerError,
     SpendingOverBalanceError,
 )
-from app.models import Category, Payment
+from app.models import Category, Income, Payment
+from app.repositories.income import IncomeRepo
 from app.schemas.dates import DateFilter
 from app.schemas.payments import (
     PaymentCreate,
@@ -18,7 +35,7 @@ from app.schemas.payments import (
     PaymentShowOne,
     PaymentUpdate,
 )
-from app.utils.constants import INT_TO_MONTHES, MONTHES
+from app.utils.constants import INT_TO_MONTHS, MONTHS
 from app.utils.tools.category_helpers import (
     get_payments_shares,
     get_payments_sums_per_category,
@@ -28,6 +45,7 @@ from app.utils.tools.helpers import (
     check_current_year_and_month,
     get_current_year_and_month,
     get_date_from_datetime_without_year,
+    get_max_date_from_year_and_month,
     get_monthly_payments,
     get_readable_amount,
 )
@@ -37,21 +55,142 @@ class PaymentRepo:
     def __init__(self, session: Session) -> None:
         self.session = session
 
-    def get_all_payments(self, user_id: int) -> list[Payment]:
+    def get_min_date_overall(self, user_id: int) -> datetime.datetime:
+        payment_subquery = select(func.min(Payment.created_at)).where(
+            Payment.user_id == user_id
+        )
+        income_subquery = select(func.min(Income.created_at)).where(
+            Income.user_id == user_id
+        )
+
         statement = (
-            select(Payment, Category.name)
+            select(
+                func.least(
+                    income_subquery.scalar_subquery(),
+                    payment_subquery.scalar_subquery(),
+                )
+            )
+            .select_from(
+                Income,
+            )
+            .where(Income.user_id == user_id)
+            .join(Payment, Income.user_id == Payment.user_id)
+        )
+        return self.session.execute(statement).scalar()
+
+    def get_max_date_overall(self, user_id: int) -> datetime.datetime:
+        payment_subquery = select(func.max(Payment.created_at)).where(
+            Payment.user_id == user_id
+        )
+        income_subquery = select(func.max(Income.created_at)).where(
+            Income.user_id == user_id
+        )
+
+        statement = (
+            select(
+                func.greatest(
+                    income_subquery.scalar_subquery(),
+                    payment_subquery.scalar_subquery(),
+                )
+            )
+            .select_from(Income)
+            .where(Income.user_id == user_id)
+            .join(Payment, Income.user_id == Payment.user_id)
+        )
+        return self.session.execute(statement).scalar()
+
+    def read_all(
+        self,
+        user_id: int,
+    ) -> list[PaymentShow]:
+        income_subquery = select(
+            Income.id,
+            Income.uuid,
+            Income.name,
+            null().label("grams"),
+            null().label("quantity"),
+            Income.amount,
+            null().label("category_id"),
+            Income.user_id,
+            Income.created_at,
+            null().label("category"),
+            literal("доход").label("type"),
+        ).where(Income.user_id == user_id)
+        payment_subquery = (
+            select(
+                Payment.id,
+                Payment.uuid,
+                Payment.name,
+                Payment.grams,
+                Payment.quantity,
+                Payment.amount,
+                Payment.category_id,
+                Payment.user_id,
+                Payment.created_at,
+                Category.name.label("category"),
+                literal("расход").label("type"),
+            )
             .where(Payment.user_id == user_id)
             .join(Payment.payment_category)
-            .order_by(Payment.created_at.desc())
         )
-        res = self.session.execute(statement)
-        return res.scalars().all()
+        union_query = union(income_subquery, payment_subquery).order_by(
+            desc("created_at")
+        )
+        final_query = self.session.execute(union_query)
+        return [PaymentShow(**row._mapping) for row in final_query]
+
+    def read_all_between_dates(
+        self,
+        user_id: int,
+        max_date: datetime.datetime,
+        min_date: datetime.datetime,
+    ) -> list[PaymentShow]:
+        income_subquery = (
+            select(
+                Income.id,
+                Income.uuid,
+                Income.name,
+                null().label("grams"),
+                null().label("quantity"),
+                Income.amount,
+                null().label("category_id"),
+                Income.user_id,
+                Income.created_at,
+                null().label("category"),
+                literal("доход").label("type"),
+            )
+            .where(Income.user_id == user_id)
+            .where(Income.created_at.between(min_date, max_date))
+        )
+        payment_subquery = (
+            select(
+                Payment.id,
+                Payment.uuid,
+                Payment.name,
+                Payment.grams,
+                Payment.quantity,
+                Payment.amount,
+                Payment.category_id,
+                Payment.user_id,
+                Payment.created_at,
+                Category.name.label("category"),
+                literal("расход").label("type"),
+            )
+            .where(Payment.user_id == user_id)
+            .where(Payment.created_at.between(min_date, max_date))
+            .join(Payment.payment_category)
+        )
+        union_query = union(income_subquery, payment_subquery).order_by(
+            desc("created_at")
+        )
+        final_query = self.session.execute(union_query)
+        return [PaymentShow(**row._mapping) for row in final_query]
 
     def get_spendings(self, payments: list[Payment]) -> list[Payment]:
-        return [payment for payment in payments if payment.is_spending is True]
+        return [payment for payment in payments if payment.type != "доход"]
 
-    def get_all_incomes(self, payments: list[Payment]) -> list[Payment]:
-        return [payment for payment in payments if payment.is_spending is False]
+    def get_incomes(self, payments: list[Payment]) -> list[Payment]:
+        return [payment for payment in payments if payment.type == "доход"]
 
     def get_total_amounts(self, payments: list[Payment]) -> int:
         amount = self.get_total(payments)
@@ -96,15 +235,6 @@ class PaymentRepo:
         )
         res = self.session.execute(statement)
         return res.scalars().all()
-
-    def read_all(self, user_id: int) -> list[Payment]:
-        results = self.get_all_payments(user_id)
-        return [
-            PaymentShow(
-                **payment.__dict__, category=payment.payment_category.name
-            )
-            for payment in results
-        ]
 
     def get_total(self, payments: list[Payment]) -> int:
         return self.sum_payment_amounts(payments)
@@ -169,7 +299,7 @@ class PaymentRepo:
 
     def get_rate_per_day(self, expenses: int, elapsed_days: int) -> int:
         try:
-            return expenses / elapsed_days
+            return expenses // elapsed_days
         except ZeroDivisionError:
             return expenses
 
@@ -179,7 +309,7 @@ class PaymentRepo:
         monthly_payments = get_monthly_payments(payments)
         sorted_monthly_payments = dict(sorted(monthly_payments.items()))
         return {
-            MONTHES[calendar.month_name[int(key)]]: (
+            MONTHS[calendar.month_name[int(key)]]: (
                 get_readable_amount(value),
                 f"/dashboard/{year}/{key}" if year else None,
             )
@@ -212,14 +342,45 @@ class PaymentRepo:
             else None
         )
 
+    def sum_payments(self, user_id: int, max_date: datetime.datetime) -> int:
+        payment_sum = (
+            self.session.query(func.sum(Payment.amount))
+            .where(Payment.user_id == user_id)
+            .where(Payment.created_at <= max_date)
+            .scalar()
+        )
+        return payment_sum if payment_sum else 0
+
+    def get_balance(self, user_id: int, max_date: datetime.datetime):
+        payments = self.sum_payments(user_id, max_date=max_date)
+        income = IncomeRepo(self.session).sum_income(
+            user_id=user_id, max_date=max_date
+        )
+        return income - payments
+
+    def check_balance(
+        self,
+        user_id: int,
+        desired_payment_amount: int,
+        max_date: datetime.datetime,
+        previous_payment_amount: int,
+    ):
+        balance = self.get_balance(user_id=user_id, max_date=max_date)
+        balance += previous_payment_amount
+        remains = balance - desired_payment_amount
+        if remains < 0:
+            raise SpendingOverBalanceError(
+                spending=int(desired_payment_amount), balance=balance
+            )
+
     def create(self, payment: PaymentCreate, user_id: int) -> Payment:
-        # year, month = get_current_year_and_month()
-        # balance = self.get_user_balance(
-        #     user_id=user_id, year=year, month=month
-        # )["balance"]
-        # balance -= int(payment.amount)
-        # if balance <= 0:
-        #     raise SpendingOverBalanceError(int(payment.amount) // 100)
+        current_date = datetime.datetime.now()
+        self.check_balance(
+            user_id=user_id,
+            desired_payment_amount=int(payment.amount),
+            previous_payment_amount=0,
+            max_date=current_date,
+        )
         new_payment = Payment(**payment.model_dump())
         self.session.add(new_payment)
         self.session.commit()
@@ -229,68 +390,67 @@ class PaymentRepo:
 
     def update(self, payment_id: int, to_update: PaymentUpdate):
         old_payment = self.read(payment_id)
+
         if old_payment.user_id != to_update.user_id:
             raise NotOwnerError(old_payment.name)
-        stmt = (
+        max_date = old_payment.created_at
+        self.check_balance(
+            user_id=old_payment.user_id,
+            desired_payment_amount=to_update.amount_in_kopecks,
+            previous_payment_amount=old_payment.amount,
+            max_date=max_date,
+        )
+
+        statement = (
             update(Payment)
             .where(Payment.id == payment_id)
             .values(
-                user_id=to_update.user_id,
                 name=to_update.name,
                 amount=to_update.amount_in_kopecks,
                 category_id=to_update.category_id,
                 created_at=to_update.date_to_update,
+                grams=to_update.grams,
+                quantity=to_update.quantity,
             )
         )
-        self.session.execute(stmt)
+        self.session.execute(statement)
         self.session.commit()
 
     def delete(self, payment_id: int, user_id: int):
         old_payment = self.read(payment_id)
         if old_payment.user_id != user_id:
             raise NotOwnerError(old_payment.name)
-        stmt = delete(Payment).where(Payment.id == payment_id)
-        self.session.execute(stmt)
+        statement = delete(Payment).where(Payment.id == payment_id)
+        self.session.execute(statement)
         self.session.commit()
 
-    def get_all_years(self, user_id: int):
-        all_payments = self.get_all_payments(user_id)
-        all_payments = list({x.created_at.year for x in all_payments})
+    def get_all_years(self, user_id: int, payments: list[Payment]):
+        all_payments = list({x.created_at.year for x in payments})
         all_payments.sort(reverse=True)
         return all_payments
-
-    def get_balance(self, payments: list[Payment]) -> dict:
-        all_spendings = self.get_spendings(payments)
-        total_spending = self.get_total_amounts(all_spendings)
-        all_incomes = self.get_all_incomes(payments)
-        total_income = self.get_total_amounts(all_incomes)
-        return {
-            "balance": total_income - total_spending,
-            "income": total_income,
-            "spending": total_spending,
-        }
-
-    def get_expenses(self, payments: list[Payment]) -> int:
-        all_spendings = self.get_spendings(payments)
-        return self.get_total_amounts(all_spendings)
 
     def get_dashboard(
         self,
         user_id: int,
-        request: Request,
         payments: list[Payment],
-        year: int = None,
-        month: int | None = None,
+        max_date: datetime.datetime,
+        min_date: datetime.datetime,
     ):
-        all_spendings = self.get_spendings(payments)
-        total_spending = self.get_total_amounts(all_spendings)
-        balance_income_spending = self.get_balance(all_spendings)
-        available_amount = balance_income_spending["balance"]
+        total_spending = self.sum_payments(user_id=user_id, max_date=max_date)
+        total_income = IncomeRepo(self.session).sum_income(
+            user_id=user_id, max_date=max_date
+        )
+        available_amount = self.get_balance(user_id=user_id, max_date=max_date)
         available_amount_frontend = get_readable_amount(available_amount)
-        total_days = self.calculate_total_days(user_id, year, month)
+        total_days = self.calculate_total_days(
+            user_id=user_id, min_date=min_date, max_date=max_date
+        )
+
         rate_per_day = self.get_rate_per_day(
             expenses=total_spending, elapsed_days=total_days
         )
+        all_spendings = self.get_spendings(payments)
+
         try:
             remaining_days = int(available_amount / rate_per_day)
             left_until = get_date_from_datetime_without_year(
@@ -298,18 +458,17 @@ class PaymentRepo:
             )
         except ZeroDivisionError:
             raise NothingToComputeError
-        month = INT_TO_MONTHES.get(month)
-        capitalized_month = month.title() if month is not None else None
+        year, month = max_date.year, max_date.month
+        month = INT_TO_MONTHS.get(month)
+        capitalized_month = month.title()
+
         return {
-            "request": request,
             "current_month": check_current_year_and_month(
                 year=year, month=month
             ),
             "available_amount_frontend": available_amount_frontend,
             "days_left": left_until,
-            "total_income": get_readable_amount(
-                balance_income_spending["income"]
-            ),
+            "total_income": get_readable_amount(total_income),
             "total_spending": get_readable_amount(total_spending),
             "all_spendings": all_spendings,
             "total_per_month": self.get_monthly_payments(
@@ -322,17 +481,7 @@ class PaymentRepo:
             "header_text": f"{capitalized_month} {year} года",
         }
 
-    def calculate_total_days(self, user_id, year, month):
-        max_date = self.get_max_date(
-            user_id=user_id, limit=DateFilter(year=year, month=month)
-        )
-        min_date = self.get_min_date(
-            user_id=user_id,
-            limit=DateFilter(
-                year=year,
-                month=month,
-            ),
-        )
+    def calculate_total_days(self, user_id, max_date, min_date):
         total_days = self.get_total_days(max_date, min_date)
         return total_days
 
@@ -355,7 +504,7 @@ class PaymentRepo:
         payments = self.get_payments_by_requested_month(
             year=year, month=month + 1, user_id=user_id
         )
-        return self.get_balance(payments)
+        return self.get_sum(payments)
 
     def get_user_expenses(
         self,

@@ -10,17 +10,11 @@ def get_payments_sums_per_category(
 ) -> dict[int, str]:
     payments_sums_per_category = {}
     for payment in all_payments:
-        if (
-            payment.payment_category.name
-            not in payments_sums_per_category.keys()
-        ):
-            payments_sums_per_category[payment.payment_category.name] = (
-                payment.amount
-            )
+        if payment.category not in payments_sums_per_category.keys():
+            payments_sums_per_category[payment.category] = payment.amount
         else:
-            payments_sums_per_category[payment.payment_category.name] = (
-                payment.amount
-                + payments_sums_per_category[payment.payment_category.name]
+            payments_sums_per_category[payment.category] = (
+                payment.amount + payments_sums_per_category[payment.category]
             )
     return payments_sums_per_category
 

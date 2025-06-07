@@ -1,16 +1,24 @@
+from datetime import datetime
 from typing import Annotated
 
-import fastapi
+from fastapi import APIRouter
 from fastapi import Depends, Request, status
 
 from app.exceptions import BeebError
+from app.repositories.income import IncomeRepo
 from app.repositories.payments import PaymentRepo
 from app.routers.auth_router import authenticate
+from app.schemas.dates import DateFilter
 from app.settings import SETTINGS, TEMPLATES
-from app.utils.dependencies import payments_repo
-from app.utils.tools.helpers import get_current_year_and_month
+from app.utils.dependencies import income_repo, payments_repo
+from app.utils.tools.helpers import (
+    get_current_year_and_month,
+    get_max_date_from_year_and_month,
+    get_max_date_from_year_and_month_datetime_format,
+    get_min_date_from_year_and_month_datetime_format,
+)
 
-payments_dashboard_router = fastapi.APIRouter()
+payments_dashboard_router = APIRouter()
 
 
 @payments_dashboard_router.get(SETTINGS.urls.payments_dashboard)
@@ -21,17 +29,22 @@ def dashboard_for_all_years(
     user_id: int | None = None,
 ):
     try:
-        current_year, current_month = get_current_year_and_month()
+        max_date = repo.get_max_date_overall(user_id)
+        min_date = repo.get_min_date_overall(user_id)
 
-        payments = repo.get_all_payments(user_id)
+        payments = repo.read_all_between_dates(
+            user_id=user_id, max_date=max_date, min_date=min_date
+        )
+
         dashboard = repo.get_dashboard(
-            request=request,
             payments=payments,
             user_id=user_id,
-            year=current_year,
-            month=current_month,
+            max_date=max_date,
+            min_date=min_date,
         )
-        dashboard["all_years"] = repo.get_all_years(user_id)
+        dashboard["all_years"] = repo.get_all_years(
+            user_id=user_id, payments=payments
+        )
         dashboard["header_text"] = "Расходы за всё время"
 
         return TEMPLATES.TemplateResponse(
@@ -57,24 +70,6 @@ def dashboard_for_all_years(
         )
 
 
-@payments_dashboard_router.get(SETTINGS.urls.total_payments_monthly)
-@authenticate
-def read_monthly_payments_breakdown(
-    repo: Annotated[PaymentRepo, Depends(payments_repo)],
-    request: Request,
-    user_id: int | None = None,
-):
-    return TEMPLATES.TemplateResponse(
-        request,
-        SETTINGS.templates.payments_dashboard_yearly,
-        context={
-            "total_per_month": repo.get_monthly_payments(
-                repo.get_all_payments(user_id)
-            ),
-        },
-    )
-
-
 @payments_dashboard_router.get(SETTINGS.urls.payments_dashboard_yearly)
 @authenticate
 def read_all_payments_per_year(
@@ -84,9 +79,20 @@ def read_all_payments_per_year(
     user_id: int | None = None,
 ):
     try:
-        payments = repo.get_payments_per_year(year=year, user_id=user_id)
+        max_date = get_max_date_from_year_and_month_datetime_format(
+            year=year, month=12
+        )
+        min_date = get_min_date_from_year_and_month_datetime_format(
+            year=year, month=1
+        )
+        payments = repo.read_all_between_dates(
+            user_id=user_id, max_date=max_date, min_date=min_date
+        )
         dashboard = repo.get_dashboard(
-            request=request, payments=payments, year=year, user_id=user_id
+            payments=payments,
+            user_id=user_id,
+            max_date=max_date,
+            min_date=min_date,
         )
         dashboard["header_text"] = f"Расходы за {year} год"
 
@@ -125,15 +131,20 @@ def read_all_payments_per_month(
     user_id: int | None = None,
 ):
     try:
-        payments = repo.get_payments_per_month(
-            year=year, month=month, user_id=user_id
+        max_date = get_max_date_from_year_and_month_datetime_format(
+            year=year, month=month
+        )
+        min_date = get_min_date_from_year_and_month_datetime_format(
+            year=year, month=month
+        )
+        payments = repo.read_all_between_dates(
+            user_id=user_id, max_date=max_date, min_date=min_date
         )
         dashboard = repo.get_dashboard(
-            request=request,
             payments=payments,
-            year=year,
-            month=month,
             user_id=user_id,
+            max_date=max_date,
+            min_date=min_date,
         )
 
         return TEMPLATES.TemplateResponse(

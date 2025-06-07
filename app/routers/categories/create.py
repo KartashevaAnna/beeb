@@ -1,6 +1,6 @@
 from typing import Annotated
 
-import fastapi
+from fastapi import APIRouter
 from fastapi import Depends, Form, Request, status
 from fastapi.responses import RedirectResponse
 from pydantic import ValidationError
@@ -12,7 +12,7 @@ from app.schemas.categories import CategoryCreate
 from app.settings import SETTINGS, TEMPLATES
 from app.utils.dependencies import categories_repo
 
-create_categories_router = fastapi.APIRouter()
+create_categories_router = APIRouter()
 
 
 @create_categories_router.get(SETTINGS.urls.create_category)

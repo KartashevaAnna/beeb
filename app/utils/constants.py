@@ -28,7 +28,7 @@ PRODUCTS = [
     "turkey",
     "yogurt",
 ]
-MONTHES = {
+MONTHS = {
     "января": "январь",
     "февраля": "февраль",
     "марта": "март",
@@ -44,7 +44,7 @@ MONTHES = {
 }
 
 
-INT_TO_MONTHES = {
+INT_TO_MONTHS = {
     1: "январь",
     2: "февраль",
     3: "март",

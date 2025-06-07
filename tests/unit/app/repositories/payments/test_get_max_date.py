@@ -2,7 +2,7 @@ import datetime
 
 from app.repositories.payments import PaymentRepo
 from app.schemas.dates import DateFilter
-from tests.conftest import TEST_USER_ID, clean_db
+from tests.conftest import TEST_USER_ID
 
 
 def test_payment_repo_get_max_date_no_year_no_month(
@@ -38,7 +38,6 @@ def test_payment_repo_get_max_date_year_no_month(
         limit=limit, user_id=TEST_USER_ID
     )
     assert result.date() == current_payment.created_at.date()
-    clean_db(session)
 
 
 def test_payment_repo_get_max_date_year_month(
@@ -59,4 +58,3 @@ def test_payment_repo_get_max_date_year_month(
         limit=limit, user_id=TEST_USER_ID
     )
     assert result.date() == month_ago_payment_later.created_at.date()
-    clean_db(session)

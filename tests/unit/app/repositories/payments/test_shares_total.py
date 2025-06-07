@@ -11,7 +11,7 @@ def test_get_monthly_payments_shares_total(fill_db, session):
     """
     repo = PaymentRepo(session)
     monthly_payments_shares_total = repo.get_total_monthly_payments_shares(
-        repo.get_all_payments(TEST_USER_ID)
+        repo.read_all(TEST_USER_ID)
     )
     checksum = int(sum(monthly_payments_shares_total.keys()))
     assert checksum <= 100

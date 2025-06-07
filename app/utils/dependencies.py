@@ -4,6 +4,7 @@ from fastapi import Cookie, Depends, Header
 from sqlalchemy.orm import Session, sessionmaker
 
 from app.repositories.categories import CategoryRepo
+from app.repositories.income import IncomeRepo
 from app.repositories.payments import PaymentRepo
 from app.repositories.users import UserRepo
 from app.settings import ENGINE
@@ -28,6 +29,10 @@ def payments_repo(session: Session = Depends(get_session)) -> PaymentRepo:
 
 def categories_repo(session: Session = Depends(get_session)) -> CategoryRepo:
     return CategoryRepo(session)
+
+
+def income_repo(session: Session = Depends(get_session)) -> IncomeRepo:
+    return IncomeRepo(session)
 
 
 def get_block_name(hx_request: Annotated[str | None, Header()] = None):

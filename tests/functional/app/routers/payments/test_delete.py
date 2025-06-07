@@ -10,44 +10,6 @@ from app.settings import SETTINGS
 from tests.conftest import fill_db, raise_always
 
 
-def test_delete_payment_template(client, payment):
-    payment_id = payment.id
-    response = client.get(
-        url=SETTINGS.urls.delete_payment.format(payment_id=payment_id),
-    )
-    assert response.status_code == 200
-
-
-def test_template_no_cookie(client, payment):
-    payment_id = payment.id
-    client.cookies = {}
-    response = client.get(
-        url=SETTINGS.urls.delete_payment.format(payment_id=payment_id),
-    )
-    assert response.status_code == status.HTTP_303_SEE_OTHER
-    assert response.headers.get("location") == SETTINGS.urls.login
-
-
-def test_template_stale_token(client, payment, stale_token):
-    payment_id = payment.id
-    client.cookies = {"token": stale_token}
-    response = client.get(
-        url=SETTINGS.urls.delete_payment.format(payment_id=payment_id),
-    )
-    assert response.status_code == status.HTTP_303_SEE_OTHER
-    assert response.headers.get("location") == SETTINGS.urls.login
-
-
-def test_template_wrong_token(client, payment, wrong_token):
-    payment_id = payment.id
-    client.cookies = {"token": wrong_token}
-    response = client.get(
-        url=SETTINGS.urls.delete_payment.format(payment_id=payment_id),
-    )
-    assert response.status_code == status.HTTP_303_SEE_OTHER
-    assert response.headers.get("location") == SETTINGS.urls.login
-
-
 def test_delete_payment(client, payment, session):
     """Case: endpoint deletes an payment."""
     payment_id = payment.id
@@ -101,11 +63,11 @@ def test_wrong_token(client, payment, wrong_token):
     assert response.headers.get("location") == SETTINGS.urls.login
 
 
-def test_wrong_user(client, payment, session, payment_update, wrong_user_token):
+def test_wrong_user(client, payment, session, update_payment, wrong_user_token):
     client.cookies["token"] = wrong_user_token
     response = client.post(
         SETTINGS.urls.delete_payment.format(payment_id=payment.id),
-        data=payment_update,
+        data=update_payment,
     )
     assert response.status_code == NotOwnerError(payment.name).status_code
     assert response.template.name == SETTINGS.templates.delete_payment

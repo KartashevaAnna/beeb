@@ -12,7 +12,7 @@ from tests.conftest import TEST_USER_ID, raise_always
 
 def test_normal_function(client, fill_db, session):
     response = client.get(SETTINGS.urls.payments)
-    assert response.status_code == 200
+    assert response.status_code == status.HTTP_200_OK
     all_payments = session.scalars(select(Payment)).all()
     assert len(all_payments) > 2
     payment = all_payments[2]
@@ -24,14 +24,14 @@ def test_normal_function(client, fill_db, session):
 
 def test_empty_db(client):
     response = client.get(SETTINGS.urls.payments)
-    assert response.status_code == 200
+    assert response.status_code == status.HTTP_200_OK
     assert response.context["payments"] == []
 
 
 @patch.object(PaymentRepo, "read_all", raise_always)
 def test_any_other_exception(client):
     response = client.get(SETTINGS.urls.payments)
-    assert response.status_code != 200
+    assert response.status_code != status.HTTP_200_OK
     assert response.template.name == SETTINGS.templates.read_payments
 
 

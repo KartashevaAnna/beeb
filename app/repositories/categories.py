@@ -115,10 +115,10 @@ class CategoryRepo:
         if category_with_the_same_name:
             if category_with_the_same_name.id != category_id:
                 raise DuplicateNameEditError(category_with_the_same_name.name)
-        stmt = (
+        statement = (
             update(Category)
             .where(Category.id == category_id)
             .values(name=to_update.name, is_active=to_update.is_active)
         )
-        self.session.execute(stmt)
+        self.session.execute(statement)
         self.session.commit()

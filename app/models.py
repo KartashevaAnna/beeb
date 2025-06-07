@@ -34,6 +34,9 @@ class User(AlchemyBaseModel):
     categories_list: Mapped[list["Category"]] = relationship(
         back_populates="category_user",
     )
+    income_list: Mapped[list["Income"]] = relationship(
+        back_populates="income_user",
+    )
 
 
 class Category(AlchemyBaseModel):
@@ -65,6 +68,20 @@ class Payment(AlchemyBaseModel):
         types.UUID, nullable=False, unique=True, default=uuid4
     )
     name: Mapped[str] = mapped_column(String(255), nullable=False)
+
+    amount: Mapped[int] = mapped_column(
+        BigInteger, nullable=False, doc="стоимость"
+    )
+    created_at: Mapped[datetime.datetime] = mapped_column(
+        DateTime(timezone=True), server_default=func.now(), nullable=False
+    )
+    user_id: Mapped[int] = mapped_column(
+        Integer, ForeignKey("users.id"), nullable=False
+    )
+    category_id: Mapped[int] = mapped_column(
+        Integer, ForeignKey("category.id"), nullable=False
+    )
+
     grams: Mapped[int] = mapped_column(
         BigInteger, nullable=True, doc="для расходов на еду"
     )
@@ -73,21 +90,30 @@ class Payment(AlchemyBaseModel):
         nullable=True,
         doc="для расходов на непродовольственные товары",
     )
+    payment_category: Mapped["Category"] = relationship(
+        back_populates="payments_list",
+    )
+    payment_user: Mapped["User"] = relationship(
+        back_populates="payments_list",
+    )
+
+
+class Income(AlchemyBaseModel):
+    __tablename__ = "income"
+    id: Mapped[int] = mapped_column(Integer, primary_key=True)
+    uuid: Mapped[UUID] = mapped_column(
+        types.UUID, nullable=False, unique=True, default=uuid4
+    )
+    name: Mapped[str] = mapped_column(String(255), nullable=False)
     amount: Mapped[int] = mapped_column(
         BigInteger, nullable=False, doc="стоимость"
     )
     created_at: Mapped[datetime.datetime] = mapped_column(
         DateTime(timezone=True), server_default=func.now(), nullable=False
     )
-    category_id: Mapped[int] = mapped_column(
-        Integer, ForeignKey("category.id"), nullable=False
-    )
     user_id: Mapped[int] = mapped_column(
         Integer, ForeignKey("users.id"), nullable=False
     )
-    payment_category: Mapped["Category"] = relationship(
-        back_populates="payments_list",
-    )
-    payment_user: Mapped["User"] = relationship(
-        back_populates="payments_list",
+    income_user: Mapped["User"] = relationship(
+        back_populates="income_list",
     )

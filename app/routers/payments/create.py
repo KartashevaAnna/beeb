@@ -2,7 +2,7 @@ from dataclasses import Field
 from datetime import datetime
 from typing import Annotated, Optional
 
-import fastapi
+from fastapi import APIRouter
 from fastapi import Depends, Form, Request, status
 from fastapi.responses import RedirectResponse
 
@@ -14,7 +14,7 @@ from app.schemas.payments import PaymentCreate
 from app.settings import SETTINGS, TEMPLATES
 from app.utils.dependencies import categories_repo, payments_repo
 
-create_payments_router = fastapi.APIRouter()
+create_payments_router = APIRouter()
 
 
 @create_payments_router.get(SETTINGS.urls.select_food_non_food)
@@ -29,6 +29,22 @@ def serve_select_food_non_food_template(
         context={
             "create_food": SETTINGS.urls.create_payment_food,
             "create_non_food": SETTINGS.urls.create_payment_non_food,
+        },
+    )
+
+
+@create_payments_router.get(SETTINGS.urls.select_income_expense)
+@authenticate
+def serve_select_income_expense_template(
+    request: Request,
+    user_id: int | None = None,
+):
+    return TEMPLATES.TemplateResponse(
+        request,
+        SETTINGS.templates.select_income_expense,
+        context={
+            "create_income": SETTINGS.urls.create_income,
+            "create_expense": SETTINGS.urls.select_food_non_food,
         },
     )
 

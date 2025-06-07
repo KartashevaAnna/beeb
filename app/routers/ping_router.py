@@ -1,8 +1,8 @@
-import fastapi
+from fastapi import APIRouter
 
 from app.settings import SETTINGS
 
-ping_router = fastapi.APIRouter(tags=["Ping"])
+ping_router = APIRouter(tags=["Ping"])
 
 
 @ping_router.get(SETTINGS.urls.ping)

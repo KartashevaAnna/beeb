@@ -1,6 +1,6 @@
 from typing import Annotated
 
-import fastapi
+from fastapi import APIRouter
 from fastapi import Depends, Form, HTTPException, Request, status
 from fastapi.responses import RedirectResponse
 
@@ -12,7 +12,50 @@ from app.schemas.payments import PaymentUpdate
 from app.settings import SETTINGS, TEMPLATES
 from app.utils.dependencies import categories_repo, payments_repo
 
-update_payment_router = fastapi.APIRouter()
+update_payment_router = APIRouter()
+
+
+@update_payment_router.get(SETTINGS.urls.update_payment)
+@authenticate
+def serve_update_payment_template(
+    payment_id: int,
+    repo: Annotated[PaymentRepo, Depends(payments_repo)],
+    category_repo: Annotated[CategoryRepo, Depends(categories_repo)],
+    request: Request,
+    user_id: int | None = None,
+):
+    try:
+        if not (payment := repo.read(payment_id)):
+            raise HTTPException(status.HTTP_404_NOT_FOUND, "payment not found")
+        return TEMPLATES.TemplateResponse(
+            request,
+            SETTINGS.templates.read_payment,
+            context={
+                "payment": payment,
+                "options": category_repo.get_payments_options(
+                    user_id=user_id, current_option=payment.category
+                ),
+                "form_action": SETTINGS.urls.update_payment_core,
+            },
+        )
+    except HTTPException as exc:
+        return TEMPLATES.TemplateResponse(
+            request,
+            SETTINGS.templates.read_payment,
+            context={
+                "exception": f"Ошибка: {str(exc)}",
+            },
+            status_code=status.HTTP_404_NOT_FOUND,
+        )
+    except Exception as exc:
+        return TEMPLATES.TemplateResponse(
+            request,
+            SETTINGS.templates.read_payment,
+            context={
+                "exception": f"Ошибка: {str(exc)}",
+            },
+            status_code=status.HTTP_501_NOT_IMPLEMENTED,
+        )
 
 
 @update_payment_router.post(SETTINGS.urls.update_payment)
@@ -49,50 +92,6 @@ def update_payment(
                 "exception": exc.detail,
             },
             status_code=exc.status_code,
-        )
-    except Exception as exc:
-        return TEMPLATES.TemplateResponse(
-            request,
-            SETTINGS.templates.read_payment,
-            context={
-                "exception": f"Ошибка: {str(exc)}",
-            },
-            status_code=status.HTTP_501_NOT_IMPLEMENTED,
-        )
-
-
-@update_payment_router.get(SETTINGS.urls.update_payment)
-@authenticate
-def serve_update_payment_template(
-    payment_id: int,
-    repo: Annotated[PaymentRepo, Depends(payments_repo)],
-    category_repo: Annotated[CategoryRepo, Depends(categories_repo)],
-    request: Request,
-    user_id: int | None = None,
-):
-    try:
-        if not (payment := repo.read(payment_id)):
-            raise HTTPException(status.HTTP_404_NOT_FOUND, "payment not found")
-        return TEMPLATES.TemplateResponse(
-            request,
-            SETTINGS.templates.read_payment,
-            context={
-                "payment": payment,
-                "form_disabled": False,
-                "options": category_repo.get_payments_options(
-                    user_id=user_id, current_option=payment.category
-                ),
-                "form_action": SETTINGS.urls.update_payment_core,
-            },
-        )
-    except HTTPException as exc:
-        return TEMPLATES.TemplateResponse(
-            request,
-            SETTINGS.templates.read_payment,
-            context={
-                "exception": f"Ошибка: {str(exc)}",
-            },
-            status_code=status.HTTP_404_NOT_FOUND,
         )
     except Exception as exc:
         return TEMPLATES.TemplateResponse(

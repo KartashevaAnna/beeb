@@ -1,6 +1,6 @@
 from typing import Annotated
 
-import fastapi
+from fastapi import APIRouter
 from fastapi import Depends, Form, Request, status
 from fastapi.responses import RedirectResponse
 
@@ -10,7 +10,7 @@ from app.schemas.users import UserCreate
 from app.settings import SETTINGS, TEMPLATES
 from app.utils.dependencies import get_block_name, user_repo
 
-create_users_router = fastapi.APIRouter()
+create_users_router = APIRouter()
 
 
 @create_users_router.get(SETTINGS.urls.signup)

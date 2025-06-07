@@ -18,7 +18,6 @@ def test_create_user(session, user):
     assert created_user.password_hash_sum == hash_password(
         user_params.get("password")
     )
-    clean_db(session)
 
 
 def test_create_user_duplicate(session, user):
@@ -28,7 +27,6 @@ def test_create_user_duplicate(session, user):
     session.expire_all()
     with pytest.raises(DuplicateNameCreateError):
         UserRepo(session).create(UserCreate(**user_params))
-    clean_db(session)
 
 
 def test_create_user_no_username(session, user):
