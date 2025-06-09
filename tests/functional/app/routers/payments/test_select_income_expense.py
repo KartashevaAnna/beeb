@@ -5,8 +5,7 @@ from app.settings import SETTINGS
 def test_template(client):
     response = client.get(SETTINGS.urls.select_income_expense)
     assert response.status_code == status.HTTP_200_OK
-    assert "Доход" in response.text
-    assert "Расход" in response.text
+    assert response.template.name == "pages/payments/select_income_expense.html"
 
 
 def test_template_no_cookie(client, fill_db):

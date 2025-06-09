@@ -1,8 +1,10 @@
 from copy import deepcopy
 import csv
+import datetime
 import locale
 import os
 import random
+import select
 from typing import Annotated
 from fastapi import APIRouter
 
@@ -10,7 +12,7 @@ from fastapi import Depends
 from pyexcel_odsr import get_data
 from sqlalchemy.orm import Session
 
-from app.models import Payment
+from app.models import Category, Payment
 from app.repositories.categories import CategoryRepo
 from app.repositories.payments import PaymentRepo
 from app.schemas.categories import CategoryCreate
@@ -67,43 +69,3 @@ def create_payments_in_db(
         add_payments_to_db(
             session, category_id=random.choice(category_ids), user_id=user_id
         )
-
-
-@dev_router.post("/upload-payments")
-def upload_payments_from_csv(
-    session: Annotated[Session, Depends(get_session)],
-    category_repo: Annotated[CategoryRepo, Depends(categories_repo)],
-    repo: Annotated[PaymentRepo, Depends(payments_repo)],
-    user_id: int | None = 1,
-):
-    filenames = os.listdir(PAYMENTS_TO_UPLOAD_DIR)
-    for file in filenames:
-        with open(f"{PAYMENTS_TO_UPLOAD_DIR}/{file}", newline="") as f:
-            reader = csv.reader(f)
-            filename = file[:-4]
-            date = get_date_for_database(filename)
-            for row in reader:
-                category_name = row[1].lower()
-                if category_name == "еда":
-                    category_name = "продукты"
-                if len(category_name) != 0:
-                    category = CategoryRepo(session).read_name(
-                        user_id=user_id, category_name=category_name
-                    ) or category_repo.create(
-                        CategoryCreate(
-                            user_id=user_id, name=category_name, is_active=True
-                        ),
-                    )
-                    name = row[0]
-                    amount = get_number_for_db(row[2].replace(",", ""))
-                    payment = Payment(
-                        user_id=user_id,
-                        name=name,
-                        amount=amount,
-                        category_id=category.id,
-                        created_at=date,
-                    )
-                    session.add(payment)
-    session.commit()
-
-    return repo.read_all(user_id)
