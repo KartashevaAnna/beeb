@@ -23,41 +23,40 @@
     <link rel="shortcut icon" href="img/logo.png" type="image/x-icon" />
 </head>
 
-<body>
-{% block body %}
-        {% block bodycontent %}
-        {% endblock %}
-{% endblock %}
-</body>
-<nav class="navbar navbar-expand-lg" style="background-color: #DCDDDF !important;">
-    <div id="navbar" class="container-fluid" style="color:bs-emphasis-color !important;">
-      
-        <a class="navbar-brand align-text-middle" href="/" style="color: var(--bs-emphasis-color) !important;">
-            <img src="/img/logo.png" alt="Logo" width="30" height="30" class="d-inline-block align-text-middle">
-            <b>beeb</b>
-        </a>
-        <ul>
-        {% if not request.path == '/payments' %}
-            <li><a href="/payments">платежи</a></li>
-        {% else %}
-            <li class="active"><a href="/payments">платежи</a></li>
-        {% endif %}
-
-
-        {% if not request.path == '/dashboard' %}
-            <li><a href="/dashboard">статистика</a></li>
-        {% else %}
-            <li class="active"><a href="/dashboard">статистика</a></li>
-        {% endif %}
-
-        
-        {% if not request.path == '/categories' %}
-            <li><a href="/categories">категории</a></li>
-        {% else %}
-            <li class="active"><a href="/categories">категории</a></li>
-        {% endif %}
-        </ul>
-      </div>
-    </div>
+<!-- Здесь нав: меню уровень 0. Приложения: Деньги -->
+<nav>
+  <div class="nav nav-tabs" id="nav-tab-level-0" role="tablist">
+    <button class="nav-link active" id="nav-money-tab" data-bs-toggle="tab" data-bs-target="#nav-money" type="button" role="tab">Деньги</button>
+  </div>
 </nav>
-</html>
+<!-- Здесь дивы уровень 0. Пункты: Деньги  -->
+<div class="tab-content" id="nav-tab-level-0Content">
+  <div class="tab-pane fade show active" id="nav-money" role="tabpanel">
+    <!-- Здесь нав меню уровень 1. Компоненты приложения Деньги: Учёт, Статистика -->
+    <nav>
+        <div class="nav nav-tabs" id="nav-tab-level-1" role="tablist">
+            <button class="nav-link active" id="nav-accounting-tab" data-bs-toggle="tab" data-bs-target="#nav-accounting" type="button" role="tab">Учёт</button>
+            <button class="nav-link" id="nav-dashboard-tab" data-bs-toggle="tab" data-bs-target="#nav-dashboard" type="button" role="tab">Статистика</button>
+        </div>
+    </nav>
+    <!-- Здесь дивы: меню уровень 1. Пункты Учёт, Статистика -->
+    <div class="tab-content" id="nav-tab-level-1Content">
+        <div class="tab-pane fade show active" id="nav-accounting" role="tabpanel">
+            <!-- Здесь нав: меню уровень 2. Пункт: Учёт -->
+            <nav>
+                <div class="nav nav-tabs" id="nav-tab-level-2" role="tablist">
+                    <button class="nav-link active" id="nav-accounting-table-tab" data-bs-toggle="tab" data-bs-target="#nav-accounting-table" type="button" role="tab">Бюджет</button>
+                    <button class="nav-link" id="nav-categories-tab" data-bs-toggle="tab" data-bs-target="#nav-categories" type="button" role="tab">Категории расходов</button>
+                </div>
+            </nav>
+            <!-- Здесь див: меню уровень 2. Пункты: Бюджет, Категории расходов -->
+            <div class="tab-content" id="nav-tab-level-2Content">
+                <div class="tab-pane fade show active" id="nav-accounting-table" role="tabpanel">accounting table page goes here</div>
+                <div class="tab-pane fade" id="nav-categories" role="tabpanel">categories table goes here</div>
+            </div>
+        </div>
+        <!-- Здесь див: меню уровень 1. Пункт: Статистика -->
+        <div class="tab-pane fade" id="nav-dashboard" role="tabpanel">dashboard page here</div>
+    </div>
+  </div>
+</div>
