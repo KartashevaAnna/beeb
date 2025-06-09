@@ -78,6 +78,13 @@ class CategoryRepo:
             else None
         )
 
+    def get_category(self, name: str, user_id: int) -> Category | None:
+        statement = select(Category).where(
+            (Category.name == name) & (Category.user_id == user_id)
+        )
+        results = self.session.execute(statement)
+        return results.scalars().one_or_none()
+
     def read(self, category_id: int) -> Category | None:
         statement = select(Category).where(Category.id == category_id)
         results = self.session.execute(statement)
